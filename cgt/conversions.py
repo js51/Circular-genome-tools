@@ -26,11 +26,9 @@ def signed_permutation_to_cycles(n, signed_permutation):
 	g = list(reversed(list(map(lambda x: -1*x, g)))) + g
 	return S_N(g)
 	
-def signed_cycle_to_unsigned(n, disjoint_cycle_string):
+def signed_cycle_to_unsigned(n, disjoint_cycle_string): # Need to test this
 	ans = []
 	for a in disjoint_cycle_string.split(')('):
 		ans.append((a.strip('(').strip(')')).split(','))
 	solution = []
-	print(ans)
-	
-print(signed_cycle_to_unsigned(2, "(-2,2,3)(-1,1)"))
+	return ans
