@@ -1,0 +1,25 @@
+from cgt import *
+from sage.all_cmdline import *  # import sage library
+
+n = 6
+Sn = SymmetricGroup(n)
+Dn = DihedralGroup(n)
+
+show(Sn.cosets(Dn))
+
+SETS_OF_CLASSES = {
+	frozenset({ d_1*sigma*d_2 for d_1 in Dn for d_2 in Dn}) for sigma in Sn
+}
+SETS_OF_CLASSES_2 = set()
+for sigma in Sn:
+	A = set()
+	B = set()
+	for d_1 in Dn:
+		for d_2 in Dn:
+			A.add(d_1*sigma*d_2)
+			B.add(d_1*sigma.inverse()*d_2)
+	SETS_OF_CLASSES_2.add(frozenset.union(frozenset(A), frozenset(B)))
+
+#show(len(SETS_OF_CLASSES))
+show(len(SETS_OF_CLASSES_2))
+print(list(Dn))
