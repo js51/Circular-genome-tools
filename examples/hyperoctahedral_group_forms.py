@@ -27,6 +27,8 @@ HO_cycles = S_pmn.subgroup([
 	conversions.signed_permutation_to_cycles(n, sigma) for sigma in HO.gens()
 ])
 
+print(S_2n.subgroup(["(3,4)", "(1,2)", "(5,6)(1,3)(2,4)"]).is_isomorphic(DihedralGroup(4)))
+
 ### Hyperoctahedral group as a wreath product
 C2_wr_Sn = gap.WreathProduct(gap.CyclicGroup(2), gap.SymmetricGroup(n)) # Group isomorphic to HO and HO_cycles but in S_{2n}
 

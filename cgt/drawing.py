@@ -1,6 +1,6 @@
 from sage.all_cmdline import *
 
-def draw_genome(n=None, permutation=None, orientation_list=None, save_as_pgf=False, show=True):
+def draw_genome(n=None, permutation=None, orientation_list=None, save_as_pgf=False, show=True, name="genome"):
 	"""Produce a drawing of a circular genome with n regions"""
 	# Imports
 	import matplotlib
@@ -58,7 +58,7 @@ def draw_genome(n=None, permutation=None, orientation_list=None, save_as_pgf=Fal
 	import os
 	if not os.path.exists('output'):
 		os.makedirs('output')
-	plt.savefig('output/genome.png', facecolor='white', transparent=True)
-	plt.savefig('output/genome' + ('.pgf' if save_as_pgf else '.pdf'), facecolor='white', transparent=True)
+	plt.savefig(f'output/{name}.png', facecolor='white', transparent=True)
+	plt.savefig(f'output/{name}' + ('.pgf' if save_as_pgf else '.pdf'), facecolor='white', transparent=True)
 	if show and (not save_as_pgf):
 		plt.show()
