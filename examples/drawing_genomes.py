@@ -12,5 +12,5 @@ permutation = "(1,-4,-3)(-1,4,3)"
 print("Permutation: ", permutation)
 permutation = conversions.cycles_to_signed_permutation(4, permutation)
 print("...in one-row (region->position): ", list(permutation))
-drawing.draw_genome(permutation = list(permutation))
+drawing.draw_genome(permutation = [2,1,5,3,4], oriented=False)
 
