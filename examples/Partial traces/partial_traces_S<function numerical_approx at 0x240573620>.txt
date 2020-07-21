@@ -1,0 +1,4 @@
+<function irreducible_representations.<locals>.representation at 0x24b0280d0>
+dimension 1
+e-values [3]
+partial-traces 

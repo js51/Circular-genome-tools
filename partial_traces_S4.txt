@@ -1,0 +1,30 @@
+Seminormal representation of the symmetric group corresponding to [4]
+dimension 1
+e-values [4]
+partial-traces 
+[8.0]
+[8.0]
+Seminormal representation of the symmetric group corresponding to [3, 1]
+dimension 3
+e-values [0, 2]
+partial-traces 
+[0.0 0.0]
+[0.0 0.0]
+Seminormal representation of the symmetric group corresponding to [2, 2]
+dimension 2
+e-values [-2, 2]
+partial-traces 
+[-4.0  0.0]
+[8.0 0.0]
+Seminormal representation of the symmetric group corresponding to [2, 1, 1]
+dimension 3
+e-values [-2, 0]
+partial-traces 
+[0.0 0.0]
+[0.0 0.0]
+Seminormal representation of the symmetric group corresponding to [1, 1, 1, 1]
+dimension 1
+e-values [-4]
+partial-traces 
+[0.0]
+[0.0]

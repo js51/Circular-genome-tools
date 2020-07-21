@@ -1,0 +1,80 @@
+<function irreducible_representations.<locals>.representation at 0x247d230d0>
+dimension 1
+e-values [3]
+partial-traces 
+[6.0]
+[6.0]
+[6.0]
+[6.0]
+<function irreducible_representations.<locals>.representation at 0x247d23d08>
+dimension 1
+e-values [-3]
+partial-traces 
+[-6.0]
+[-6.0]
+[6.0]
+[6.0]
+<function irreducible_representations.<locals>.representation at 0x247d23d90>
+dimension 1
+e-values [3]
+partial-traces 
+[0.0]
+[0.0]
+[0.0]
+[0.0]
+<function irreducible_representations.<locals>.representation at 0x247d23ea0>
+dimension 1
+e-values [-3]
+partial-traces 
+[0.0]
+[0.0]
+[0.0]
+[0.0]
+<function irreducible_representations.<locals>.representation at 0x247d23f28>
+dimension 2
+e-values [0]
+partial-traces 
+[0.0]
+[0.0]
+[0.0]
+[0.0]
+<function irreducible_representations.<locals>.representation at 0x247d23e18>
+dimension 2
+e-values [0]
+partial-traces 
+[0.0]
+[0.0]
+[0.0]
+[0.0]
+<function irreducible_representations.<locals>.representation at 0x247d57048>
+dimension 3
+e-values [-2, 1]
+partial-traces 
+[0.0 0.0]
+[0.0 0.0]
+[0.0 0.0]
+[0.0 0.0]
+<function irreducible_representations.<locals>.representation at 0x247d570d0>
+dimension 3
+e-values [-1, 2]
+partial-traces 
+[-2.0  0.0]
+[6.0 0.0]
+[-2.0  0.0]
+[6.0 0.0]
+<function irreducible_representations.<locals>.representation at 0x247d57158>
+dimension 3
+e-values [-2, 1]
+partial-traces 
+[0.0 2.0]
+[ 0.0 -6.0]
+[ 0.0 -2.0]
+[0.0 6.0]
+<function irreducible_representations.<locals>.representation at 0x247d57268>
+dimension 3
+e-values [-1, 2]
+partial-traces 
+[0.0 0.0]
+[0.0 0.0]
+[0.0 0.0]
+[0.0 0.0]
