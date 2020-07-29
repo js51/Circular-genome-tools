@@ -1,6 +1,6 @@
 from sage.all_cmdline import *
 
-def draw_genome(n=None, permutation=None, orientation_list=None, save_as_pgf=False, show=True):
+def draw_genome(n=None, permutation=None, orientation_list=None, save_as_pgf=False, show=True, name="genome", oriented=True):
 	"""Produce a drawing of a circular genome with n regions"""
 	# Imports
 	import matplotlib
@@ -37,7 +37,7 @@ def draw_genome(n=None, permutation=None, orientation_list=None, save_as_pgf=Fal
 	fig1, ax1 = plt.subplots(figsize=(2,2))
 	wedges, texts = ax1.pie(segment_sizes, labeldistance=1.2, colors=segment_colors, labels=region_labels, radius=1, startangle=90, wedgeprops={"edgecolor":"0", 'linewidth': 1, 'linestyle': 'solid', 'antialiased': True})
 				
-	if orientation_list:
+	if oriented and orientation_list:
 		for i, p in enumerate(wedges):
 			ang = (p.theta2 - p.theta1)/2. + p.theta1
 			y = np.sin(np.deg2rad(ang))
@@ -56,9 +56,9 @@ def draw_genome(n=None, permutation=None, orientation_list=None, save_as_pgf=Fal
 
 
 	import os
-	if not os.path.exists('output'):
-		os.makedirs('output')
-	plt.savefig('output/genome.png', facecolor='white', transparent=True)
-	plt.savefig('output/genome' + ('.pgf' if save_as_pgf else '.pdf'), facecolor='white', transparent=True)
+	if not os.path.exists('_output'):
+		os.makedirs('_output')
+	plt.savefig(f'_output/{name}.png', facecolor='white', transparent=True)
+	plt.savefig(f'_output/{name}' + ('.pgf' if save_as_pgf else '.pdf'), facecolor='white', transparent=True)
 	if show and (not save_as_pgf):
 		plt.show()

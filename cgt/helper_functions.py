@@ -7,3 +7,6 @@ def rotation_permutation(n):
 	positive = tuple(i for i in range(1,n+1))
 	negative = tuple(-i for i in positive)
 	return str(positive) + str(negative)
+	
+def signed_inversion(of_positions = (1,2)):
+	return "not done yet, will return a signed inversion in cycles form"
