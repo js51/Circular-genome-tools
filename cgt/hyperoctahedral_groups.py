@@ -64,7 +64,7 @@ def EquivalenceClasses(G, n=None, write_to_file_named=None):
 		T = T.union(Set([g.inverse() for g in T]))
 		H_n_elements = H_n_elements.difference(T)
 		perms=[conversions.cycles_to_signed_permutation(n, str(g)) for g in T]
-		#perms=sorted(perms)
+		perms = sorted(perms, key = lambda perm : str(perm).replace('-', 'Z'))
 		cards.append((perms[0],len(perms)))
 		if write_to_file_named != None:
 			sdreps.write(str(perms[0]))
