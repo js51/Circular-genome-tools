@@ -21,6 +21,6 @@ def irreducible_representations(n, signed=False):
 			irrep = gap.IrreducibleAffordingRepresentation(character)
 			def representation(sigma, as_gap_matrix=False, _irrep=irrep):	
 				image = gap.Image(_irrep, sigma)
-				return image if as_gap_matrix else matrix(CDF, image)
+				return image if as_gap_matrix else matrix(UniversalCyclotomicField(), image)
 			representations.append(representation)
 		return representations
