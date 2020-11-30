@@ -9,7 +9,7 @@ class MODEL(Enum):
 	TWO_REGION_INVERSIONS 			= auto()
 
 def model(G, n, signed=True, model_type = MODEL.ONE_AND_TWO_REGION_INVERSIONS):
-	print("WARNING: only working for subgroups of sage 'SymmetricGroup' G (signed or unsigned)")
+	# print("WARNING: only working for subgroups of sage 'SymmetricGroup' G (signed or unsigned)")
 	if model_type == MODEL.TWO_REGION_INVERSIONS:
 		return set(sorted(__all_inversions_model(G, n, signed, num_regions = 2)))
 	elif model_type == MODEL.ONE_AND_TWO_REGION_INVERSIONS:
