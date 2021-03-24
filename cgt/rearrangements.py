@@ -1,5 +1,5 @@
 from sage.all_cmdline import *
-from cgt import hyperoctahedral_groups
+from cgt import hyperoctahedral_groups, conversions
 import numpy as np
 import itertools
 
@@ -16,15 +16,23 @@ def c_range(x,y,n,G):
 		yield i
 		i = c(i)
 
-def to_pos_paradigm(block_graph, blocks, G):
-	# Position paradigm (for num regions n):	
+def rearrangements_with_k_cuts(k,n):
+	N = (i for i in range(1,n+1))
+	for pattern in itertools.combinations(N,k):
+		yield from rearrangements_with_cuts_set(pattern, n)
+		
+def to_pos_paradigm(block_graph, blocks, cuts_set, G):
+	H_c = hyperoctahedral_groups.HyperoctahedralGroup(n)
+	H = hyperoctahedral_groups.HyperoctahedralGroup(n, hyperoctahedral_groups.SET.ONE_ROW)
+	D = hyperoctahedral_groups.DihedralSubgroup(H_c, n)
 	perm = []
-	for b in block_graph[::2]: #every second element
+	c = c_permutation(max(max(blocks)), G)
+	for b in block_graph[1::2]: #every second element
 		if b>0:
 			perm += list(blocks[b-1])
 		elif b<0:
 			perm += list(reversed(list(-x for x in blocks[-b-1])))
-	return G(str(tuple(perm)) + str(tuple(reversed(list(-p for p in perm)))))
+	return perm
 
 def rearrangements_with_cuts_set(cuts_set, n):
 	pmN = list(range(-n, 0)) + list(range(1, n+1))	# The set {+-1, ..., +-n}
@@ -33,8 +41,13 @@ def rearrangements_with_cuts_set(cuts_set, n):
 	c = c_permutation(n, S_pmn)
 	cs = cuts_set
 	for i in range(len(cs)):
-		blocks.append(tuple(j for j in c_range(c(cs[i]), cs[(i+1)%len(cs)]+1, n, S_pmn)))
+		blocks.append(tuple(j for j in c_range(c(cs[i]), c(cs[(i+1)%len(cs)]), n, S_pmn)))
 	m = len(blocks)
+	for b in blocks:
+		if 2 in b:
+			ind = blocks.index(b)
+	blocks = blocks[ind:] + blocks[:ind]
+	print(f"cuts set {cs} leads to blocks {blocks}")
 	pmM = list(range(-m, 0)) + list(range(1, m+1))	# The set {+-1, ..., +-n}
 	S_pmm = SymmetricGroup(pmM)
 	nat_ord = S_pmm(sum(((-i,i) for i in range(1,m+1)), tuple()))
@@ -46,7 +59,8 @@ def rearrangements_with_cuts_set(cuts_set, n):
 					perm_copy = perm.copy()
 					perm_copy += [option, -option]
 					if len(perm_copy) == 2*m:
-						yield to_pos_paradigm(perm_copy, blocks, S_pmn)
+						print(perm_copy)
+						yield to_pos_paradigm(perm_copy, blocks, cuts_set, S_pmn)
 					else:
 						yield from _next_block(perm_copy)
 	yield from _next_block(perm)
@@ -69,6 +83,32 @@ def rearrangements_with_cuts_set(cuts_set, n):
 	# Convert to position paradigm.
 		
 	
+n=6
+pmN = list(range(-n, 0)) + list(range(1, n+1))	# The set {+-1, ..., +-n}
+S_pmn = SymmetricGroup(pmN)
 
-cs = [1,2,3,4,5]
-print(len(list(rearrangements_with_cuts_set(cs, 1000))))
+def cuts(sigma):
+	c = c_permutation(n, S_pmn)
+	sigma = list(sigma)
+	return set([ 
+		tuple(([i+1,c(i+1)])) for i in range(len(sigma)) 
+		if (sigma[c(i + 1)-1] != c(sigma[i]))
+	])
+
+
+cs = [1,3,4]
+rearrangements = list(rearrangements_with_cuts_set(cs,n))
+print([cuts(a) for a in rearrangements])
+
+rearrangements = list(rearrangements_with_k_cuts(3, n))
+H = hyperoctahedral_groups.HyperoctahedralGroup(n)
+D = hyperoctahedral_groups.DihedralSubgroup(H, n)
+rearrangements_cycles = [H(conversions.signed_permutation_to_cycles(n, a)) for a in rearrangements]
+
+
+rearrangements_cycles = {a for a in list(H) if len(cuts(conversions.cycles_to_signed_permutation(n, a))) == 3}
+cosets = {
+	frozenset([d_1*a*d_2 for d_1 in D for d_2 in D]) for a in rearrangements_cycles
+}
+for coset in cosets:
+	print({frozenset(cuts(conversions.cycles_to_signed_permutation(n, x))) for x in coset})
