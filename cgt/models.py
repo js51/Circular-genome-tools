@@ -18,7 +18,7 @@ def css(cuts_set):
 		if len(string) != len(cuts_set): print("something went very wrong here...")
 		return string
 
-def cuts(sigma):
+def cuts(sigma, n):
 	pmN = list(range(-n, 0)) + list(range(1, n+1))	# The set {+-1, ..., +-n}
 	S_pmn = SymmetricGroup(pmN)
 	c_string = f'({",".join(str(i) for i in list(range(1, n+1)))})({",".join(str(i) for i in list(range(-n, 0)))})'
