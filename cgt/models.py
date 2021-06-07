@@ -20,7 +20,7 @@ def css(cuts_set):
 
 def cuts(sigma, n):
 	pmN = list(range(-n, 0)) + list(range(1, n+1))	# The set {+-1, ..., +-n}
-	S_pmn = SymmetricGroup(pmN)
+	G = SymmetricGroup(pmN)
 	c_string = f'({",".join(str(i) for i in list(range(1, n+1)))})({",".join(str(i) for i in list(range(-n, 0)))})'
 	c = G(c_string)
 	sigma = list(sigma)
