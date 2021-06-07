@@ -82,7 +82,7 @@ def rearrangements_with_cuts_set(cuts_set, n):
 	# 	Choose a following block (if current one is not inverted, choose a non-adjacent one)
 	# Convert to position paradigm.
 		
-	
+'''	
 n=6
 pmN = list(range(-n, 0)) + list(range(1, n+1))	# The set {+-1, ..., +-n}
 S_pmn = SymmetricGroup(pmN)
@@ -112,3 +112,4 @@ cosets = {
 }
 for coset in cosets:
 	print({frozenset(cuts(conversions.cycles_to_signed_permutation(n, x))) for x in coset})
+'''
