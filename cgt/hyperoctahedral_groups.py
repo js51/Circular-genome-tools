@@ -63,11 +63,11 @@ def EquivalenceClasses(G, n=None, classes_as="counts", sorted=False):
 		H_n_elements = H_n_elements.difference(T)
 		perms=[conversions.cycles_to_signed_permutation(n, str(g)) for g in T]
 		perms = sorted(perms, key = lambda perm : str(perm).replace('-', 'Z'))
-		if classes_as = 'counts':
+		if classes_as == 'counts':
 			cards.append((perms[0],len(perms)))
-		elif classes_as = 'lists':
+		elif classes_as == 'lists':
 			cards.append(perms)
-		elif classes_as = 'dict':
+		elif classes_as == 'dict':
 			cards[perms[0]] = perms
 	if sorted and classes_as != 'dict':
 		cards = sorted(perms, key = lambda perm : str(perm[0]).replace('-', 'Z'))
