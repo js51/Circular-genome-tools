@@ -62,7 +62,7 @@ def EquivalenceClasses(G, n=None, classes_as="counts", sort_classes=False):
 		T = T.union(Set([g.inverse() for g in T]))
 		H_n_elements = H_n_elements.difference(T)
 		perms=[conversions.cycles_to_signed_permutation(n, str(g)) for g in T]
-		perms = sorted(perms, key = lambda perm : str(perm).replace('-', 'Z'))
+		perms = sorted(perms, key = lambda perm : str(perm).replace('-', 'Z')) # always sort these. Why not!?
 		if classes_as == 'counts':
 			cards.append((perms[0],len(perms)))
 		elif classes_as == 'lists':
@@ -70,5 +70,5 @@ def EquivalenceClasses(G, n=None, classes_as="counts", sort_classes=False):
 		elif classes_as == 'dict':
 			cards[perms[0]] = perms
 	if sort_classes and classes_as != 'dict':
-		cards = sorted(perms, key = lambda perm : str(perm[0]).replace('-', 'Z'))
+		cards = sorted(cards, key = lambda card : str(card[0]).replace('-', 'Z'))
 	return cards
