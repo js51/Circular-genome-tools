@@ -47,7 +47,7 @@ def DihedralSubgroup(G, n=None):
 		return DihedralGroup(n)
 		
 
-def EquivalenceClasses(G, n=None, classes_as="counts", sorted=False):
+def EquivalenceClasses(G, n=None, classes_as="counts", sort_classes=False):
 	'''Example use: EquivalenceClasses(HyperoctahedralGroup(5, as_set_of=SET.SIGNED_CYCLES))'''
 	H_n = G
 	try:
@@ -69,6 +69,6 @@ def EquivalenceClasses(G, n=None, classes_as="counts", sorted=False):
 			cards.append(perms)
 		elif classes_as == 'dict':
 			cards[perms[0]] = perms
-	if sorted and classes_as != 'dict':
+	if sort_classes and classes_as != 'dict':
 		cards = sorted(perms, key = lambda perm : str(perm[0]).replace('-', 'Z'))
 	return cards
