@@ -47,7 +47,7 @@ def DihedralSubgroup(G, n=None):
 		return DihedralGroup(n)
 		
 
-def EquivalenceClasses(G, n=None, write_to_file_named=None):
+def EquivalenceClasses(G, n=None, classes_as="counts", sorted=False):
 	'''Example use: EquivalenceClasses(HyperoctahedralGroup(5, as_set_of=SET.SIGNED_CYCLES))'''
 	H_n = G
 	try:
@@ -55,9 +55,7 @@ def EquivalenceClasses(G, n=None, write_to_file_named=None):
 	except:
 		print("Assuming group is S_n")
 	D_n = DihedralSubgroup(H_n, n)
-	cards=[]
-	if write_to_file_named != None:
-		sdreps = open('_output/genomes_H'+str(n)+'.txt','w')
+	cards = {} if classes_as == 'dict' else []
 	H_n_elements = Set(H_n)
 	while H_n_elements.cardinality()>0:
 		T = Set([d_1*H_n_elements[0]*d_2 for d_1 in D_n for d_2 in D_n])
@@ -65,11 +63,12 @@ def EquivalenceClasses(G, n=None, write_to_file_named=None):
 		H_n_elements = H_n_elements.difference(T)
 		perms=[conversions.cycles_to_signed_permutation(n, str(g)) for g in T]
 		perms = sorted(perms, key = lambda perm : str(perm).replace('-', 'Z'))
-		cards.append((perms[0],len(perms)))
-		if write_to_file_named != None:
-			sdreps.write(str(perms[0]))
-			sdreps.write(str('\n'))
-	if write_to_file_named != None:
-		sdreps.close()
-	else:
-		return cards
+		if classes_as = 'counts':
+			cards.append((perms[0],len(perms)))
+		elif classes_as = 'lists':
+			cards.append(perms)
+		elif classes_as = 'dict':
+			cards[perms[0]] = perms
+	if sorted and classes_as != 'dict':
+		cards = sorted(perms, key = lambda perm : str(perm[0]).replace('-', 'Z'))
+	return cards
