@@ -47,7 +47,7 @@ def DihedralSubgroup(G, n=None):
 		return DihedralGroup(n)
 		
 
-def EquivalenceClasses(G, n=None, classes_as="counts", sort_classes=False):
+def EquivalenceClasses(G, n=None, classes='double-cosets-and-inverses', classes_as="counts", sort_classes=False):
 	'''Example use: EquivalenceClasses(HyperoctahedralGroup(5, as_set_of=SET.SIGNED_CYCLES))'''
 	H_n = G
 	try:
@@ -58,8 +58,13 @@ def EquivalenceClasses(G, n=None, classes_as="counts", sort_classes=False):
 	cards = {} if classes_as == 'dict' else []
 	H_n_elements = Set(H_n)
 	while H_n_elements.cardinality()>0:
-		T = Set([d_1*H_n_elements[0]*d_2 for d_1 in D_n for d_2 in D_n])
-		T = T.union(Set([g.inverse() for g in T]))
+		if classes == 'genomes':
+			T = Set([H_n_elements[0]*d for d in D_n])
+		if classes == 'double-cosets':
+			T = Set([d_1*H_n_elements[0]*d_2 for d_1 in D_n for d_2 in D_n])
+		elif classes == 'double-cosets-and-inverses':
+			T = Set([d_1*H_n_elements[0]*d_2 for d_1 in D_n for d_2 in D_n])
+			T = T.union(Set([g.inverse() for g in T]))
 		H_n_elements = H_n_elements.difference(T)
 		perms=[conversions.cycles_to_signed_permutation(n, str(g)) for g in T]
 		perms = sorted(perms, key = lambda perm : str(perm).replace('-', 'Z')) # always sort these. Why not!?
