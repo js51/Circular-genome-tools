@@ -37,7 +37,7 @@ def model(G, n, signed=True, model_type = MODEL.ONE_AND_TWO_REGION_INVERSIONS):
 	elif model_type == MODEL.ONE_AND_TWO_REGION_INVERSIONS:
 		return set(sorted(__all_inversions_model(G, n, signed, num_regions = 1) + __all_inversions_model(G, n, signed, num_regions = 2)))
 	elif model_type == MODEL.ALL_INVERSIONS:
-		
+		return set(sorted(__all_inversions_model(G, n, signed)))
 
 def __all_inversions_model(G, n, signed, num_regions='any'):
 	if num_regions == 1:
