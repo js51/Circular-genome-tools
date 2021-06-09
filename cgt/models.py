@@ -56,7 +56,7 @@ def __all_inversions_model(G, n, signed, num_regions='any'):
 			for permutation in G:
 				if set(permutation.cycle_type()) == {1,2} and cuts(conversions.cycles_to_signed_permutation(n, permutation), n) == 2:
 					M.append(permutation)
-			return permutation
+			return M
 		else:
 			return 'not yet implemented'
 		
