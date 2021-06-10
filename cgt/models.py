@@ -8,6 +8,7 @@ class MODEL(Enum):
 	ONE_AND_TWO_REGION_INVERSIONS 						= auto()
 	TWO_REGION_INVERSIONS 								= auto()
 	ALL_INVERSIONS										= auto()
+	ALL_INVERSIONS_HALF_CIRCLE							= auto()
 	SHORT_INVERSIONS_AND_ONE_REGION_SWAPS				= auto()
 
 # TODO: add the cuts function here, enable creation of more models
@@ -39,6 +40,8 @@ def model(G, n, signed=True, model_type = MODEL.ONE_AND_TWO_REGION_INVERSIONS):
 		return set(sorted(__all_inversions_model(G, n, signed, num_regions = 1) + __all_inversions_model(G, n, signed, num_regions = 2)))
 	elif model_type == MODEL.ALL_INVERSIONS:
 		return set(sorted(__all_inversions_model(G, n, signed)))
+	elif model_type == MODEL.ALL_INVERSIONS_HALF_CIRCLE:
+		return set(sorted(__all_inversions_model(G, n, signed, num_regions='half-circle')))
 	elif model_type == MODEL.SHORT_INVERSIONS_AND_ONE_REGION_SWAPS:
 		return set(sorted(list(model(G, n, signed=signed, model_type=MODEL.ONE_AND_TWO_REGION_INVERSIONS)) + __one_region_adjacent_transpositions(G, n, signed)))
 
