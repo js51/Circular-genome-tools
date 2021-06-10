@@ -79,4 +79,4 @@ def __all_inversions_model(G, n, signed, num_regions='any'):
 def __one_region_adjacent_transpositions(G, n, signed):
 	D = hyperoctahedral_groups.DihedralSubgroup(G, n=n)
 	generators = { G('(-2,-1)(1,2)'), G('(-2,1,2,-1)'), G('(-2,-1,2,1)'), G('(-2,2)(-1,1)') }
-	return { d.inverse() * a * d for a in generators for d in D }
+	return list({ d.inverse() * a * d for a in generators for d in D })
