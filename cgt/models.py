@@ -70,7 +70,7 @@ def __all_inversions_model(G, n, signed, num_regions='any'):
 			M = []
 			for permutation in G:
 				cycle_type = permutation.cycle_type()
-				if set(cycle_type) == {1,2} and cycle_type.count(2) <= n/2 and len(cuts(conversions.cycles_to_signed_permutation(n, permutation), n)) == 2:
+				if set(cycle_type) == {1,2} and list(cycle_type).count(2) <= n/2 and len(cuts(conversions.cycles_to_signed_permutation(n, permutation), n)) == 2:
 					M.append(permutation)
 			return M
 		else:
