@@ -47,14 +47,17 @@ def DihedralSubgroup(G, n=None):
 		return DihedralGroup(n)
 		
 
-def EquivalenceClasses(G, n=None, classes='double-cosets-and-inverses', classes_as="counts", sort_classes=False):
+def EquivalenceClasses(G, n=None, symmetry_group='dihedral', classes='double-cosets-and-inverses', classes_as="counts", sort_classes=False):
 	'''Example use: EquivalenceClasses(HyperoctahedralGroup(5, as_set_of=SET.SIGNED_CYCLES))'''
 	H_n = G
 	try:
 		n = H_n._n
 	except:
 		print("Assuming group is S_n")
-	D_n = DihedralSubgroup(H_n, n)
+	if symmetry_group == 'dihedral':
+		D_n = DihedralSubgroup(H_n, n)
+	else:
+		D_n = symmetry_group
 	cards = {} if classes_as == 'dict' else []
 	H_n_elements = Set(H_n)
 	while H_n_elements.cardinality()>0:
