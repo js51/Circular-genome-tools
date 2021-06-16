@@ -24,3 +24,8 @@ def irreducible_representations(n, signed=False):
 				return image if as_gap_matrix else matrix(UniversalCyclotomicField(), image)
 			representations.append(representation)
 		return representations
+
+
+
+
+
