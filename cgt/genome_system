@@ -1,5 +1,4 @@
 from cgt.hyperoctahedral_groups import HyperoctahedralGroup
-from sage.rings.complex_field import CDF
 from enum import Enum, auto
 
 class SYMMETRY(Enum):
@@ -95,6 +94,7 @@ class GenomeSystem:
         if self.oriented:
             negative = tuple(-i for i in positive)
             string += str(negative)
+        string = string.replace(',)', ')')
         return self.genome_group()(string)
 
     def make_inversion(self, a, b):
