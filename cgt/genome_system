@@ -1,0 +1,101 @@
+from cgt.hyperoctahedral_groups import HyperoctahedralGroup
+from sage.rings.complex_field import CDF
+from enum import Enum, auto
+
+class SYMMETRY(Enum):
+    circular    = auto()
+    linear      = auto()
+
+class MODEL(Enum):
+    ONE_REGION_INVERSIONS   = auto()
+    TWO_REGION_INVERSIONS 	= auto()
+    ALL_INVERSIONS          = auto()
+    ONE_REGION_SWAPS		= auto()
+
+class GenomeSystem:
+    def __init__(self, num_regions, oriented, symmetry):
+        self.n = num_regions
+        self.oriented = oriented
+        self.symmetry = symmetry
+
+    def __str__(self):
+        string = f"{str(self.symmetry).replace('SYMMETRY.', '')} genomes"
+        string += f" with {self.n}{' oriented' if self.oriented else ''} regions"
+        return string
+
+    def __call__(self, x):
+        if x in self.genome_group():
+            return self.genome_group()(x)
+        elif x in self.symmetry_group:
+            return self.symmetry_group()(x)
+        else:
+            return self.group_algebra()(x)
+
+    def genome_group(self):
+        try:
+            return self.G
+        except AttributeError:
+            if self.oriented:
+                self.G = HyperoctahedralGroup(self.n)
+            else:
+                self.G = SymmetricGroup(self.n)
+        return self.G
+
+    def symmetry_group(self):
+        try:
+            return self.Z
+        except AttributeError:
+            if self.symmetry == SYMMETRY.circular:
+                gens = [self.standard_reflection(), self.standard_rotation()]
+            if self.symmetry == SYMMETRY.linear:
+                gens = [self.standard_reflection()]
+            self.Z = self.G.subgroup(gens)
+        return self.Z
+    
+    def group_algebra(self):
+        try:
+            return self.CG
+        except AttributeError:
+            self.GA = self.genome_group().algebra(CDF)
+        return self.GA
+        
+    def symmetry_element(self):
+        try:
+            return self.z
+        except AttributeError:
+            self.z = 1/self.symmetry_group().order() * sum(self.group_algebra()(d) for d in self.symmetry_group())
+        return self.z
+
+    def set_model(self):
+        raise(NotImplementedError())
+    
+    def num_genomes(self):
+        return self.genome_group().order()/self.symmetry_group().order()
+    
+    def num_rearrangements(self):
+        raise(NotImplementedError())
+
+    def standard_reflection(self):
+        if self.oriented:
+            string = f'({1},-{self.n})({self.n},-{1})'
+            for i in range(1, int(self.n/2)):
+                string += f'({i+1}, -{self.n-(i-1)-1})({self.n-(i-1)-1}, -{i+1})'
+            if self.n % 2 != 0:
+                mid = int(self.n/2) + 1
+                string += f'({mid},-{mid})'
+        else:
+            string = f'(1,{self.n})'
+            for i in range(1, int(self.n/2)):
+                string += f'({i+1},{self.n-(i-1)-1})'
+        return self.genome_group()(string)
+        
+    def standard_rotation(self):
+        positive = tuple(i for i in range(1,self.n+1))
+        string = str(positive)
+        if self.oriented:
+            negative = tuple(-i for i in positive)
+            string += str(negative)
+        return self.genome_group()(string)
+
+    def make_inversion(self, a, b):
+        raise(NotImplementedError())
