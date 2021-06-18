@@ -1,3 +1,4 @@
+from sage.all_cmdline import *
 from enum import Enum, auto
 import numpy as np
 
