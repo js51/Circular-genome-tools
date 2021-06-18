@@ -12,7 +12,7 @@ setuptools.setup(
     version= readfile("VERSION").strip(),
     author="Joshua Stevenson",
     author_email="joshua.stevenson@utas.edu.au",
-    description="Tools for representing circular genomes in sage",
+    description="Tools for representing genomes in sage",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/js51/Circular-genome-tools",
@@ -22,5 +22,5 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=2',
+    python_requires='>=3.7',
 )
