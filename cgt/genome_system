@@ -45,6 +45,9 @@ class GenomeSystem:
         else:
             return self.group_algebra()(x)
 
+    def __repr__(self):
+        return self.__str__()
+
     def genome_group(self):
         try:
             return self.G
@@ -118,7 +121,7 @@ class GenomeSystem:
             if self.oriented:
                 row = SignedPermutations(self.n)(row)
             else:
-                row = Permutations(self.n)
+                row = Permutations(self.n)(row)
         return row
 
     def make_inversion(self, a, b):
