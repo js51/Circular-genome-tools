@@ -1,15 +1,30 @@
-from cgt.hyperoctahedral_groups import HyperoctahedralGroup
 from enum import Enum, auto
 
 class SYMMETRY(Enum):
+    # Circular genomes
     circular    = auto()
+    dihedral    = circular
+    D_n         = circular
+    # Linear genomes
     linear      = auto()
+    S_2         = linear
+    C_2         = linear
 
 class MODEL(Enum):
     ONE_REGION_INVERSIONS   = auto()
     TWO_REGION_INVERSIONS 	= auto()
     ALL_INVERSIONS          = auto()
     ONE_REGION_SWAPS		= auto()
+
+def HyperoctahedralGroup(n):
+    pmn = tuple(range(1,n+1)) + tuple(range(-n, 0))
+    s_pmn = SymmetricGroup(pmn)
+    if n==1: return s_pmn
+    h_gens = [
+        s_pmn([(1,2),(-1,-2)]),
+        s_pmn(tuple(range(1,n+1)) + tuple(range(-1, -(n+1), -1)))
+    ]
+    return s_pmn.subgroup(h_gens)
 
 class GenomeSystem:
     def __init__(self, num_regions, oriented, symmetry):
@@ -96,6 +111,15 @@ class GenomeSystem:
             string += str(negative)
         string = string.replace(',)', ')')
         return self.genome_group()(string)
+
+    def one_row(self, element, as_list=False):
+        row = list(element.dict().values())[0:self.n]
+        if not as_list:
+            if self.oriented:
+                row = SignedPermutations(self.n)(row)
+            else:
+                row = Permutations(self.n)
+        return row
 
     def make_inversion(self, a, b):
         raise(NotImplementedError())
