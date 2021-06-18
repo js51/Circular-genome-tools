@@ -89,7 +89,6 @@ class PositionParadigmFramework:
         else:
             raise ValueError("Invalid data for constructing a permutation")
 
-        
     def one_row(self, element, as_list=False):
         """Return a given genome instance in one-row notation.
 
@@ -160,7 +159,7 @@ class PositionParadigmFramework:
         """Return the number of distinct genomes up to symmetries."""
         return self.genome_group().order()/self.symmetry_group().order()
     
-    def sort_key(self, one_row_perm):
+    def __sort_key(self, one_row_perm):
         return str(one_row_perm).replace('-', 'Z')
 
     def genomes(self, format=FORMAT.dictionary, sort_genomes=True):
@@ -172,23 +171,21 @@ class PositionParadigmFramework:
             instance = instances.pop()
             coset = set(instance*d for d in self.symmetry_group())
             instances -= coset
-            coset = sorted([self.one_row(g) for g in coset], key=self.sort_key)
+            coset = sorted([self.one_row(g) for g in coset], key=self.__sort_key)
             genomes[coset[0]] = coset
         if format == FORMAT.formal_sum:
             Z = self.symmetry_group()
             A = self.group_algebra()
             genomes = { rep : sum(1/Z.order()*A(self.cycles(dx)) for dx in coset) for rep, coset in genomes.items() }
         if sort_genomes:
-            genomes = dict(sorted(genomes.items(), key=lambda x: self.sort_key(x[0])))
+            genomes = dict(sorted(genomes.items(), key=lambda x: self.__sort_key(x[0])))
         return genomes
 
     def num_rearrangements(self):
         raise(NotImplementedError())
 
     def standard_reflection(self):
-        """Return a permutation which reflects a genome instance about the center region (n odd), or 
-        the center two regions (n even).
-        """
+        """Return a permutation which reflects a genome instance about the center region (n odd), or the center two regions (n even)."""
         if self.oriented:
             string = f'({1},-{self.n})({self.n},-{1})'
             for i in range(1, int(self.n/2)):
@@ -225,3 +222,23 @@ class PositionParadigmFramework:
 
     def make_inversion(self, a, b):
         raise(NotImplementedError())
+
+    def irreps(self):
+        """Return a complete list of pairwise irreducible representations of the genome group."""
+        try:
+            return self.irreducible_representations
+        except AttributeError:
+            representations = []
+        if not self.oriented:
+            for irrep in SymmetricGroupRepresentations(self.n):
+                def representation(sigma, _irrep=irrep):
+                    return matrix(UniversalCyclotomicField(), _irrep(sigma))
+                representations.append(representation)
+        else:
+            for character in gap.Irr(self.genome_group()):
+                irrep = gap.IrreducibleAffordingRepresentation(character)
+                def representation(sigma, as_gap_matrix=False, _irrep=irrep):	
+                    return image if as_gap_matrix else matrix(UniversalCyclotomicField(), gap.Image(_irrep, sigma))
+                representations.append(representation)
+        self.irreducible_representations = representations
+        return representations
