@@ -4,13 +4,13 @@ import numpy as np
 
 class SYMMETRY(Enum):
     # Circular genomes
-    circular    = auto()
-    dihedral    = circular
-    D_n         = circular
+    circular   = auto()
+    dihedral   = circular
+    D_n        = circular
     # Linear genomes
-    linear      = auto()
-    S_2         = linear
-    C_2         = linear
+    linear     = auto()
+    S_2        = linear
+    C_2        = linear
 
 class MODEL(Enum):
     pass
@@ -22,10 +22,10 @@ class TYPE(Enum):
     signed_pos_to_reg = auto()
 
 class FORMAT(Enum):
-    formal_sum      = auto()
-    equiv_classes   = auto()
-    dictionary      = auto()
-    only_reps       = auto()
+    formal_sum     = auto()
+    equiv_classes  = auto()
+    dictionary     = auto()
+    only_reps      = auto()
 
 def HyperoctahedralGroup(n):
     pmn = tuple(range(1,n+1)) + tuple(range(-n, 0))

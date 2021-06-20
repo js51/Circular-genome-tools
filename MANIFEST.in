@@ -3,4 +3,4 @@ include *.md
 include *.txt
 include LICENSE
 include VERSION
-
+include *.py

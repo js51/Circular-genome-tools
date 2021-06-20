@@ -1,6 +1,5 @@
 from sage.all_cmdline import *
-from cgt import hyperoctahedral_groups
-import numpy as np
+from . import hyperoctahedral_groups
 
 def regular_representation(G, g): 
 	"""regular representation """

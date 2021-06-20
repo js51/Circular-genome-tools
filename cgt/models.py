@@ -2,7 +2,8 @@
 
 from enum import Enum, auto
 from sage.all_cmdline import *
-from cgt import conversions, helper_functions, hyperoctahedral_groups
+from . import conversions
+from . import hyperoctahedral_groups
 
 class MODEL(Enum):
 	ONE_AND_TWO_REGION_INVERSIONS 						= auto()

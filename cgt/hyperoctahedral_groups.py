@@ -1,6 +1,7 @@
 from enum import Enum, auto
 from sage.all_cmdline import *
-from cgt import conversions, helper_functions
+from . import conversions
+from . import helper_functions
 
 class SET(Enum):
 	SIGNED_CYCLES 	= auto()
