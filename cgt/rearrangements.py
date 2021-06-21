@@ -1,5 +1,6 @@
 from sage.all_cmdline import *
 from . import hyperoctahedral_groups
+from .enums import *
 import itertools
 
 def c_permutation(n, G):

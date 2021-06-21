@@ -1,5 +1,6 @@
 from sage.all_cmdline import *
 from . import hyperoctahedral_groups
+from .enums import *
 
 def regular_representation(G, g): 
 	"""regular representation """

@@ -1,31 +1,7 @@
 from sage.all_cmdline import *
-from enum import Enum, auto
+from .enums import *
 import numpy as np
-
-class SYMMETRY(Enum):
-    # Circular genomes
-    circular   = auto()
-    dihedral   = circular
-    D_n        = circular
-    # Linear genomes
-    linear     = auto()
-    S_2        = linear
-    C_2        = linear
-
-class MODEL(Enum):
-    pass
-
-class TYPE(Enum):
-    reg_to_signed_pos = auto()
-    pos_to_signed_reg = auto()
-    signed_reg_to_pos = auto()
-    signed_pos_to_reg = auto()
-
-class FORMAT(Enum):
-    formal_sum     = auto()
-    equiv_classes  = auto()
-    dictionary     = auto()
-    only_reps      = auto()
+from copy import deepcopy
 
 def HyperoctahedralGroup(n):
     pmn = tuple(range(1,n+1)) + tuple(range(-n, 0))
@@ -122,6 +98,28 @@ class PositionParadigmFramework:
                 self.G = SymmetricGroup(self.n)
         return self.G
 
+    def canonical_instance(self, instance):
+        """Return the 'canonical' instance of the genome represented by the permutation if there is one."""
+        instance = deepcopy(self.one_row(self(instance)))
+        if self.symmetry in {SYMMETRY.circular, SYMMETRY.linear}:
+            f = self.one_row(self.standard_reflection())
+            if list(instance)[0] < 0:
+                instance = instance*f
+            if self.symmetry is SYMMETRY.circular:
+                r = self.one_row(self.standard_rotation())
+                instance = instance*(r**((self.n-list(instance)[0]+1)%self.n))
+            return instance
+        else:
+            raise NotImplementedError("No canonical form exists in the current framework")
+
+    def random_instance(self, genome=None):
+        """Return a random permutation corresponding to a given genome, or a random genome if none is given."""
+        if genome:
+            raise NotImplementedError("Not yet implemented")
+        else:
+            return self.genome_group().random_element()
+    random = random_instance
+
     def symmetry_group(self):
         """Return the symmetry group of the genomes."""
         try:
@@ -162,6 +160,13 @@ class PositionParadigmFramework:
     def __sort_key(self, one_row_perm):
         return str(one_row_perm).replace('-', 'Z')
 
+    def __genome_coset(self, instance):
+        coset = set(instance*d for d in self.symmetry_group())
+        return sorted([self.one_row(g) for g in coset], key=self.__sort_key)
+
+    def genome(self, instance):
+        return self.__genome_coset(instance)
+
     def genomes(self, format=FORMAT.dictionary, sort_genomes=True):
         if format not in {FORMAT.dictionary, FORMAT.formal_sum}:
             raise NotImplementedError("Not yet implemented! Convert manually to other formats from FORMAT.dictionary")
@@ -169,9 +174,8 @@ class PositionParadigmFramework:
         genomes = {}
         while len(instances) > 0:
             instance = instances.pop()
-            coset = set(instance*d for d in self.symmetry_group())
+            coset = self.__genome_coset(instance)
             instances -= coset
-            coset = sorted([self.one_row(g) for g in coset], key=self.__sort_key)
             genomes[coset[0]] = coset
         if format == FORMAT.formal_sum:
             Z = self.symmetry_group()
@@ -208,6 +212,24 @@ class PositionParadigmFramework:
             string += str(negative)
         string = string.replace(',)', ')')
         return self.genome_group()(string)
+
+    def draw_instance(self, instance):
+        permutation = instance.inverse()
+        if self.symmetry in {SYMMETRY.circular, SYMMETRY.linear}:
+            string = "..." if self.symmetry is SYMMETRY.circular else ""
+            for position in range(1, self.n + 1):
+                signed_region = permutation(position)
+                if signed_region < 0:
+                    region = f" <-{abs(signed_region)}-|"
+                else:
+                    region = f" |-{abs(signed_region)}->"
+                if position == 1:
+                    first_region = region
+                string += region
+            string += f"{first_region} ..." if self.symmetry is SYMMETRY.circular else ""
+            return string if self.symmetry is SYMMETRY.circular else string[1:]
+        else:
+            raise NotImplementedError(f"Can't draw genome instance with symmetry group {str(self.symmetry)}")
 
     def __permutation_group_element_from_matrix(self, matrix):
         sigma = []
