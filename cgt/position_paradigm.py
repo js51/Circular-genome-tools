@@ -72,9 +72,16 @@ class PositionParadigmFramework:
             element: the genome instance to represent in one-row notation. Multiple formats accepted.
             as_list: if true, return as a list of images, otherwise return a sage permutation.
 
-        Examples:
-            >>> PositionParadigmFramework(3).one_row('(1,-2)(-1,2)')
+        EXAMPLES::
+            sage: import cgt
+            sage: cgt.PositionParadigmFramework(3).one_row('(1,-2)(-1,2)')
             [-2, -1, 3]
+        
+        TESTS::
+            sage: import cgt
+            sage: ppf = cgt.PositionParadigmFramework(3)
+            sage: ppf.cycles(ppf.one_row('(1,-2)(-1,2)')) == ppf.cycles('(1,-2)(-1,2)')
+            True
         """
         elt = self.cycles(element)
         row = list(elt.dict().values())[0:self.n]
@@ -259,7 +266,7 @@ class PositionParadigmFramework:
         else:
             for character in gap.Irr(self.genome_group()):
                 irrep = gap.IrreducibleAffordingRepresentation(character)
-                def representation(sigma, as_gap_matrix=False, _irrep=irrep):	
+                def representation(sigma, as_gap_matrix=False, _irrep=irrep):
                     return image if as_gap_matrix else matrix(UniversalCyclotomicField(), gap.Image(_irrep, sigma))
                 representations.append(representation)
         self.irreducible_representations = representations
