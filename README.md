@@ -1,5 +1,5 @@
 # Circular genome tools (cgt)
-[![](https://img.shields.io/pypi/v/cgt.svg)](https://pypi.org/project/cgt/)[![](https://github.com/js51/Circular-genome-tools/actions/workflows/python-publish.yml/badge.svg)](https://github.com/js51/Circular-genome-tools/actions/workflows/python-publish.yml)
+[![](https://img.shields.io/pypi/v/cgt.svg)](https://pypi.org/project/cgt/) [![](https://github.com/js51/Circular-genome-tools/actions/workflows/python-publish.yml/badge.svg)](https://github.com/js51/Circular-genome-tools/actions/workflows/python-publish.yml)
 
 A sage package for working with circular genomes represented by signed or unsigned permutations. It includes tools for converting between representations as well as visualisations using matplotlib.
 
