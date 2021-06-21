@@ -7,9 +7,9 @@ Follow the instructions located [here](https://doc.sagemath.org/html/en/installa
 
 The basic steps (for Linux) are:
 
-- [Download binaries](https://www.sagemath.org/download-linux.html). You will most likely need the 64bit version. Choose the latest one.
+- [Download binaries](https://www.sagemath.org/download-linux.html). You will most likely need the 64bit version. Choose the latest one for your operating system, making sure the OS version is the same.
 - Make a directory on your machine called `Sage` or similar, where you will place the sage installation. Move the file you downloaded into this folder.
-- Extract the files using `tar`. For example: `tar -xjf sage-9.3-Ubuntu_20.04-x86_64.tar.bz2.tar.bz2` After extracting, you can delete the `.bz2` file.
+- Extract the files using `tar`. For example: `tar -xjf sage-9.3-Ubuntu_20.04-x86_64.tar.bz2` After extracting, you can delete the `.bz2` file.
 - `cd` into SageMath and run sage for the first time by executing the `sage` file. Wait for it to finish loading, to the point where you get the sage prompt and can type commands. Exit sage.
 - Run the command `sudo ln -s /path/to/SageMath/sage /usr/local/bin/sage` You can now start SageMath from any directory by typing `sage`.
 
