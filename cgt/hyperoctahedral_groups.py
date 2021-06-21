@@ -1,14 +1,9 @@
 from enum import Enum, auto
 from sage.all_cmdline import *
-from cgt import conversions, helper_functions
+from . import conversions
+from . import helper_functions
+from .enums import *
 
-class SET(Enum):
-	SIGNED_CYCLES 	= auto()
-	UNSIGNED_CYCLES = auto()
-	ONE_ROW			= auto()
-	WREATH			= auto()
-	WREATH_S2		= auto()
-	
 def HyperoctahedralGroup(n, as_set_of=SET.SIGNED_CYCLES):
 	### Some constants
 	N 		= list(range(1, n+1))		# The set {1, ..., n}
