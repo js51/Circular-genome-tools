@@ -1,8 +1,7 @@
 from sage.all_cmdline import *
-from cgt import hyperoctahedral_groups, conversions
-import numpy as np
+from . import hyperoctahedral_groups
+from .enums import *
 import itertools
-
 
 def c_permutation(n, G):
 	c_string = f'({",".join(str(i) for i in list(range(1, n+1)))})({",".join(str(i) for i in list(range(-n, 0)))})'

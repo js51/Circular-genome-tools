@@ -1,4 +1,5 @@
 from sage.all_cmdline import *
+from .enums import *
 
 def draw_genome(n=None, permutation=None, orientation_list=None, save_as_pgf=False, show=True, name="genome", oriented=True):
 	"""Produce a drawing of a circular genome with n regions"""

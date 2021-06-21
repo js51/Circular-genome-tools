@@ -1,15 +1,8 @@
-## Models 
-
 from enum import Enum, auto
 from sage.all_cmdline import *
-from cgt import conversions, helper_functions, hyperoctahedral_groups
-
-class MODEL(Enum):
-	ONE_AND_TWO_REGION_INVERSIONS 						= auto()
-	TWO_REGION_INVERSIONS 								= auto()
-	ALL_INVERSIONS										= auto()
-	ALL_INVERSIONS_HALF_CIRCLE							= auto()
-	SHORT_INVERSIONS_AND_ONE_REGION_SWAPS				= auto()
+from . import conversions
+from . import hyperoctahedral_groups
+from .enums import *
 
 # TODO: add the cuts function here, enable creation of more models
 # a model class which consists of a dictionary (?) of model elements mapping to their probability

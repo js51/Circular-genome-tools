@@ -1,8 +1,11 @@
 name = "cgt"
-from cgt import drawing
-from cgt import conversions
-from cgt import representations
-from cgt import hyperoctahedral_groups
-from cgt import models
-#from cgt import rearrangements # Don't import this, it's full of crap!
-from cgt.helper_functions import *
+from . import drawing
+from . import conversions
+from . import representations
+from . import hyperoctahedral_groups
+from . import models
+from . import position_paradigm
+from . import enums
+from .enums import *
+from .helper_functions import *
+from .position_paradigm import PositionParadigmFramework

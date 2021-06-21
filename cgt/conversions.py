@@ -1,4 +1,4 @@
-from sage.all_cmdline import *  # import sage library
+from sage.all_cmdline import *
 
 def cycles_to_signed_permutation(n, disjoint_cycle_string):
 	"""Converts a cycle notation string into two-row notation"""
