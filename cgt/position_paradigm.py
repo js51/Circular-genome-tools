@@ -71,11 +71,6 @@ class PositionParadigmFramework:
         Args:
             element: the genome instance to represent in one-row notation. Multiple formats accepted.
             as_list: if true, return as a list of images, otherwise return a sage permutation.
-
-        EXAMPLES::
-            sage: import cgt
-            sage: cgt.PositionParadigmFramework(3).one_row('(1,-2)(-1,2)')
-            [-2, -1, 3]
         
         TESTS::
             sage: import cgt
@@ -106,7 +101,13 @@ class PositionParadigmFramework:
         return self.G
 
     def canonical_instance(self, instance):
-        """Return the 'canonical' instance of the genome represented by the permutation if there is one."""
+        """Return the 'canonical' instance of the genome represented by the permutation if there is one.
+        
+        TESTS::
+            sage: import cgt; ppf = cgt.PositionParadigmFramework(3, symmetry=cgt.SYMMETRY.circular)
+            sage: ppf.canonical_instance('(1,-2)(-1,2)')
+            [1, 2, -3]
+        """
         instance = deepcopy(self.one_row(self(instance)))
         if self.symmetry in {SYMMETRY.circular, SYMMETRY.linear}:
             f = self.one_row(self.standard_reflection())
