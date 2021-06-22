@@ -1,8 +1,7 @@
 from enum import Enum, auto
 from sage.all_cmdline import *
-from . import conversions
-from . import hyperoctahedral_groups
 from .enums import *
+from . import structures
 
 # TODO: add the cuts function here, enable creation of more models
 # a model class which consists of a dictionary (?) of model elements mapping to their probability
@@ -24,12 +23,12 @@ def cuts(sigma, n):
 		tuple(([i+1,c(i+1)])) for i in range(len(sigma)) 
 		if (sigma[c(i + 1)-1] != c(sigma[i]))
 	])
-
+"""
 def model(G, n, signed=True, model_type = MODEL.ONE_AND_TWO_REGION_INVERSIONS):
 	# print("WARNING: only working for subgroups of sage 'SymmetricGroup' G (signed or unsigned)")
-	if model_type == MODEL.TWO_REGION_INVERSIONS:
+	if model_type == MODEL.two_region_inversions:
 		return set(sorted(__all_inversions_model(G, n, signed, num_regions = 2)))
-	elif model_type == MODEL.ONE_AND_TWO_REGION_INVERSIONS:
+	elif model_type == MODEL.one_and_:
 		return set(sorted(__all_inversions_model(G, n, signed, num_regions = 1) + __all_inversions_model(G, n, signed, num_regions = 2)))
 	elif model_type == MODEL.ALL_INVERSIONS:
 		return set(sorted(__all_inversions_model(G, n, signed)))
@@ -70,6 +69,15 @@ def __all_inversions_model(G, n, signed, num_regions='any'):
 			return 'not yet implemented'
 		
 def __one_region_adjacent_transpositions(G, n, signed):
-	D = hyperoctahedral_groups.DihedralSubgroup(G, n=n)
+	D = structures.DihedralSubgroup(G, n=n)
 	generators = { G('(-2,-1)(1,2)'), G('(-2,1,2,-1)'), G('(-2,-1,2,1)'), G('(-2,2)(-1,1)') }
 	return list({ d.inverse() * a * d for a in generators for d in D })
+"""
+class Model:
+	"""Defines a model. A model consists of some collection of permutations and a map from these permutations to probabilities [0,1]"""
+	def __init__(framework, generating_dictionary):
+		"""Define a model from a dictionary of single permutations, with their probabilities as the values."""
+
+	@classmethod
+	def named_model(cls, framework, named_model_dictionary):
+		pass
