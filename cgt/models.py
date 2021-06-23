@@ -13,7 +13,7 @@ class Model:
 		"""Define a model from a dictionary of single permutations, with their probabilities as the values."""
 		self.framework = framework
 		self.generating_dictionary = generating_dictionary
-		# TODO: Check model properties
+		# TODO: Implement checks for certain model properties, for example time reversibility, symmetry and missing rearrangements
 
 	@classmethod
 	def named_model_with_relative_probs(cls, framework, named_model_dictionary):

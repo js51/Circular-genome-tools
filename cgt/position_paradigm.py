@@ -5,11 +5,13 @@ that they can acces information without it needing to be recreated.
 """
 
 from sage.all_cmdline import *
+from sage.misc.superseded import warning
 from .enums import *
 import numpy as np
 import warnings
 from copy import deepcopy
 from .structures import HyperoctahedralGroup
+from scipy.sparse import dok_matrix as dok
 
 class PositionParadigmFramework:
     """Everything you need for working with genomes under the position paradigm"""
@@ -21,6 +23,9 @@ class PositionParadigmFramework:
         self.n = num_regions
         self.oriented = oriented
         self.symmetry = symmetry
+
+    def __eq__(self, other):
+        return self.__repr__() == other.__repr__()
 
     def __str__(self):
         string = f"Framework for {str(self.symmetry).replace('SYMMETRY.', '')} genomes"
@@ -34,7 +39,8 @@ class PositionParadigmFramework:
         """Return an object as a group or group algebra element if possible, oherwise return None"""
         if x in self.genome_group():
             return self.genome_group()(x)
-        elif type(x) is list:
+        elif type(x) is list: 
+            # TODO: #10 Fix __call__ to work as well as cycles. Maybe just make it call cycles and leave all the hard work to cycles.
             return self.cycles(x)
         elif x in self.group_algebra():
             return self.group_algebra()(x)
@@ -102,7 +108,7 @@ class PositionParadigmFramework:
             sage: ppf.canonical_instance('(1,-2)(-1,2)')
             [1, 2, -3]
         """
-        instance = deepcopy(self.one_row(self(instance)))
+        instance = deepcopy(self.one_row(self.cycles(instance)))
         if self.symmetry in {SYMMETRY.circular, SYMMETRY.linear}:
             f = self.one_row(self.standard_reflection())
             if list(instance)[0] < 0:
@@ -177,7 +183,7 @@ class PositionParadigmFramework:
         while len(instances) > 0:
             instance = instances.pop()
             coset = self.__genome_coset(instance)
-            instances -= coset
+            instances -= set(coset)
             genomes[coset[0]] = coset
         if format == FORMAT.formal_sum:
             Z = self.symmetry_group()
@@ -245,11 +251,37 @@ class PositionParadigmFramework:
         """Return the defining representation matrix. Note that matrix(x)matrix(y) = matrix(yx)"""
         return np.array(self.one_row(self.cycles(element)).to_matrix())
 
-    def make_inversion(self, a, b):
-        raise(NotImplementedError())
+    def regular_rep_of_zs(self, model, to_adjacency_matrix=False):
+        warnings.warn("Untested! Use at your own risk!")
+        if self is not model.framework:
+            if self != model.framework:
+                raise ValueError(f"Current framework and model framework are not the same!")
+            else:
+                warnings.warn("Current framework and model framework reference different objects! This might cause problems.")
+        Z = self.symmetry_group()
+        genomes = self.genomes()
+        genome_list = list(genomes.values())
+        reps = list(genomes.keys()) # Thousands of these
+        model_classes = list({frozenset({ d.inverse() * a * d for d in Z }) for a in model.generating_dictionary.keys()})
+        model_generators_cycles = list(model.generating_dictionary.keys()) #[sorted(list(model_class))[0] for model_class in model_classes]
+        model_generators = [
+            self.one_row(elt) for elt in model_generators_cycles
+        ]
+        model_classes = { rep : list(model_classes[r]) for r, rep in enumerate(model_generators) }
+        genome_lookup = { rep : r for r, rep in enumerate(reps) }
+        num_genomes = len(genomes.keys())
+        matrix = dok((num_genomes, num_genomes), dtype=np.float32)
+        for g, genome in enumerate(genome_list): # For each genome
+            print(f'\rComputing class {g+1} with rep {genome[0]}', end="")
+            for permutation in genome:
+                for rearrangement in model_generators:
+                    coeff = 1
+                    if not to_adjacency_matrix:
+                        coeff = 1/Z.order() * model.generating_dictionary[model_generators_cycles[model_generators.index(rearrangement)]] # * len(model_classes[rearrangement])
+                    matrix[g, genome_lookup[self.canonical_instance(permutation * rearrangement)]] += coeff
+        print('...done!')
+        return matrix
 
-    def regular_rep_of_zs(self, model):
-        pass
 
     def irreps(self):
         """Return a complete list of pairwise irreducible representations of the genome group."""
