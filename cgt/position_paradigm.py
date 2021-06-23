@@ -1,17 +1,15 @@
+"""
+position_paradigm is the most important module in cgt. PositionParadigmFramework keeps track of important objects, can 
+convert group elements and genomes between different forms, and instances can be passed to functions from other modules so 
+that they can acces information without it needing to be recreated.
+"""
+
 from sage.all_cmdline import *
 from .enums import *
 import numpy as np
+import warnings
 from copy import deepcopy
-
-def HyperoctahedralGroup(n):
-    pmn = tuple(range(1,n+1)) + tuple(range(-n, 0))
-    s_pmn = SymmetricGroup(pmn)
-    if n==1: return s_pmn
-    h_gens = [
-        s_pmn([(1,2),(-1,-2)]),
-        s_pmn(tuple(range(1,n+1)) + tuple(range(-1, -(n+1), -1)))
-    ]
-    return s_pmn.subgroup(h_gens)
+from .structures import HyperoctahedralGroup
 
 class PositionParadigmFramework:
     """Everything you need for working with genomes under the position paradigm"""
@@ -31,8 +29,6 @@ class PositionParadigmFramework:
 
     def __repr__(self):
         return self.__str__()
-
-    ### Conversion functions
 
     def __call__(self, x):
         """Return an object as a group or group algebra element if possible, oherwise return None"""
@@ -71,10 +67,12 @@ class PositionParadigmFramework:
         Args:
             element: the genome instance to represent in one-row notation. Multiple formats accepted.
             as_list: if true, return as a list of images, otherwise return a sage permutation.
-
-        Examples:
-            >>> PositionParadigmFramework(3).one_row('(1,-2)(-1,2)')
-            [-2, -1, 3]
+        
+        TESTS::
+            sage: import cgt
+            sage: ppf = cgt.PositionParadigmFramework(3)
+            sage: ppf.cycles(ppf.one_row('(1,-2)(-1,2)')) == ppf.cycles('(1,-2)(-1,2)')
+            True
         """
         elt = self.cycles(element)
         row = list(elt.dict().values())[0:self.n]
@@ -84,8 +82,6 @@ class PositionParadigmFramework:
             else:
                 row = Permutations(self.n)(row)
         return row
-
-    ### Algebraic structures
 
     def genome_group(self):
         """Return the permutation group containing genome instances."""
@@ -99,7 +95,13 @@ class PositionParadigmFramework:
         return self.G
 
     def canonical_instance(self, instance):
-        """Return the 'canonical' instance of the genome represented by the permutation if there is one."""
+        """Return the 'canonical' instance of the genome represented by the permutation if there is one.
+        
+        TESTS::
+            sage: import cgt; ppf = cgt.PositionParadigmFramework(3, symmetry=cgt.SYMMETRY.circular)
+            sage: ppf.canonical_instance('(1,-2)(-1,2)')
+            [1, 2, -3]
+        """
         instance = deepcopy(self.one_row(self(instance)))
         if self.symmetry in {SYMMETRY.circular, SYMMETRY.linear}:
             f = self.one_row(self.standard_reflection())
@@ -139,7 +141,7 @@ class PositionParadigmFramework:
         try:
             return self.CG
         except AttributeError:
-            self.GA = self.genome_group().algebra(CDF)
+            self.GA = self.genome_group().algebra(QQ)
         return self.GA
         
     def symmetry_element(self):
@@ -227,7 +229,8 @@ class PositionParadigmFramework:
                     first_region = region
                 string += region
             string += f"{first_region} ..." if self.symmetry is SYMMETRY.circular else ""
-            return string if self.symmetry is SYMMETRY.circular else string[1:]
+            string = string if self.symmetry is SYMMETRY.circular else string[1:]
+            return string if self.oriented else string.replace('<', '|').replace('>', '|')
         else:
             raise NotImplementedError(f"Can't draw genome instance with symmetry group {str(self.symmetry)}")
 
@@ -245,6 +248,9 @@ class PositionParadigmFramework:
     def make_inversion(self, a, b):
         raise(NotImplementedError())
 
+    def regular_rep_of_zs(self, model):
+        pass
+
     def irreps(self):
         """Return a complete list of pairwise irreducible representations of the genome group."""
         try:
@@ -259,8 +265,13 @@ class PositionParadigmFramework:
         else:
             for character in gap.Irr(self.genome_group()):
                 irrep = gap.IrreducibleAffordingRepresentation(character)
-                def representation(sigma, as_gap_matrix=False, _irrep=irrep):	
+                def representation(sigma, as_gap_matrix=False, _irrep=irrep):
                     return image if as_gap_matrix else matrix(UniversalCyclotomicField(), gap.Image(_irrep, sigma))
                 representations.append(representation)
         self.irreducible_representations = representations
         return representations
+
+    def regular_representation(self, g): 
+        """Return the regular representation of a single element"""
+        warnings.warn("this function is untested! Use at your own risk.", DeprecationWarning)
+        return matrix(QQbar, [(self.group_algebra()(g)*self.genome_group()(h)).to_vector(QQbar) for h in self.genome_group()]).transpose()
