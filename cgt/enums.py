@@ -1,10 +1,12 @@
+"""
+"""
+
 from enum import Enum, auto
 
 class MODEL(Enum):
     one_region_inversions  = auto()
     two_region_inversions  = auto()
     all_inversions		   = auto()
-    all_inversions_		   = auto()
     one_region_swaps       = auto()
 
 class TYPE(Enum):
@@ -29,3 +31,8 @@ class SET(Enum):
 class SYMMETRY(Enum):
     circular = dihedral = D_n              = auto()
     linear = S_2 = C_2 = flip = reflection = auto()
+
+class CLASSES(Enum):
+    conjugacy_classes = auto()
+    cosets            = auto()
+    double_cosets     = auto()

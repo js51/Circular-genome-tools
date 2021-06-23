@@ -1,4 +1,5 @@
-""" position_paradigm is the most important module in cgt. PositionParadigmFramework keeps track of important objects, can 
+"""
+position_paradigm is the most important module in cgt. PositionParadigmFramework keeps track of important objects, can 
 convert group elements and genomes between different forms, and instances can be passed to functions from other modules so 
 that they can acces information without it needing to be recreated.
 """

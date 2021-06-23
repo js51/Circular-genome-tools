@@ -1,3 +1,6 @@
+"""
+"""
+
 class Genome:
     """Optional wrapper for genomes, so that they can be printed/operated on in a more pythonic way."""
     def __init__(self, framework, genome):
