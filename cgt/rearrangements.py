@@ -67,6 +67,18 @@ def __one_region_adjacent_transposition_reps(framework):
 	G = framework.genome_group()
 	return { G('(-2,-1)(1,2)'), G('(-2,1,2,-1)'), G('(-2,-1,2,1)'), G('(-2,2)(-1,1)') }
 
+def double_coset(framework, perm):
+	Z = framework.symmetry_group()
+	return { d1 * perm * d2 for d1 in Z for d2 in Z }
+
+def conjugacy_class(framework, perm):
+	Z = framework.symmetry_group()
+	return { d.inverse() * perm * d for d in Z }
+
+def single_coset(framework, perm):
+	Z = framework.symmetry_group()
+	return { perm * d for d in Z }
+
 def __representatives(framework, set_of_permutations, classes=CLASSES.double_cosets):
 	if not framework.oriented:
 		raise NotImplementedError(f"not yet implemented for {str(framework)}")
@@ -76,11 +88,11 @@ def __representatives(framework, set_of_permutations, classes=CLASSES.double_cos
 	while len(perms):
 		perm = perms.pop()
 		if classes is CLASSES.double_cosets:
-			coset = { d1 * perm * d2 for d1 in Z for d2 in Z }
+			coset = double_coset(framework, perm)
 		elif classes is CLASSES.conjugacy_classes:
-			coset = { d.inverse() * perm * d for d in Z }
+			coset = conjugacy_class(framework, perm)
 		elif classes is CLASSES.cosets:
-			coset = { perm * d for d in Z }
+			coset = single_coset(framework, perm)
 		for element in coset:
 			perms.discard(element)
 		cosets.append(coset)
