@@ -13,7 +13,7 @@ class Model:
 		"""Define a model from a dictionary of single permutations, with their probabilities as the values."""
 		self.framework = framework
 		self.generating_dictionary = generating_dictionary
-		# TODO: Check model properties
+		# TODO: Implement checks for certain model properties, for example time reversibility, symmetry and missing rearrangements
 
 	@classmethod
 	def named_model_with_relative_probs(cls, framework, named_model_dictionary):
@@ -37,3 +37,24 @@ class Model:
 				for generator in gens:
 					model[generator] = relative_prob/len(gens)
 		return cls(framework, model)
+
+	def generators(self):
+		return self.generating_dictionary
+
+	def element(self):
+		try:
+			return self.s
+		except AttributeError:
+			A = self.framework.group_algebra()
+			s = A(0) # Zero element in algebra
+			gens_dict = self.generators()
+			gens = {x for x in self.generators().keys()}
+			while len(gens) > 0:
+				gen = gens.pop()
+				prob = gens_dict[gen]
+				conj_class = rearrangements.conjugacy_class(self.framework, gen)
+				for perm in conj_class:
+					s += (prob/len(conj_class)) * A(perm)
+				gens -= conj_class
+			self.s = s
+			return s

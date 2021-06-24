@@ -5,11 +5,14 @@ that they can acces information without it needing to be recreated.
 """
 
 from sage.all_cmdline import *
+from sage.combinat.colored_permutations import SignedPermutations
+from sage.misc.superseded import warning
 from .enums import *
 import numpy as np
 import warnings
-from copy import deepcopy
+from copy import deepcopy 
 from .structures import HyperoctahedralGroup
+from scipy.sparse import dok_matrix as dok
 
 class PositionParadigmFramework:
     """Everything you need for working with genomes under the position paradigm"""
@@ -21,6 +24,9 @@ class PositionParadigmFramework:
         self.n = num_regions
         self.oriented = oriented
         self.symmetry = symmetry
+
+    def __eq__(self, other):
+        return self.__repr__() == other.__repr__()
 
     def __str__(self):
         string = f"Framework for {str(self.symmetry).replace('SYMMETRY.', '')} genomes"
@@ -34,7 +40,8 @@ class PositionParadigmFramework:
         """Return an object as a group or group algebra element if possible, oherwise return None"""
         if x in self.genome_group():
             return self.genome_group()(x)
-        elif type(x) is list:
+        elif type(x) is list: 
+            # TODO: #10 Fix __call__ to work as well as cycles. Maybe just make it call cycles and leave all the hard work to cycles.
             return self.cycles(x)
         elif x in self.group_algebra():
             return self.group_algebra()(x)
@@ -102,7 +109,7 @@ class PositionParadigmFramework:
             sage: ppf.canonical_instance('(1,-2)(-1,2)')
             [1, 2, -3]
         """
-        instance = deepcopy(self.one_row(self(instance)))
+        instance = deepcopy(self.one_row(self.cycles(instance)))
         if self.symmetry in {SYMMETRY.circular, SYMMETRY.linear}:
             f = self.one_row(self.standard_reflection())
             if list(instance)[0] < 0:
@@ -177,7 +184,7 @@ class PositionParadigmFramework:
         while len(instances) > 0:
             instance = instances.pop()
             coset = self.__genome_coset(instance)
-            instances -= coset
+            instances -= set(coset)
             genomes[coset[0]] = coset
         if format == FORMAT.formal_sum:
             Z = self.symmetry_group()
@@ -245,11 +252,37 @@ class PositionParadigmFramework:
         """Return the defining representation matrix. Note that matrix(x)matrix(y) = matrix(yx)"""
         return np.array(self.one_row(self.cycles(element)).to_matrix())
 
-    def make_inversion(self, a, b):
-        raise(NotImplementedError())
+    def regular_rep_of_zs(self, model, to_adjacency_matrix=False):
+        warnings.warn("Untested! Use at your own risk!")
+        if self is not model.framework:
+            if self != model.framework:
+                raise ValueError(f"Current framework and model framework are not the same!")
+            else:
+                warnings.warn("Current framework and model framework reference different objects! This might cause problems.")
+        Z = self.symmetry_group()
+        genomes = self.genomes()
+        genome_list = list(genomes.values())
+        reps = list(genomes.keys()) # Thousands of these
+        model_classes = list({frozenset({ d.inverse() * a * d for d in Z }) for a in model.generating_dictionary.keys()})
+        model_generators_cycles = list(model.generating_dictionary.keys()) #[sorted(list(model_class))[0] for model_class in model_classes]
+        model_generators = [
+            self.one_row(elt) for elt in model_generators_cycles
+        ]
+        model_classes = { rep : list(model_classes[r]) for r, rep in enumerate(model_generators) }
+        genome_lookup = { rep : r for r, rep in enumerate(reps) }
+        num_genomes = len(genomes.keys())
+        matrix = dok((num_genomes, num_genomes), dtype=np.float32)
+        for g, genome in enumerate(genome_list): # For each genome
+            print(f'\rComputing class {g+1} with rep {genome[0]}', end="")
+            for permutation in genome:
+                for rearrangement in model_generators:
+                    coeff = 1
+                    if not to_adjacency_matrix:
+                        coeff = 1/Z.order() * model.generating_dictionary[model_generators_cycles[model_generators.index(rearrangement)]] # * len(model_classes[rearrangement])
+                    matrix[g, genome_lookup[self.canonical_instance(permutation * rearrangement)]] += coeff
+        print('...done!')
+        return matrix
 
-    def regular_rep_of_zs(self, model):
-        pass
 
     def irreps(self):
         """Return a complete list of pairwise irreducible representations of the genome group."""
@@ -275,3 +308,30 @@ class PositionParadigmFramework:
         """Return the regular representation of a single element"""
         warnings.warn("this function is untested! Use at your own risk.", DeprecationWarning)
         return matrix(QQbar, [(self.group_algebra()(g)*self.genome_group()(h)).to_vector(QQbar) for h in self.genome_group()]).transpose()
+
+    def coefficient_in(self, more_terms, fewer_terms):
+        """For example, the coefficient of (a/2 + b/2) in x=(a/3 + b/3 + c/3) is 2/3, since x=2/3*(a/2 + b/2) + c/3""" 
+        coefficients_in_larger_sum = {}
+        for term in fewer_terms.terms():
+            perm  = self.genome_group()(list(term)[0][0]) # a
+            coeff = list(term)[0][1] # 1/2
+            coefficients_in_larger_sum[perm] = more_terms.coefficient(perm) * (1/coeff) # 1/3 * 2 = 2/3
+        terms = set(coefficients_in_larger_sum.values())
+        if len(terms) != 1:
+            warnings.warn("Note that extra terms from the smaller sum remain in the larger sum!")
+        return min(terms)
+
+    def collect_genome_terms(self, formal_sum):
+        formal_sum = deepcopy(formal_sum)
+        terms = formal_sum.terms()
+        genomes = self.genomes(format=FORMAT.formal_sum)
+        new_sum = [] # [(coeff, rep), ...]
+        while len(terms) > 0:
+            term = list(terms[0])[0][0]
+            canonical_instance = self.canonical_instance(term)
+            genome = genomes[canonical_instance]
+            coeff = self.coefficient_in(formal_sum, genome)
+            formal_sum -= coeff * genome
+            terms = formal_sum.terms()
+            new_sum.append((coeff, str(canonical_instance) + 'z'))
+        return FormalSum(new_sum, parent=QQ)
