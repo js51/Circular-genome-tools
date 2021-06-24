@@ -6,10 +6,11 @@ that they can acces information without it needing to be recreated.
 
 from sage.all_cmdline import *
 from sage.combinat.colored_permutations import SignedPermutations
+from sage.misc.superseded import warning
 from .enums import *
 import numpy as np
 import warnings
-from copy import deepcopy
+from copy import deepcopy 
 from .structures import HyperoctahedralGroup
 from scipy.sparse import dok_matrix as dok
 
@@ -307,3 +308,30 @@ class PositionParadigmFramework:
         """Return the regular representation of a single element"""
         warnings.warn("this function is untested! Use at your own risk.", DeprecationWarning)
         return matrix(QQbar, [(self.group_algebra()(g)*self.genome_group()(h)).to_vector(QQbar) for h in self.genome_group()]).transpose()
+
+    def coefficient_in(self, more_terms, fewer_terms):
+        """For example, the coefficient of (a/2 + b/2) in x=(a/3 + b/3 + c/3) is 2/3, since x=2/3*(a/2 + b/2) + c/3""" 
+        coefficients_in_larger_sum = {}
+        for term in fewer_terms.terms():
+            perm  = self.genome_group()(list(term)[0][0]) # a
+            coeff = list(term)[0][1] # 1/2
+            coefficients_in_larger_sum[perm] = more_terms.coefficient(perm) * (1/coeff) # 1/3 * 2 = 2/3
+        terms = set(coefficients_in_larger_sum.values())
+        if len(terms) != 1:
+            warnings.warn("Note that extra terms from the smaller sum remain in the larger sum!")
+        return min(terms)
+
+    def collect_genome_terms(self, formal_sum):
+        formal_sum = deepcopy(formal_sum)
+        terms = formal_sum.terms()
+        genomes = self.genomes(format=FORMAT.formal_sum)
+        new_sum = [] # [(coeff, rep), ...]
+        while len(terms) > 0:
+            term = list(terms[0])[0][0]
+            canonical_instance = self.canonical_instance(term)
+            genome = genomes[canonical_instance]
+            coeff = self.coefficient_in(formal_sum, genome)
+            formal_sum -= coeff * genome
+            terms = formal_sum.terms()
+            new_sum.append((coeff, str(canonical_instance) + 'z'))
+        return FormalSum(new_sum, parent=QQ)
