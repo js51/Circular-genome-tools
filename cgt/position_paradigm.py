@@ -173,8 +173,14 @@ class PositionParadigmFramework:
         coset = set(instance*d for d in self.symmetry_group())
         return sorted([self.one_row(g) for g in coset], key=self.__sort_key)
 
-    def genome(self, instance):
-        return self.__genome_coset(instance)
+    def genome(self, instance, format=None):
+        coset = self.__genome_coset(instance)
+        if format == FORMAT.formal_sum:
+            Z = self.symmetry_group()
+            A = self.group_algebra()
+            return sum(1/Z.order()*A(self.cycles(dx)) for dx in coset)
+        else:
+            return coset
 
     def genomes(self, format=FORMAT.dictionary, sort_genomes=True):
         if format not in {FORMAT.dictionary, FORMAT.formal_sum}:
