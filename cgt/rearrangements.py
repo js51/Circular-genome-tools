@@ -1,114 +1,105 @@
-from sage.all_cmdline import *
-from . import hyperoctahedral_groups
-from .enums import *
-import itertools
+"""
+"""
 
-def c_permutation(n, G):
+from enum import Enum, auto
+from copy import deepcopy
+from sage.all_cmdline import *
+from . import structures
+from .enums import *
+
+def css(cuts_set):
+	string = ''.join(sorted([str(cut[0]) for cut in cuts_set]))
+	if len(string) != len(cuts_set): print("something went very wrong here...")
+	return string
+
+def cuts(framework, sigma):
+	sigma = deepcopy(framework.one_row(sigma))
+	n = framework.n
+	pmN = structures.set_plus_minus(n)
+	G = SymmetricGroup(pmN)
 	c_string = f'({",".join(str(i) for i in list(range(1, n+1)))})({",".join(str(i) for i in list(range(-n, 0)))})'
 	c = G(c_string)
-	return c
-
-def c_range(x,y,n,G):
-	c = c_permutation(n,G)
-	i=x
-	while i != y:
-		yield i
-		i = c(i)
-
-def rearrangements_with_k_cuts(k,n):
-	N = (i for i in range(1,n+1))
-	for pattern in itertools.combinations(N,k):
-		yield from rearrangements_with_cuts_set(pattern, n)
-		
-def to_pos_paradigm(block_graph, blocks, cuts_set, G):
-	H_c = hyperoctahedral_groups.HyperoctahedralGroup(n)
-	H = hyperoctahedral_groups.HyperoctahedralGroup(n, hyperoctahedral_groups.SET.ONE_ROW)
-	D = hyperoctahedral_groups.DihedralSubgroup(H_c, n)
-	perm = []
-	c = c_permutation(max(max(blocks)), G)
-	for b in block_graph[1::2]: #every second element
-		if b>0:
-			perm += list(blocks[b-1])
-		elif b<0:
-			perm += list(reversed(list(-x for x in blocks[-b-1])))
-	return perm
-
-def rearrangements_with_cuts_set(cuts_set, n):
-	pmN = list(range(-n, 0)) + list(range(1, n+1))	# The set {+-1, ..., +-n}
-	S_pmn = SymmetricGroup(pmN)
-	blocks = []
-	c = c_permutation(n, S_pmn)
-	cs = cuts_set
-	for i in range(len(cs)):
-		blocks.append(tuple(j for j in c_range(c(cs[i]), c(cs[(i+1)%len(cs)]), n, S_pmn)))
-	m = len(blocks)
-	for b in blocks:
-		if 2 in b:
-			ind = blocks.index(b)
-	blocks = blocks[ind:] + blocks[:ind]
-	print(f"cuts set {cs} leads to blocks {blocks}")
-	pmM = list(range(-m, 0)) + list(range(1, m+1))	# The set {+-1, ..., +-n}
-	S_pmm = SymmetricGroup(pmM)
-	nat_ord = S_pmm(sum(((-i,i) for i in range(1,m+1)), tuple()))
-	perm = [-1,1]
-	def _next_block(perm):
-		for option in range(-m,m+1):
-			if option not in perm+[0] and option != nat_ord(perm[-1]) and nat_ord(option) != perm[-1]:
-				if len(perm)+1 < 2*m-2 or nat_ord(-option) != perm[0]:
-					perm_copy = perm.copy()
-					perm_copy += [option, -option]
-					if len(perm_copy) == 2*m:
-						print(perm_copy)
-						yield to_pos_paradigm(perm_copy, blocks, cuts_set, S_pmn)
-					else:
-						yield from _next_block(perm_copy)
-	yield from _next_block(perm)
-			
-	
-#	
-	# Choose orientations
-		#	orientations = keywords = [i for i in itertools.product([1,-1], repeat = len(blocks))]
-	
-	
-		#	for orientation in orientation:
-#		#for b,block in enumerate(blocks):
-		#	o = orientation[b]
-		#	# Decide the orientation, add to the perm
-		#	_block = block[::-1] if o=-1 else block
-		#	p = tuple(o*r for r in _block))
-			
-			
-	# 	Choose a following block (if current one is not inverted, choose a non-adjacent one)
-	# Convert to position paradigm.
-		
-'''	
-n=6
-pmN = list(range(-n, 0)) + list(range(1, n+1))	# The set {+-1, ..., +-n}
-S_pmn = SymmetricGroup(pmN)
-
-def cuts(sigma):
-	c = c_permutation(n, S_pmn)
 	sigma = list(sigma)
 	return set([ 
 		tuple(([i+1,c(i+1)])) for i in range(len(sigma)) 
 		if (sigma[c(i + 1)-1] != c(sigma[i]))
 	])
 
+def __all_canonical_inversions(framework, num_regions=None):
+	if not framework.oriented:
+		raise NotImplementedError(f"not yet implemented for {str(framework)}")
+	if framework.symmetry not in {SYMMETRY.circular, SYMMETRY.linear}:
+		raise NotImplementedError(f"not implemented for framework with {str(framework.symmetry)} symmetry")
+	n = framework.n
+	G = framework.genome_group()
+	if num_regions == 1:
+		return {G(f'({i},-{i})') for i in range(1, n+1)} if framework.oriented else {}
+	elif num_regions == 2:
+		if framework.oriented:
+			perms = {G(f'({i},{-1*(i+1)})({-1*i},{i+1})') for i in range(1,n)}
+			if framework.symmetry is not SYMMETRY.linear:
+				perms.union({G(f'({n},-1)(-{n},1)')})
+		else:
+			perms = {G(f'({i},{i+1})') for i in range(1,n)} 
+			if framework.symmetry is not SYMMETRY.linear:
+				perms.union({G(f'(1,{n})')})
+		return perms
+	elif num_regions == None: # Return all inversions up to length floor(n/2)
+		up_to_length = floor(framework.n/2)
+		if framework.oriented: 
+			perms = set()
+			for permutation in G:
+				cycle_type = list(permutation.cycle_type())
+				if set(cycle_type)=={1,2} and list(cycle_type).count(2)<=up_to_length and len(cuts(framework, permutation))==2:
+					perms.add(permutation)
+			if framework.symmetry is SYMMETRY.linear:
+				perms = {perm for perm in perms if not ('1' in str(perm) and str(n) in str(perm))}
+			return perms
+		else:
+			raise NotImplementedError(f"not yet implemented for {framework}")
+	else:
+		raise NotImplementedError(f"inversions of length {num_regions} not yet implemented")
+	
+def __one_region_adjacent_transposition_reps(framework):
+	warnings.warn("This function is currently untested! Generators might be incorrect")
+	if not framework.oriented or framework.symmetry != SYMMETRY.circular:
+		raise NotImplementedError(f"not yet implemented for {str(framework)}")
+	G = framework.genome_group()
+	return { G('(-2,-1)(1,2)'), G('(-2,1,2,-1)'), G('(-2,-1,2,1)'), G('(-2,2)(-1,1)') }
 
-cs = [1,3,4]
-rearrangements = list(rearrangements_with_cuts_set(cs,n))
-print([cuts(a) for a in rearrangements])
+def double_coset(framework, perm):
+	Z = framework.symmetry_group()
+	return { d1 * perm * d2 for d1 in Z for d2 in Z }
 
-rearrangements = list(rearrangements_with_k_cuts(3, n))
-H = hyperoctahedral_groups.HyperoctahedralGroup(n)
-D = hyperoctahedral_groups.DihedralSubgroup(H, n)
-rearrangements_cycles = [H(conversions.signed_permutation_to_cycles(n, a)) for a in rearrangements]
+def conjugacy_class(framework, perm):
+	Z = framework.symmetry_group()
+	return { d.inverse() * perm * d for d in Z }
 
+def single_coset(framework, perm):
+	Z = framework.symmetry_group()
+	return { perm * d for d in Z }
 
-rearrangements_cycles = {a for a in list(H) if len(cuts(conversions.cycles_to_signed_permutation(n, a))) == 3}
-cosets = {
-	frozenset([d_1*a*d_2 for d_1 in D for d_2 in D]) for a in rearrangements_cycles
-}
-for coset in cosets:
-	print({frozenset(cuts(conversions.cycles_to_signed_permutation(n, x))) for x in coset})
-'''
+def __representatives(framework, set_of_permutations, classes=CLASSES.double_cosets):
+	if not framework.oriented:
+		raise NotImplementedError(f"not yet implemented for {str(framework)}")
+	Z = framework.symmetry_group()
+	perms = {x for x in set_of_permutations}
+	cosets = []
+	while len(perms):
+		perm = perms.pop()
+		if classes is CLASSES.double_cosets:
+			coset = double_coset(framework, perm)
+		elif classes is CLASSES.conjugacy_classes:
+			coset = conjugacy_class(framework, perm)
+		elif classes is CLASSES.cosets:
+			coset = single_coset(framework, perm)
+		for element in coset:
+			perms.discard(element)
+		cosets.append(coset)
+	reps = set()
+	for coset in cosets:
+		reps.add(sorted(list(coset), key=lambda x: (sum(set(x.cycle_type())), list(x.cycle_type()).count(2), str(x)) )[0])
+	return reps
+
+def all_inversions_representatives(framework, num_regions=None):
+	return __representatives(framework, __all_canonical_inversions(framework, num_regions=num_regions), classes=CLASSES.double_cosets)
