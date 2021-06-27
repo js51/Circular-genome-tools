@@ -162,9 +162,6 @@ class PositionParadigmFramework:
             self.z = 1/self.symmetry_group().order() * sum(self.group_algebra()(d) for d in self.symmetry_group())
         return self.z
 
-    def set_model(self):
-        raise(NotImplementedError())
-    
     def num_genomes(self):
         """Return the number of distinct genomes up to symmetries."""
         return self.genome_group().order()/self.symmetry_group().order()
@@ -202,9 +199,6 @@ class PositionParadigmFramework:
         if sort_genomes:
             genomes = dict(sorted(genomes.items(), key=lambda x: self.__sort_key(x[0])))
         return genomes
-
-    def num_rearrangements(self):
-        raise(NotImplementedError())
 
     def standard_reflection(self):
         """Return a permutation which reflects a genome instance about the center region (n odd), or the center two regions (n even)."""
