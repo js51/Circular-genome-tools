@@ -127,7 +127,10 @@ class PositionParadigmFramework:
             raise NotImplementedError("Not yet implemented")
         else:
             return self.genome_group().random_element()
-    random = random_instance
+
+    def random_genome(self, format=FORMAT.formal_sum):
+        """Return a random genome"""
+        return self.genome(self.random_instance(), format=format)
 
     def symmetry_group(self):
         """Return the symmetry group of the genomes."""
