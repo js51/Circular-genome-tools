@@ -228,22 +228,28 @@ class PositionParadigmFramework:
         string = string.replace(',)', ')')
         return self.genome_group()(string)
 
-    def draw_instance(self, instance):
+    def draw_instance(self, instance, shortened=False):
         permutation = instance.inverse()
+        if shortened:
+            left_tail, right_head = '\u2758', '\u276D'
+            left_head, right_tail = '\u276C', '\u2758'
+        else:
+            left_tail, right_head = '|-', '->'
+            left_head, right_tail = '<-', '-|'
         if self.symmetry in {SYMMETRY.circular, SYMMETRY.linear}:
             string = "..." if self.symmetry is SYMMETRY.circular else ""
             for position in range(1, self.n + 1):
                 signed_region = permutation(position)
                 if signed_region < 0:
-                    region = f" <-{abs(signed_region)}-|"
+                    region = f"{left_head}{abs(signed_region)}{right_tail}"
                 else:
-                    region = f" |-{abs(signed_region)}->"
+                    region = f"{left_tail}{abs(signed_region)}{right_head}"
                 if position == 1:
                     first_region = region
                 string += region
-            string += f"{first_region} ..." if self.symmetry is SYMMETRY.circular else ""
+            string += f"{first_region}..." if self.symmetry is SYMMETRY.circular else ""
             string = string if self.symmetry is SYMMETRY.circular else string[1:]
-            return string if self.oriented else string.replace('<', '|').replace('>', '|')
+            return string if self.oriented else string.replace(right_head, right_tail).replace(left_head, left_tail)
         else:
             raise NotImplementedError(f"Can't draw genome instance with symmetry group {str(self.symmetry)}")
 
@@ -327,17 +333,24 @@ class PositionParadigmFramework:
             warnings.warn("Note that extra terms from the smaller sum remain in the larger sum!")
         return min(terms)
 
-    def collect_genome_terms(self, formal_sum):
-        formal_sum = deepcopy(formal_sum)
+    def collect_genome_terms(self, formal_sum, display=DISPLAY.one_row):
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            formal_sum = deepcopy(formal_sum)
         terms = formal_sum.terms()
-        genomes = self.genomes(format=FORMAT.formal_sum)
         new_sum = [] # [(coeff, rep), ...]
         while len(terms) > 0:
             term = list(terms[0])[0][0]
             canonical_instance = self.canonical_instance(term)
-            genome = genomes[canonical_instance]
+            genome = self.genome(self.cycles(canonical_instance), format=FORMAT.formal_sum)
             coeff = self.coefficient_in(formal_sum, genome)
             formal_sum -= coeff * genome
             terms = formal_sum.terms()
-            new_sum.append((coeff, str(canonical_instance) + 'z'))
+            if display is DISPLAY.one_row:
+                genome_string = str(canonical_instance).replace(' ', '') + 'z'
+            elif display is DISPLAY.cycles:
+                genome_string = str(self.cycles(canonical_instance)) + 'z'
+            elif display is DISPLAY.arrows:
+                genome_string = '(' + self.draw_instance(self.cycles(canonical_instance), shortened=True) + ')'
+            new_sum.append((coeff, genome_string))
         return FormalSum(new_sum, parent=QQ)

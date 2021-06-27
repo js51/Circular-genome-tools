@@ -36,3 +36,8 @@ class CLASSES(Enum):
     conjugacy_classes = auto()
     cosets            = auto()
     double_cosets     = auto()
+
+class DISPLAY(Enum):
+    arrows  = auto()
+    one_row = auto()
+    cycles  = auto()
