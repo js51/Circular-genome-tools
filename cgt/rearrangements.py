@@ -1,7 +1,6 @@
 """
 """
 
-from enum import Enum, auto
 from copy import deepcopy
 from sage.all_cmdline import *
 from . import structures

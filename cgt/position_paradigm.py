@@ -6,7 +6,6 @@ that they can acces information without it needing to be recreated.
 
 from sage.all_cmdline import *
 from sage.combinat.colored_permutations import SignedPermutations
-from sage.misc.superseded import warning
 from .enums import *
 import numpy as np
 import warnings

@@ -1,11 +1,9 @@
 """
 """
 
-from enum import Enum, auto
 from sage.all_cmdline import *
 from .enums import *
 from . import rearrangements
-from . import structures
 
 class Model:
 	"""Defines a model. A model consists of some collection of permutations and a map from these permutations to probabilities [0,1]"""
