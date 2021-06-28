@@ -22,12 +22,12 @@ class FORMAT(Enum):
     only_reps      = auto()
 
 class SET(Enum):
-	signed_cycles 	= auto()
-	unsigned_cycles = auto()
-	one_row			= auto()
-	wreath			= auto()
-	wreath_s2		= auto()
-	
+    signed_cycles 	= auto()
+    unsigned_cycles = auto()
+    one_row			= auto()
+    wreath			= auto()
+    wreath_s2		= auto()
+    
 class SYMMETRY(Enum):
     circular = dihedral = D_n              = auto()
     linear = S_2 = C_2 = flip = reflection = auto()
@@ -41,3 +41,8 @@ class DISPLAY(Enum):
     arrows  = auto()
     one_row = auto()
     cycles  = auto()
+
+class ALGEBRA(Enum):
+    group        = auto()
+    genome       = auto()
+    genome_class = auto()

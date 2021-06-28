@@ -42,7 +42,7 @@ def draw_genome_instance(framework, instance, show=False):
     wedges, texts = ax1.pie(segment_sizes, labeldistance=1.2, colors=segment_colors, 
                             labels=region_labels, radius=1, startangle=90, 
                             wedgeprops={"edgecolor":"0", 'linewidth': 1, 'linestyle': 'solid', 'antialiased': True})
-				
+                
     if framework.oriented and orientation_list:
         for i, p in enumerate(wedges):
             ang = (p.theta2 - p.theta1)/2. + p.theta1
@@ -51,11 +51,11 @@ def draw_genome_instance(framework, instance, show=False):
             arrow_length = 0.00001 # We only want the arrow head
             angle = np.deg2rad(ang) + (np.pi/2 if orientation_list[i] else 3*np.pi/2)
             if orientation_list:
-            	ax1.arrow(x, y, arrow_length*np.cos(angle), arrow_length*np.sin(angle), 
+                ax1.arrow(x, y, arrow_length*np.cos(angle), arrow_length*np.sin(angle), 
                             overhang = 0.3, head_width=0.12, head_length=0.12, head_starts_at_zero=True, 
                             length_includes_head=True, linewidth=1, facecolor='black', fill=True)
 
-	# Draw inner circle to hide most of the segment edges
+    # Draw inner circle to hide most of the segment edges
     centre_circle = plt.Circle((0,0),0.85,fc='white')
     fig = plt.gcf()
     fig.gca().add_artist(centre_circle)
