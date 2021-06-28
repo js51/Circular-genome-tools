@@ -36,10 +36,20 @@ class Model:
                     model[generator] = relative_prob/len(gens)
         return cls(framework, model)
 
+    def reg_rep_of_zs(self):
+        """Return the regular representation of zs as comptued by PositionParadigmFramework.reg_rep_zs, but store the sparse result"""
+        try:
+            return self._reg_rep_of_zs
+        except AttributeError:
+            self._reg_rep_of_zs = self.framework.reg_rep_of_zs(self, sparse=True)
+            return self._reg_rep_of_zs
+
     def generators(self):
         return self.generating_dictionary
 
-    def element(self, in_algebra=ALGEBRA):
+    def element(self, in_algebra=ALGEBRA.group):
+        if in_algebra is not ALGEBRA.group:
+            raise NotImplementedError(f"Model element for {str(in_algebra)} algebra not yet implemented")
         try:
             return self.s
         except AttributeError:

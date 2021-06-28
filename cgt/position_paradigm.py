@@ -252,8 +252,9 @@ class PositionParadigmFramework:
         """Return the defining representation matrix. Note that matrix(x)matrix(y) = matrix(yx)"""
         return np.array(self.one_row(self.cycles(element)).to_matrix())
 
-    def regular_rep_of_zs(self, model, to_adjacency_matrix=False):
+    def reg_rep_of_zs(self, model, to_adjacency_matrix=False, sparse=False):
         warnings.warn("Untested! Use at your own risk!")
+        # TODO: #14 re-write to directly use model element from the genome algebra
         if self is not model.framework:
             if self != model.framework:
                 raise ValueError(f"Current framework and model framework are not the same!")
