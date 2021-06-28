@@ -12,6 +12,8 @@ from . import models
 from . import position_paradigm
 from . import enums
 from . import rearrangements
+from . import examples
+from .examples import *
 from .enums import *
 from .position_paradigm import PositionParadigmFramework
 from .models import Model
