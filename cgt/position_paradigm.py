@@ -36,16 +36,8 @@ class PositionParadigmFramework:
         return self.__str__()
 
     def __call__(self, x):
-        """Return an object as a group or group algebra element if possible, oherwise return None"""
-        if x in self.genome_group():
-            return self.genome_group()(x)
-        elif type(x) is list: 
-            # TODO: #10 Fix __call__ to work as well as cycles. Maybe just make it call cycles and leave all the hard work to cycles.
-            return self.cycles(x)
-        elif x in self.group_algebra():
-            return self.group_algebra()(x)
-        else:
-            return None
+        """Return an object as a group algebra element if possible"""
+        return self.genome_algebra()(self.cycles(x))
 
     def cycles(self, element):
         try: # See if it's already a group element
