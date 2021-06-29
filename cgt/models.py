@@ -11,6 +11,7 @@ class Model:
         """Define a model from a dictionary of single permutations, with their probabilities as the values."""
         self.framework = framework
         self.generating_dictionary = generating_dictionary
+        self.s = {} # model elements
         # TODO: Implement checks for certain model properties, for example time reversibility, symmetry and missing rearrangements
 
     @classmethod
@@ -47,12 +48,12 @@ class Model:
     def generators(self):
         return self.generating_dictionary
 
-    def element(self, in_algebra=ALGEBRA.group):
-        if in_algebra is not ALGEBRA.group:
+    def s_element(self, in_algebra=ALGEBRA.group):
+        if in_algebra not in {ALGEBRA.group, ALGEBRA.genome}:
             raise NotImplementedError(f"Model element for {str(in_algebra)} algebra not yet implemented")
         try:
-            return self.s
-        except AttributeError:
+            return self.s[in_algebra]
+        except (AttributeError, KeyError):
             A = self.framework.group_algebra()
             s = A(0) # Zero element in algebra
             gens_dict = self.generators()
@@ -60,9 +61,12 @@ class Model:
             while len(gens) > 0:
                 gen = gens.pop()
                 prob = gens_dict[gen]
-                conj_class = rearrangements.conjugacy_class(self.framework, gen)
+                if in_algebra is ALGEBRA.group:
+                    conj_class = rearrangements.conjugacy_class(self.framework, gen)
+                elif in_algebra is ALGEBRA.genome:
+                    conj_class = {gen}
                 for perm in conj_class:
-                    s += (prob/len(conj_class)) * A(perm)
+                    s += QQ(prob/len(conj_class)) * A(perm)
                 gens -= conj_class
-            self.s = s
+            self.s[in_algebra] = s
             return s
