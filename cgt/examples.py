@@ -5,10 +5,10 @@ from .enums import MODEL, SYMMETRY
 from .models import Model
 from .position_paradigm import PositionParadigmFramework
 
-def example():
-    framework = PositionParadigmFramework(6, symmetry=SYMMETRY.circular)
+def example(n):
+    framework = PositionParadigmFramework(n, symmetry=SYMMETRY.circular)
     model = Model.named_model_with_relative_probs(framework, {
-        MODEL.one_region_inversions: 0.75, 
-        MODEL.two_region_inversions: 0.25
+        MODEL.one_region_inversions: 0.5, 
+        MODEL.two_region_inversions: 0.5
     })
     return framework, model

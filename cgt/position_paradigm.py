@@ -168,7 +168,7 @@ class PositionParadigmFramework:
         return sorted([self.one_row(g) for g in coset], key=self._sort_key)
 
     def _double_coset(self, instance):
-        coset = set(d2 * instance * d1 for d1 in self.symmetry_group() for d2 in self.symmetry_group)
+        coset = set(d2 * instance * d1 for d1 in self.symmetry_group() for d2 in self.symmetry_group())
         return sorted(coset, key=self._sort_key_cycles)
 
     def genome_equivalence_classes(self, sort_classes=True):
