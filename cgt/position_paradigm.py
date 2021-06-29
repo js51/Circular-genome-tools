@@ -160,9 +160,29 @@ class PositionParadigmFramework:
     def _sort_key(self, one_row_perm):
         return str(one_row_perm).replace('-', 'Z')
 
+    def _sort_key_cycles(self, cycles_perm):
+        return str(self.one_row(cycles_perm)).replace('-', 'Z')
+
     def _genome_coset(self, instance):
         coset = set(instance*d for d in self.symmetry_group())
         return sorted([self.one_row(g) for g in coset], key=self._sort_key)
+
+    def _double_coset(self, instance):
+        coset = set(d2 * instance * d1 for d1 in self.symmetry_group() for d2 in self.symmetry_group)
+        return sorted(coset, key=self._sort_key_cycles)
+
+    def genome_equivalence_classes(self, sort_classes=True):
+        """Return double cosets of instances---genomes in the same class will have the same likelihood functions"""
+        instances = set(self.genome_group())
+        classes = {}
+        while len(instances) > 0:
+            instance = instances.pop()
+            dcoset = self._double_coset(instance)
+            instances -= set(dcoset)
+            classes[dcoset[0]] = dcoset
+        if sort_classes:
+            classes = dict(sorted(classes.items(), key=lambda x: self._sort_key_cycles(x[0])))
+        return classes
 
     def genome(self, instance, format=None):
         coset = self._genome_coset(instance)
