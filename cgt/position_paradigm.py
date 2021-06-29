@@ -45,7 +45,7 @@ class PositionParadigmFramework:
         except ValueError:
             pass # Not able to be directly converted, try something else!
         if type(element) is np.ndarray: # If it's a matrix, let's convert it!
-            return self.__permutation_group_element_from_matrix(element)
+            return self._permutation_group_element_from_matrix(element)
         else: # Not a matrix, assume it's a list
             try:
                 elt = list(element)
@@ -157,15 +157,15 @@ class PositionParadigmFramework:
         """Return the number of distinct genomes up to symmetries."""
         return self.genome_group().order()/self.symmetry_group().order()
     
-    def __sort_key(self, one_row_perm):
+    def _sort_key(self, one_row_perm):
         return str(one_row_perm).replace('-', 'Z')
 
-    def __genome_coset(self, instance):
+    def _genome_coset(self, instance):
         coset = set(instance*d for d in self.symmetry_group())
-        return sorted([self.one_row(g) for g in coset], key=self.__sort_key)
+        return sorted([self.one_row(g) for g in coset], key=self._sort_key)
 
     def genome(self, instance, format=None):
-        coset = self.__genome_coset(instance)
+        coset = self._genome_coset(instance)
         if format == FORMAT.formal_sum:
             Z = self.symmetry_group()
             A = self.group_algebra()
@@ -180,7 +180,7 @@ class PositionParadigmFramework:
         genomes = {}
         while len(instances) > 0:
             instance = instances.pop()
-            coset = self.__genome_coset(instance)
+            coset = self._genome_coset(instance)
             instances -= set(coset)
             genomes[coset[0]] = coset
         if format == FORMAT.formal_sum:
@@ -188,7 +188,7 @@ class PositionParadigmFramework:
             A = self.group_algebra()
             genomes = { rep : sum(1/Z.order()*A(self.cycles(dx)) for dx in coset) for rep, coset in genomes.items() }
         if sort_genomes:
-            genomes = dict(sorted(genomes.items(), key=lambda x: self.__sort_key(x[0])))
+            genomes = dict(sorted(genomes.items(), key=lambda x: self._sort_key(x[0])))
         return genomes
 
     def standard_reflection(self):
@@ -241,7 +241,7 @@ class PositionParadigmFramework:
         else:
             raise NotImplementedError(f"Can't draw genome instance with symmetry group {str(self.symmetry)}")
 
-    def __permutation_group_element_from_matrix(self, matrix):
+    def _permutation_group_element_from_matrix(self, matrix):
         sigma = []
         for c, col in enumerate(matrix.T):
             image = np.nonzero(col)[0][0]
