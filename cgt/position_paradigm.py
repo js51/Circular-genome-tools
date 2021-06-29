@@ -285,25 +285,34 @@ class PositionParadigmFramework:
         return matrix
 
 
-    def irreps(self):
+    def irreps(self, element=None):
         """Return a complete list of pairwise irreducible representations of the genome group."""
         try:
-            return self.irreducible_representations
+            representations = self.irreducible_representations
         except AttributeError:
             representations = []
-        if not self.oriented:
-            for irrep in SymmetricGroupRepresentations(self.n):
-                def representation(sigma, _irrep=irrep):
-                    return matrix(UniversalCyclotomicField(), _irrep(sigma))
-                representations.append(representation)
+            def irrep_function_factory(irrep, signed):
+                def representation(sigma, _irrep=irrep, _signed=signed):
+                        result = 0
+                        if sigma in self.group_algebra(): # sigma is an algebra element
+                            for term in sigma:
+                                perm, coeff = term
+                                result += coeff * (gap.Image(_irrep, perm) if _signed else _irrep(perm))
+                        else: # sigma is a group element
+                            result = (gap.Image(_irrep, sigma) if _signed else _irrep(sigma))
+                        return matrix(UniversalCyclotomicField(), result)
+                return representation
+            if not self.oriented:
+                irreps = SymmetricGroupRepresentations(self.n)
+            else:
+                irreps = (gap.IrreducibleAffordingRepresentation(character) for character in gap.Irr(self.genome_group()))
+            for irrep in irreps:
+                representations.append(irrep_function_factory(irrep, self.oriented))
+            self.irreducible_representations = representations
+        if element is not None:
+            return [irrep(element) for irrep in representations]
         else:
-            for character in gap.Irr(self.genome_group()):
-                irrep = gap.IrreducibleAffordingRepresentation(character)
-                def representation(sigma, as_gap_matrix=False, _irrep=irrep):
-                    return image if as_gap_matrix else matrix(UniversalCyclotomicField(), gap.Image(_irrep, sigma))
-                representations.append(representation)
-        self.irreducible_representations = representations
-        return representations
+            return representations
 
     def regular_representation(self, g): 
         """Return the regular representation of a single element"""
