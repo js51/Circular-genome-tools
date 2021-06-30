@@ -1,7 +1,7 @@
 """
 """
 name = "cgt"
-from sage.all_cmdline import *
+from sage.all_cmdline import gap
 gigs = 30
 old_command = gap._Expect__command
 s = old_command.index('-o ')
