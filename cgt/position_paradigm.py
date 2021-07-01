@@ -6,13 +6,13 @@ that they can acces information without it needing to be recreated.
 
 from sage.all_cmdline import *
 from sage.combinat.colored_permutations import SignedPermutations
-from sage.misc.superseded import warning
 from .enums import *
 import numpy as np
 import warnings
 from copy import deepcopy 
 from .structures import HyperoctahedralGroup
 from scipy.sparse import dok_matrix as dok
+from random import choice
 
 class PositionParadigmFramework:
     """Everything you need for working with genomes under the position paradigm"""
@@ -37,16 +37,8 @@ class PositionParadigmFramework:
         return self.__str__()
 
     def __call__(self, x):
-        """Return an object as a group or group algebra element if possible, oherwise return None"""
-        if x in self.genome_group():
-            return self.genome_group()(x)
-        elif type(x) is list: 
-            # TODO: #10 Fix __call__ to work as well as cycles. Maybe just make it call cycles and leave all the hard work to cycles.
-            return self.cycles(x)
-        elif x in self.group_algebra():
-            return self.group_algebra()(x)
-        else:
-            return None
+        """Return an object as a group algebra element if possible"""
+        return self.genome_algebra()(self.cycles(x))
 
     def cycles(self, element):
         try: # See if it's already a group element
@@ -54,7 +46,7 @@ class PositionParadigmFramework:
         except ValueError:
             pass # Not able to be directly converted, try something else!
         if type(element) is np.ndarray: # If it's a matrix, let's convert it!
-            return self.__permutation_group_element_from_matrix(element)
+            return self._permutation_group_element_from_matrix(element)
         else: # Not a matrix, assume it's a list
             try:
                 elt = list(element)
@@ -124,10 +116,13 @@ class PositionParadigmFramework:
     def random_instance(self, genome=None):
         """Return a random permutation corresponding to a given genome, or a random genome if none is given."""
         if genome:
-            raise NotImplementedError("Not yet implemented")
+            return choice(list(genome))[0]
         else:
             return self.genome_group().random_element()
-    random = random_instance
+
+    def random_genome(self, format=FORMAT.formal_sum):
+        """Return a random genome"""
+        return self.genome(self.random_instance(), format=format)
 
     def symmetry_group(self):
         """Return the symmetry group of the genomes."""
@@ -159,22 +154,45 @@ class PositionParadigmFramework:
             self.z = 1/self.symmetry_group().order() * sum(self.group_algebra()(d) for d in self.symmetry_group())
         return self.z
 
-    def set_model(self):
-        raise(NotImplementedError())
-    
     def num_genomes(self):
         """Return the number of distinct genomes up to symmetries."""
         return self.genome_group().order()/self.symmetry_group().order()
     
-    def __sort_key(self, one_row_perm):
+    def _sort_key(self, one_row_perm):
         return str(one_row_perm).replace('-', 'Z')
 
-    def __genome_coset(self, instance):
-        coset = set(instance*d for d in self.symmetry_group())
-        return sorted([self.one_row(g) for g in coset], key=self.__sort_key)
+    def _sort_key_cycles(self, cycles_perm):
+        return str(self.one_row(cycles_perm)).replace('-', 'Z')
 
-    def genome(self, instance):
-        return self.__genome_coset(instance)
+    def _genome_coset(self, instance):
+        coset = set(instance*d for d in self.symmetry_group())
+        return sorted([self.one_row(g) for g in coset], key=self._sort_key)
+
+    def _double_coset(self, instance):
+        coset = set(d2 * instance * d1 for d1 in self.symmetry_group() for d2 in self.symmetry_group())
+        return sorted(coset, key=self._sort_key_cycles)
+
+    def genome_equivalence_classes(self, sort_classes=True):
+        """Return double cosets of instances---genomes in the same class will have the same likelihood functions"""
+        instances = set(self.genome_group())
+        classes = {}
+        while len(instances) > 0:
+            instance = instances.pop()
+            dcoset = self._double_coset(instance)
+            instances -= set(dcoset)
+            classes[dcoset[0]] = dcoset
+        if sort_classes:
+            classes = dict(sorted(classes.items(), key=lambda x: self._sort_key_cycles(x[0])))
+        return classes
+
+    def genome(self, instance, format=None):
+        coset = self._genome_coset(instance)
+        if format == FORMAT.formal_sum:
+            Z = self.symmetry_group()
+            A = self.group_algebra()
+            return sum(1/Z.order()*A(self.cycles(dx)) for dx in coset)
+        else:
+            return coset
 
     def genomes(self, format=FORMAT.dictionary, sort_genomes=True):
         if format not in {FORMAT.dictionary, FORMAT.formal_sum}:
@@ -183,7 +201,7 @@ class PositionParadigmFramework:
         genomes = {}
         while len(instances) > 0:
             instance = instances.pop()
-            coset = self.__genome_coset(instance)
+            coset = self._genome_coset(instance)
             instances -= set(coset)
             genomes[coset[0]] = coset
         if format == FORMAT.formal_sum:
@@ -191,11 +209,8 @@ class PositionParadigmFramework:
             A = self.group_algebra()
             genomes = { rep : sum(1/Z.order()*A(self.cycles(dx)) for dx in coset) for rep, coset in genomes.items() }
         if sort_genomes:
-            genomes = dict(sorted(genomes.items(), key=lambda x: self.__sort_key(x[0])))
+            genomes = dict(sorted(genomes.items(), key=lambda x: self._sort_key(x[0])))
         return genomes
-
-    def num_rearrangements(self):
-        raise(NotImplementedError())
 
     def standard_reflection(self):
         """Return a permutation which reflects a genome instance about the center region (n odd), or the center two regions (n even)."""
@@ -222,26 +237,32 @@ class PositionParadigmFramework:
         string = string.replace(',)', ')')
         return self.genome_group()(string)
 
-    def draw_instance(self, instance):
+    def draw_instance(self, instance, shortened=False):
         permutation = instance.inverse()
+        if shortened:
+            left_tail, right_head = '\u2758', '\u276D'
+            left_head, right_tail = '\u276C', '\u2758'
+        else:
+            left_tail, right_head = '|-', '->'
+            left_head, right_tail = '<-', '-|'
         if self.symmetry in {SYMMETRY.circular, SYMMETRY.linear}:
             string = "..." if self.symmetry is SYMMETRY.circular else ""
             for position in range(1, self.n + 1):
                 signed_region = permutation(position)
                 if signed_region < 0:
-                    region = f" <-{abs(signed_region)}-|"
+                    region = f"{left_head}{abs(signed_region)}{right_tail}"
                 else:
-                    region = f" |-{abs(signed_region)}->"
+                    region = f"{left_tail}{abs(signed_region)}{right_head}"
                 if position == 1:
                     first_region = region
                 string += region
-            string += f"{first_region} ..." if self.symmetry is SYMMETRY.circular else ""
+            string += f"{first_region}..." if self.symmetry is SYMMETRY.circular else ""
             string = string if self.symmetry is SYMMETRY.circular else string[1:]
-            return string if self.oriented else string.replace('<', '|').replace('>', '|')
+            return string if self.oriented else string.replace(right_head, right_tail).replace(left_head, left_tail)
         else:
             raise NotImplementedError(f"Can't draw genome instance with symmetry group {str(self.symmetry)}")
 
-    def __permutation_group_element_from_matrix(self, matrix):
+    def _permutation_group_element_from_matrix(self, matrix):
         sigma = []
         for c, col in enumerate(matrix.T):
             image = np.nonzero(col)[0][0]
@@ -250,10 +271,13 @@ class PositionParadigmFramework:
 
     def matrix(self, element):
         """Return the defining representation matrix. Note that matrix(x)matrix(y) = matrix(yx)"""
-        return np.array(self.one_row(self.cycles(element)).to_matrix())
+        with warnings.catch_warnings(): # Sage uses deprecated objects in to_matrix for coloured permutations
+            warnings.simplefilter("ignore", category=PendingDeprecationWarning)
+            return np.array(self.one_row(self.cycles(element)).to_matrix())
 
-    def regular_rep_of_zs(self, model, to_adjacency_matrix=False):
+    def reg_rep_of_zs(self, model, to_adjacency_matrix=False, sparse=False):
         warnings.warn("Untested! Use at your own risk!")
+        # TODO: #14 re-write to directly use model element from the genome algebra
         if self is not model.framework:
             if self != model.framework:
                 raise ValueError(f"Current framework and model framework are not the same!")
@@ -284,25 +308,34 @@ class PositionParadigmFramework:
         return matrix
 
 
-    def irreps(self):
+    def irreps(self, element=None):
         """Return a complete list of pairwise irreducible representations of the genome group."""
         try:
-            return self.irreducible_representations
+            representations = self.irreducible_representations
         except AttributeError:
             representations = []
-        if not self.oriented:
-            for irrep in SymmetricGroupRepresentations(self.n):
-                def representation(sigma, _irrep=irrep):
-                    return matrix(UniversalCyclotomicField(), _irrep(sigma))
-                representations.append(representation)
+            def irrep_function_factory(irrep, signed):
+                def representation(sigma, _irrep=irrep, _signed=signed):
+                        result = 0
+                        if sigma in self.group_algebra(): # sigma is an algebra element
+                            for term in sigma:
+                                perm, coeff = term
+                                result += coeff * (gap.Image(_irrep, perm) if _signed else _irrep(perm))
+                        else: # sigma is a group element
+                            result = (gap.Image(_irrep, sigma) if _signed else _irrep(sigma))
+                        return matrix(UniversalCyclotomicField(), result)
+                return representation
+            if not self.oriented:
+                irreps = SymmetricGroupRepresentations(self.n)
+            else:
+                irreps = (gap.IrreducibleAffordingRepresentation(character) for character in gap.Irr(self.genome_group()))
+            for irrep in irreps:
+                representations.append(irrep_function_factory(irrep, self.oriented))
+            self.irreducible_representations = representations
+        if element is not None:
+            return [irrep(element) for irrep in representations]
         else:
-            for character in gap.Irr(self.genome_group()):
-                irrep = gap.IrreducibleAffordingRepresentation(character)
-                def representation(sigma, as_gap_matrix=False, _irrep=irrep):
-                    return image if as_gap_matrix else matrix(UniversalCyclotomicField(), gap.Image(_irrep, sigma))
-                representations.append(representation)
-        self.irreducible_representations = representations
-        return representations
+            return representations
 
     def regular_representation(self, g): 
         """Return the regular representation of a single element"""
@@ -321,17 +354,24 @@ class PositionParadigmFramework:
             warnings.warn("Note that extra terms from the smaller sum remain in the larger sum!")
         return min(terms)
 
-    def collect_genome_terms(self, formal_sum):
-        formal_sum = deepcopy(formal_sum)
+    def collect_genome_terms(self, formal_sum, display=DISPLAY.one_row):
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            formal_sum = deepcopy(formal_sum)
         terms = formal_sum.terms()
-        genomes = self.genomes(format=FORMAT.formal_sum)
         new_sum = [] # [(coeff, rep), ...]
         while len(terms) > 0:
             term = list(terms[0])[0][0]
             canonical_instance = self.canonical_instance(term)
-            genome = genomes[canonical_instance]
+            genome = self.genome(self.cycles(canonical_instance), format=FORMAT.formal_sum)
             coeff = self.coefficient_in(formal_sum, genome)
             formal_sum -= coeff * genome
             terms = formal_sum.terms()
-            new_sum.append((coeff, str(canonical_instance) + 'z'))
+            if display is DISPLAY.one_row:
+                genome_string = str(canonical_instance).replace(' ', '') + 'z'
+            elif display is DISPLAY.cycles:
+                genome_string = str(self.cycles(canonical_instance)) + 'z'
+            elif display is DISPLAY.arrows:
+                genome_string = '(' + self.draw_instance(self.cycles(canonical_instance), shortened=True) + ')'
+            new_sum.append((coeff, genome_string))
         return FormalSum(new_sum, parent=QQ)
