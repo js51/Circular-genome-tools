@@ -5,7 +5,6 @@ import os
 import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-from sage.all_cmdline import *
 from .position_paradigm import *
 from .enums import *
 

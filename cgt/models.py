@@ -1,7 +1,7 @@
 """
 """
 
-from sage.all_cmdline import *
+from sage.all_cmdline import QQ
 from .enums import *
 from . import rearrangements
 
