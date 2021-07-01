@@ -12,6 +12,7 @@ import warnings
 from copy import deepcopy 
 from .structures import HyperoctahedralGroup
 from scipy.sparse import dok_matrix as dok
+from random import choice
 
 class PositionParadigmFramework:
     """Everything you need for working with genomes under the position paradigm"""
@@ -115,7 +116,7 @@ class PositionParadigmFramework:
     def random_instance(self, genome=None):
         """Return a random permutation corresponding to a given genome, or a random genome if none is given."""
         if genome:
-            raise NotImplementedError("Not yet implemented")
+            return choice(list(genome))[0]
         else:
             return self.genome_group().random_element()
 
