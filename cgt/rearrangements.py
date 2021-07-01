@@ -2,7 +2,8 @@
 """
 
 from copy import deepcopy
-from sage.all_cmdline import *
+from sage.all_cmdline import SymmetricGroup, floor
+import warnings
 from . import structures
 from .enums import *
 
