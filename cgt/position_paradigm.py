@@ -12,6 +12,7 @@ import warnings
 from copy import deepcopy 
 from .structures import HyperoctahedralGroup
 from scipy.sparse import dok_matrix as dok
+from random import choice
 
 class PositionParadigmFramework:
     """Everything you need for working with genomes under the position paradigm"""
@@ -115,7 +116,7 @@ class PositionParadigmFramework:
     def random_instance(self, genome=None):
         """Return a random permutation corresponding to a given genome, or a random genome if none is given."""
         if genome:
-            raise NotImplementedError("Not yet implemented")
+            return choice(list(genome))[0]
         else:
             return self.genome_group().random_element()
 
@@ -168,7 +169,7 @@ class PositionParadigmFramework:
         return sorted([self.one_row(g) for g in coset], key=self._sort_key)
 
     def _double_coset(self, instance):
-        coset = set(d2 * instance * d1 for d1 in self.symmetry_group() for d2 in self.symmetry_group)
+        coset = set(d2 * instance * d1 for d1 in self.symmetry_group() for d2 in self.symmetry_group())
         return sorted(coset, key=self._sort_key_cycles)
 
     def genome_equivalence_classes(self, sort_classes=True):
