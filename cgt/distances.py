@@ -5,14 +5,14 @@ import numpy as np
 import networkx as nx
 from sage.all import ComplexDoubleField, UniversalCyclotomicField, matrix, Matrix, real, exp, round
 from scipy.optimize import minimize
+from warnings import warn
+import matplotlib.pyplot as plt
 
-def mles(framework, model, genome_reps):
+def mles(framework, model, genome_reps, plots=False):
     """
     Return dictionary of MLEs (if they exist) for time elapsed rearranging ref->genome for each genome
-    
-    args:
-        genomes: a list of instances representing genomes
     """
+    warn("This... might take a while!")
     CDF, UCF = ComplexDoubleField(), UniversalCyclotomicField()
     G = framework.genome_group()
     Z = framework.symmetry_group()
@@ -49,9 +49,16 @@ def mles(framework, model, genome_reps):
     for instance in genome_reps:
         def L(time):
             return -likelihood(time, instance)
-        mle = minimize(L, 1, method="TNC", bounds=[bound])
+        mle = minimize(L, 0.1, method="TNC", bounds=[bound])
         mle_dict[instance] = mle.x[0]
-    return {framework.one_row(key) : value for key, value in mle_dict}
+        if plots:
+            plt.figure()
+            times = np.arange(bound[0], bound[1], 0.5)
+            likelihood_functional_values = [likelihood(time, instance) for time in times]
+            plt.plot(times, likelihood_functional_values)
+            plt.savefig(f'./cgt_{framework.one_row(instance)}')
+
+    return {framework.one_row(key) : value for key, value in mle_dict.items()}
 
 def _projection_operators(mat, eigs):
         """Return projection operators for given matrix and its eigenvalues"""
