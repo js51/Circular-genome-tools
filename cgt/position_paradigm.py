@@ -271,7 +271,9 @@ class PositionParadigmFramework:
 
     def matrix(self, element):
         """Return the defining representation matrix. Note that matrix(x)matrix(y) = matrix(yx)"""
-        return np.array(self.one_row(self.cycles(element)).to_matrix())
+        with warnings.catch_warnings(): # Sage uses deprecated objects in to_matrix for coloured permutations
+            warnings.simplefilter("ignore", category=PendingDeprecationWarning)
+            return np.array(self.one_row(self.cycles(element)).to_matrix())
 
     def reg_rep_of_zs(self, model, to_adjacency_matrix=False, sparse=False):
         warnings.warn("Untested! Use at your own risk!")
