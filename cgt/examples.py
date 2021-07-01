@@ -1,6 +1,5 @@
 """
 """
-from sage.modular.modform.element import ModularFormElement
 from .enums import MODEL, SYMMETRY
 from .models import Model
 from .position_paradigm import PositionParadigmFramework

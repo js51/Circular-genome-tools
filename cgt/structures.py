@@ -2,7 +2,7 @@
 A place for functions which return important but general algebraic structures requiring only a few parameters
 """
 
-from sage.all_cmdline import *
+from sage.all_cmdline import SymmetricGroup
 
 def set_plus_minus(n):
     return tuple(range(1,n+1)) + tuple(range(-n, 0))
