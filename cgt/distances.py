@@ -13,7 +13,6 @@ def mles(framework, model, genome_reps):
     args:
         genomes: a list of instances representing genomes
     """
-    # raise NotImplementedError('not finished!')
     CDF, UCF = ComplexDoubleField(), UniversalCyclotomicField()
     G = framework.genome_group()
     Z = framework.symmetry_group()
