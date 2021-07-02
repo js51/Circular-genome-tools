@@ -4,10 +4,10 @@
 from enum import Enum, auto
 
 class MODEL(Enum):
-    one_region_inversions  = auto()
-    two_region_inversions  = auto()
-    all_inversions		   = auto()
-    one_region_swaps       = auto()
+    one_region_inversions  = "inversions of a single region"
+    two_region_inversions  = "inversions of two adjacent regions"
+    all_inversions		   = "all inversions"
+    one_region_swaps       = "adjacent transpositions"
 
 class TYPE(Enum):
     reg_to_signed_pos = auto()
