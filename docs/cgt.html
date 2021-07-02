@@ -1,0 +1,677 @@
+
+
+<!doctype html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cgt package &#8212; Circular Genome Tools 0.1.1 documentation</title>
+    <link rel="stylesheet" href="_static/bizstyle.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="_static/bizstyle.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="cgt.tests package" href="cgt.tests.html" />
+    <link rel="prev" title="cgt" href="modules.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <!--[if lt IE 9]>
+    <script src="_static/css3-mediaqueries.js"></script>
+    <![endif]-->
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="cgt.tests.html" title="cgt.tests package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="modules.html" title="cgt"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Circular Genome Tools 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" accesskey="U">cgt</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">cgt package</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="cgt-package">
+<h1>cgt package<a class="headerlink" href="#cgt-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="subpackages">
+<h2>Subpackages<a class="headerlink" href="#subpackages" title="Permalink to this headline">¶</a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cgt.tests.html">cgt.tests package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cgt.tests.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cgt.tests.html#module-cgt.tests.test_conversions">cgt.tests.test_conversions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cgt.tests.html#module-cgt.tests">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-cgt.distances">
+<span id="cgt-distances-module"></span><h2>cgt.distances module<a class="headerlink" href="#module-cgt.distances" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="cgt.distances.MFPT">
+<code class="sig-prename descclassname">cgt.distances.</code><code class="sig-name descname">MFPT</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">scale_by</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.MFPT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the mean time elapsed rearranging ref-&gt;genome where the target is an absorbing state</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="cgt.distances.likelihood_function">
+<code class="sig-prename descclassname">cgt.distances.</code><code class="sig-name descname">likelihood_function</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.likelihood_function" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the likelihood function for a given genome</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="cgt.distances.min_distance">
+<code class="sig-prename descclassname">cgt.distances.</code><code class="sig-name descname">min_distance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">weighted</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.min_distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return dictionary of minimum distances ref-&gt;genome, using inverse of model probabilities as weights (or not)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="cgt.distances.mles">
+<code class="sig-prename descclassname">cgt.distances.</code><code class="sig-name descname">mles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">genome_reps</span></em>, <em class="sig-param"><span class="n">plots</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.mles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return dictionary of MLEs (if they exist) for time elapsed rearranging ref-&gt;genome for each genome</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cgt.enums">
+<span id="cgt-enums-module"></span><h2>cgt.enums module<a class="headerlink" href="#module-cgt.enums" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="cgt.enums.ALGEBRA">
+<em class="property">class </em><code class="sig-prename descclassname">cgt.enums.</code><code class="sig-name descname">ALGEBRA</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.enums.ALGEBRA" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt id="cgt.enums.ALGEBRA.genome">
+<code class="sig-name descname">genome</code><em class="property"> = 2</em><a class="headerlink" href="#cgt.enums.ALGEBRA.genome" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.ALGEBRA.genome_class">
+<code class="sig-name descname">genome_class</code><em class="property"> = 3</em><a class="headerlink" href="#cgt.enums.ALGEBRA.genome_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.ALGEBRA.group">
+<code class="sig-name descname">group</code><em class="property"> = 1</em><a class="headerlink" href="#cgt.enums.ALGEBRA.group" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="cgt.enums.CLASSES">
+<em class="property">class </em><code class="sig-prename descclassname">cgt.enums.</code><code class="sig-name descname">CLASSES</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.enums.CLASSES" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt id="cgt.enums.CLASSES.conjugacy_classes">
+<code class="sig-name descname">conjugacy_classes</code><em class="property"> = 1</em><a class="headerlink" href="#cgt.enums.CLASSES.conjugacy_classes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.CLASSES.cosets">
+<code class="sig-name descname">cosets</code><em class="property"> = 2</em><a class="headerlink" href="#cgt.enums.CLASSES.cosets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.CLASSES.double_cosets">
+<code class="sig-name descname">double_cosets</code><em class="property"> = 3</em><a class="headerlink" href="#cgt.enums.CLASSES.double_cosets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="cgt.enums.DISPLAY">
+<em class="property">class </em><code class="sig-prename descclassname">cgt.enums.</code><code class="sig-name descname">DISPLAY</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.enums.DISPLAY" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt id="cgt.enums.DISPLAY.arrows">
+<code class="sig-name descname">arrows</code><em class="property"> = 1</em><a class="headerlink" href="#cgt.enums.DISPLAY.arrows" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.DISPLAY.cycles">
+<code class="sig-name descname">cycles</code><em class="property"> = 3</em><a class="headerlink" href="#cgt.enums.DISPLAY.cycles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.DISPLAY.one_row">
+<code class="sig-name descname">one_row</code><em class="property"> = 2</em><a class="headerlink" href="#cgt.enums.DISPLAY.one_row" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="cgt.enums.FORMAT">
+<em class="property">class </em><code class="sig-prename descclassname">cgt.enums.</code><code class="sig-name descname">FORMAT</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.enums.FORMAT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt id="cgt.enums.FORMAT.dictionary">
+<code class="sig-name descname">dictionary</code><em class="property"> = 3</em><a class="headerlink" href="#cgt.enums.FORMAT.dictionary" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.FORMAT.equiv_classes">
+<code class="sig-name descname">equiv_classes</code><em class="property"> = 2</em><a class="headerlink" href="#cgt.enums.FORMAT.equiv_classes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.FORMAT.formal_sum">
+<code class="sig-name descname">formal_sum</code><em class="property"> = 1</em><a class="headerlink" href="#cgt.enums.FORMAT.formal_sum" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.FORMAT.only_reps">
+<code class="sig-name descname">only_reps</code><em class="property"> = 4</em><a class="headerlink" href="#cgt.enums.FORMAT.only_reps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="cgt.enums.MODEL">
+<em class="property">class </em><code class="sig-prename descclassname">cgt.enums.</code><code class="sig-name descname">MODEL</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.enums.MODEL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt id="cgt.enums.MODEL.all_inversions">
+<code class="sig-name descname">all_inversions</code><em class="property"> = 3</em><a class="headerlink" href="#cgt.enums.MODEL.all_inversions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.MODEL.one_region_inversions">
+<code class="sig-name descname">one_region_inversions</code><em class="property"> = 1</em><a class="headerlink" href="#cgt.enums.MODEL.one_region_inversions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.MODEL.one_region_swaps">
+<code class="sig-name descname">one_region_swaps</code><em class="property"> = 4</em><a class="headerlink" href="#cgt.enums.MODEL.one_region_swaps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.MODEL.two_region_inversions">
+<code class="sig-name descname">two_region_inversions</code><em class="property"> = 2</em><a class="headerlink" href="#cgt.enums.MODEL.two_region_inversions" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="cgt.enums.SET">
+<em class="property">class </em><code class="sig-prename descclassname">cgt.enums.</code><code class="sig-name descname">SET</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.enums.SET" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt id="cgt.enums.SET.one_row">
+<code class="sig-name descname">one_row</code><em class="property"> = 3</em><a class="headerlink" href="#cgt.enums.SET.one_row" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.SET.signed_cycles">
+<code class="sig-name descname">signed_cycles</code><em class="property"> = 1</em><a class="headerlink" href="#cgt.enums.SET.signed_cycles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.SET.unsigned_cycles">
+<code class="sig-name descname">unsigned_cycles</code><em class="property"> = 2</em><a class="headerlink" href="#cgt.enums.SET.unsigned_cycles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.SET.wreath">
+<code class="sig-name descname">wreath</code><em class="property"> = 4</em><a class="headerlink" href="#cgt.enums.SET.wreath" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.SET.wreath_s2">
+<code class="sig-name descname">wreath_s2</code><em class="property"> = 5</em><a class="headerlink" href="#cgt.enums.SET.wreath_s2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="cgt.enums.SYMMETRY">
+<em class="property">class </em><code class="sig-prename descclassname">cgt.enums.</code><code class="sig-name descname">SYMMETRY</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.enums.SYMMETRY" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt id="cgt.enums.SYMMETRY.C_2">
+<code class="sig-name descname">C_2</code><em class="property"> = 2</em><a class="headerlink" href="#cgt.enums.SYMMETRY.C_2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.SYMMETRY.D_n">
+<code class="sig-name descname">D_n</code><em class="property"> = 1</em><a class="headerlink" href="#cgt.enums.SYMMETRY.D_n" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.SYMMETRY.S_2">
+<code class="sig-name descname">S_2</code><em class="property"> = 2</em><a class="headerlink" href="#cgt.enums.SYMMETRY.S_2" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.SYMMETRY.circular">
+<code class="sig-name descname">circular</code><em class="property"> = 1</em><a class="headerlink" href="#cgt.enums.SYMMETRY.circular" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.SYMMETRY.dihedral">
+<code class="sig-name descname">dihedral</code><em class="property"> = 1</em><a class="headerlink" href="#cgt.enums.SYMMETRY.dihedral" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.SYMMETRY.flip">
+<code class="sig-name descname">flip</code><em class="property"> = 2</em><a class="headerlink" href="#cgt.enums.SYMMETRY.flip" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.SYMMETRY.linear">
+<code class="sig-name descname">linear</code><em class="property"> = 2</em><a class="headerlink" href="#cgt.enums.SYMMETRY.linear" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.SYMMETRY.reflection">
+<code class="sig-name descname">reflection</code><em class="property"> = 2</em><a class="headerlink" href="#cgt.enums.SYMMETRY.reflection" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="cgt.enums.TYPE">
+<em class="property">class </em><code class="sig-prename descclassname">cgt.enums.</code><code class="sig-name descname">TYPE</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.enums.TYPE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt id="cgt.enums.TYPE.pos_to_signed_reg">
+<code class="sig-name descname">pos_to_signed_reg</code><em class="property"> = 2</em><a class="headerlink" href="#cgt.enums.TYPE.pos_to_signed_reg" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.TYPE.reg_to_signed_pos">
+<code class="sig-name descname">reg_to_signed_pos</code><em class="property"> = 1</em><a class="headerlink" href="#cgt.enums.TYPE.reg_to_signed_pos" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.TYPE.signed_pos_to_reg">
+<code class="sig-name descname">signed_pos_to_reg</code><em class="property"> = 4</em><a class="headerlink" href="#cgt.enums.TYPE.signed_pos_to_reg" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.TYPE.signed_reg_to_pos">
+<code class="sig-name descname">signed_reg_to_pos</code><em class="property"> = 3</em><a class="headerlink" href="#cgt.enums.TYPE.signed_reg_to_pos" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cgt.examples">
+<span id="cgt-examples-module"></span><h2>cgt.examples module<a class="headerlink" href="#module-cgt.examples" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="cgt.examples.example">
+<code class="sig-prename descclassname">cgt.examples.</code><code class="sig-name descname">example</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.examples.example" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-cgt.genome">
+<span id="cgt-genome-module"></span><h2>cgt.genome module<a class="headerlink" href="#module-cgt.genome" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="cgt.genome.Genome">
+<em class="property">class </em><code class="sig-prename descclassname">cgt.genome.</code><code class="sig-name descname">Genome</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">genome</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.genome.Genome" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Optional wrapper for genomes, so that they can be printed/operated on in a more pythonic way.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cgt.models">
+<span id="cgt-models-module"></span><h2>cgt.models module<a class="headerlink" href="#module-cgt.models" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="cgt.models.Model">
+<em class="property">class </em><code class="sig-prename descclassname">cgt.models.</code><code class="sig-name descname">Model</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">generating_dictionary</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.models.Model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Defines a model. A model consists of some collection of permutations and a map from these permutations to probabilities [0,1]</p>
+<dl class="py method">
+<dt id="cgt.models.Model.generators">
+<code class="sig-name descname">generators</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cgt.models.Model.generators" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="cgt.models.Model.named_model_with_relative_probs">
+<em class="property">classmethod </em><code class="sig-name descname">named_model_with_relative_probs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">named_model_dictionary</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.models.Model.named_model_with_relative_probs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="cgt.models.Model.reg_rep_of_zs">
+<code class="sig-name descname">reg_rep_of_zs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cgt.models.Model.reg_rep_of_zs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the regular representation of zs as comptued by PositionParadigmFramework.reg_rep_zs, but store the sparse result</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgt.models.Model.s_element">
+<code class="sig-name descname">s_element</code><span class="sig-paren">(</span><em class="sig-param">in_algebra=&lt;ALGEBRA.group: 1&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.models.Model.s_element" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cgt.position_paradigm">
+<span id="cgt-position-paradigm-module"></span><h2>cgt.position_paradigm module<a class="headerlink" href="#module-cgt.position_paradigm" title="Permalink to this headline">¶</a></h2>
+<p>position_paradigm is the most important module in cgt. PositionParadigmFramework keeps track of important objects, can
+convert group elements and genomes between different forms, and instances can be passed to functions from other modules so
+that they can acces information without it needing to be recreated.</p>
+<dl class="py class">
+<dt id="cgt.position_paradigm.PositionParadigmFramework">
+<em class="property">class </em><code class="sig-prename descclassname">cgt.position_paradigm.</code><code class="sig-name descname">PositionParadigmFramework</code><span class="sig-paren">(</span><em class="sig-param">num_regions</em>, <em class="sig-param">oriented=True</em>, <em class="sig-param">symmetry=None</em>, <em class="sig-param">genome_type=&lt;TYPE.reg_to_signed_pos: 1&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Everything you need for working with genomes under the position paradigm</p>
+<dl class="py method">
+<dt id="cgt.position_paradigm.PositionParadigmFramework.canonical_instance">
+<code class="sig-name descname">canonical_instance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">instance</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.canonical_instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the ‘canonical’ instance of the genome represented by the permutation if there is one.</p>
+<dl class="simple">
+<dt>TESTS::</dt><dd><p>sage: import cgt; ppf = cgt.PositionParadigmFramework(3, symmetry=cgt.SYMMETRY.circular)
+sage: ppf.canonical_instance(‘(1,-2)(-1,2)’)
+[1, 2, -3]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgt.position_paradigm.PositionParadigmFramework.coefficient_in">
+<code class="sig-name descname">coefficient_in</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">more_terms</span></em>, <em class="sig-param"><span class="n">fewer_terms</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.coefficient_in" title="Permalink to this definition">¶</a></dt>
+<dd><p>For example, the coefficient of (a/2 + b/2) in x=(a/3 + b/3 + c/3) is 2/3, since x=2/3*(a/2 + b/2) + c/3</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgt.position_paradigm.PositionParadigmFramework.collect_genome_terms">
+<code class="sig-name descname">collect_genome_terms</code><span class="sig-paren">(</span><em class="sig-param">formal_sum</em>, <em class="sig-param">display=&lt;DISPLAY.one_row: 2&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.collect_genome_terms" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="cgt.position_paradigm.PositionParadigmFramework.cycles">
+<code class="sig-name descname">cycles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">element</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.cycles" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="cgt.position_paradigm.PositionParadigmFramework.draw_instance">
+<code class="sig-name descname">draw_instance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">instance</span></em>, <em class="sig-param"><span class="n">shortened</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.draw_instance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="cgt.position_paradigm.PositionParadigmFramework.genome">
+<code class="sig-name descname">genome</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">instance</span></em>, <em class="sig-param"><span class="n">format</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.genome" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="cgt.position_paradigm.PositionParadigmFramework.genome_equivalence_classes">
+<code class="sig-name descname">genome_equivalence_classes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sort_classes</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.genome_equivalence_classes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return double cosets of instances—genomes in the same class will have the same likelihood functions</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgt.position_paradigm.PositionParadigmFramework.genome_group">
+<code class="sig-name descname">genome_group</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.genome_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the permutation group containing genome instances.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgt.position_paradigm.PositionParadigmFramework.genomes">
+<code class="sig-name descname">genomes</code><span class="sig-paren">(</span><em class="sig-param">format=&lt;FORMAT.dictionary: 3&gt;</em>, <em class="sig-param">sort_genomes=True</em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.genomes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="cgt.position_paradigm.PositionParadigmFramework.group_algebra">
+<code class="sig-name descname">group_algebra</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.group_algebra" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the group alegbra, where the group is the group containing genome instances.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgt.position_paradigm.PositionParadigmFramework.irreps">
+<code class="sig-name descname">irreps</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">element</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.irreps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a complete list of pairwise irreducible representations of the genome group.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgt.position_paradigm.PositionParadigmFramework.matrix">
+<code class="sig-name descname">matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">element</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the defining representation matrix. Note that matrix(x)matrix(y) = matrix(yx)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgt.position_paradigm.PositionParadigmFramework.num_genomes">
+<code class="sig-name descname">num_genomes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.num_genomes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the number of distinct genomes up to symmetries.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgt.position_paradigm.PositionParadigmFramework.one_row">
+<code class="sig-name descname">one_row</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">element</span></em>, <em class="sig-param"><span class="n">as_list</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.one_row" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a given genome instance in one-row notation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>element</strong> – the genome instance to represent in one-row notation. Multiple formats accepted.</p></li>
+<li><p><strong>as_list</strong> – if true, return as a list of images, otherwise return a sage permutation.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="simple">
+<dt>TESTS::</dt><dd><p>sage: import cgt
+sage: ppf = cgt.PositionParadigmFramework(3)
+sage: ppf.cycles(ppf.one_row(‘(1,-2)(-1,2)’)) == ppf.cycles(‘(1,-2)(-1,2)’)
+True</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgt.position_paradigm.PositionParadigmFramework.random_genome">
+<code class="sig-name descname">random_genome</code><span class="sig-paren">(</span><em class="sig-param">format=&lt;FORMAT.formal_sum: 1&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.random_genome" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a random genome</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgt.position_paradigm.PositionParadigmFramework.random_instance">
+<code class="sig-name descname">random_instance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">genome</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.random_instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a random permutation corresponding to a given genome, or a random genome if none is given.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgt.position_paradigm.PositionParadigmFramework.reg_rep_of_zs">
+<code class="sig-name descname">reg_rep_of_zs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">to_adjacency_matrix</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">sparse</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.reg_rep_of_zs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="cgt.position_paradigm.PositionParadigmFramework.regular_representation">
+<code class="sig-name descname">regular_representation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">g</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.regular_representation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the regular representation of a single element</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgt.position_paradigm.PositionParadigmFramework.standard_reflection">
+<code class="sig-name descname">standard_reflection</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.standard_reflection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a permutation which reflects a genome instance about the center region (n odd), or the center two regions (n even).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgt.position_paradigm.PositionParadigmFramework.standard_rotation">
+<code class="sig-name descname">standard_rotation</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.standard_rotation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a permutation which rotates positions clockwise by one position.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgt.position_paradigm.PositionParadigmFramework.symmetry_element">
+<code class="sig-name descname">symmetry_element</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.symmetry_element" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the symmetry element: a convex sum of elements from symmetry_group().</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgt.position_paradigm.PositionParadigmFramework.symmetry_group">
+<code class="sig-name descname">symmetry_group</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.symmetry_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the symmetry group of the genomes.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-cgt.rearrangements">
+<span id="cgt-rearrangements-module"></span><h2>cgt.rearrangements module<a class="headerlink" href="#module-cgt.rearrangements" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="cgt.rearrangements.all_inversions_representatives">
+<code class="sig-prename descclassname">cgt.rearrangements.</code><code class="sig-name descname">all_inversions_representatives</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">num_regions</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.rearrangements.all_inversions_representatives" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="cgt.rearrangements.conjugacy_class">
+<code class="sig-prename descclassname">cgt.rearrangements.</code><code class="sig-name descname">conjugacy_class</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">perm</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.rearrangements.conjugacy_class" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="cgt.rearrangements.css">
+<code class="sig-prename descclassname">cgt.rearrangements.</code><code class="sig-name descname">css</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">cuts_set</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.rearrangements.css" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="cgt.rearrangements.cuts">
+<code class="sig-prename descclassname">cgt.rearrangements.</code><code class="sig-name descname">cuts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">sigma</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.rearrangements.cuts" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="cgt.rearrangements.double_coset">
+<code class="sig-prename descclassname">cgt.rearrangements.</code><code class="sig-name descname">double_coset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">perm</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.rearrangements.double_coset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="cgt.rearrangements.single_coset">
+<code class="sig-prename descclassname">cgt.rearrangements.</code><code class="sig-name descname">single_coset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">perm</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.rearrangements.single_coset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-cgt.structures">
+<span id="cgt-structures-module"></span><h2>cgt.structures module<a class="headerlink" href="#module-cgt.structures" title="Permalink to this headline">¶</a></h2>
+<p>A place for functions which return important but general algebraic structures requiring only a few parameters</p>
+<dl class="py function">
+<dt id="cgt.structures.HyperoctahedralGroup">
+<code class="sig-prename descclassname">cgt.structures.</code><code class="sig-name descname">HyperoctahedralGroup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.structures.HyperoctahedralGroup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the hyperoctahedral group of order (2^n)n! as a subgroup of SymmetricGroup(2n) with two generators.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="cgt.structures.set_plus_minus">
+<code class="sig-prename descclassname">cgt.structures.</code><code class="sig-name descname">set_plus_minus</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.structures.set_plus_minus" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-cgt.visualisation">
+<span id="cgt-visualisation-module"></span><h2>cgt.visualisation module<a class="headerlink" href="#module-cgt.visualisation" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="cgt.visualisation.draw_genome_instance">
+<code class="sig-prename descclassname">cgt.visualisation.</code><code class="sig-name descname">draw_genome_instance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">instance</span></em>, <em class="sig-param"><span class="n">show</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.visualisation.draw_genome_instance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produce a drawing of a circular genome with n regions</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-cgt">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-cgt" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">cgt package</a><ul>
+<li><a class="reference internal" href="#subpackages">Subpackages</a></li>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-cgt.distances">cgt.distances module</a></li>
+<li><a class="reference internal" href="#module-cgt.enums">cgt.enums module</a></li>
+<li><a class="reference internal" href="#module-cgt.examples">cgt.examples module</a></li>
+<li><a class="reference internal" href="#module-cgt.genome">cgt.genome module</a></li>
+<li><a class="reference internal" href="#module-cgt.models">cgt.models module</a></li>
+<li><a class="reference internal" href="#module-cgt.position_paradigm">cgt.position_paradigm module</a></li>
+<li><a class="reference internal" href="#module-cgt.rearrangements">cgt.rearrangements module</a></li>
+<li><a class="reference internal" href="#module-cgt.structures">cgt.structures module</a></li>
+<li><a class="reference internal" href="#module-cgt.visualisation">cgt.visualisation module</a></li>
+<li><a class="reference internal" href="#module-cgt">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="modules.html"
+                        title="previous chapter">cgt</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="cgt.tests.html"
+                        title="next chapter">cgt.tests package</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/cgt.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" />
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="cgt.tests.html" title="cgt.tests package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="modules.html" title="cgt"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Circular Genome Tools 0.1.1 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="modules.html" >cgt</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">cgt package</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2021, Joshua Stevenson.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 3.1.2.
+    </div>
+  </body>
+</html>
