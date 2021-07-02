@@ -136,3 +136,7 @@ examples/.DS_Store
 cgt/scratchpad.ipynb
 _output
 .vscode/settings.json
+*.aux
+*.out
+*.gz
+*.tex
