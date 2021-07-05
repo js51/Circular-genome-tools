@@ -12,8 +12,18 @@ class Model:
         """Define a model from a dictionary of single permutations, with their probabilities as the values."""
         self.framework = framework
         self.generating_dictionary = generating_dictionary
-        self.s = {} # model elements
+        self.names = []
         # TODO: Implement checks for certain model properties, for example time reversibility, symmetry and missing rearrangements
+
+    def __repr__(self):
+        return f"Model({str(self.framework)}, {str(self.generating_dictionary)})"
+
+    def __str__(self):
+        """Return a descriptive string for the model"""
+        # TODO: #21 Make the model able to describe which permutations it allows after it is created
+        string = f"Model under the {str(self.framework).lower()}"
+        string += f" containing {' and '.join(str(name.value) for name in self.names) if self.names else 'generating perms: ' + str(self.generating_dictionary)}."
+        return string
 
     @classmethod
     def named_model_with_relative_probs(cls, framework, named_model_dictionary):
@@ -36,7 +46,9 @@ class Model:
                 gens = rearrangements.all_inversions_representatives(framework)
                 for generator in gens:
                     model[generator] = relative_prob/len(gens)
-        return cls(framework, model)
+        model = cls(framework, model)
+        model.names += list(named_model_dictionary.keys())
+        return model
 
     @cache
     def reg_rep_of_zs(self):

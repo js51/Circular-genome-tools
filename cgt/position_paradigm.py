@@ -42,7 +42,7 @@ class PositionParadigmFramework:
         return self.genome_algebra()(self.cycles(x))
 
     def __hash__(self):
-        return self.__str__().__hash__() # String rep is unique, so just hash that
+        return self.__str__().__hash__() # String rep is unique, so just hash that!
 
     def cycles(self, element):
         try: # See if it's already a group element
