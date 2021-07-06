@@ -26,7 +26,7 @@ class PositionParadigmFramework:
         self.oriented = oriented
         self.symmetry = symmetry
 
-    def __eq__(self, other):
+    def __eq__(self, other): # String representation is unique and repr calls str
         return self.__repr__() == other.__repr__()
 
     def __str__(self):
@@ -35,7 +35,7 @@ class PositionParadigmFramework:
         return string
 
     def __repr__(self):
-        return self.__str__()
+        return self.__str__() # String representation is unique
 
     def __call__(self, x):
         """Return an object as a group algebra element if possible"""
@@ -71,7 +71,7 @@ class PositionParadigmFramework:
             element: the genome instance to represent in one-row notation. Multiple formats accepted.
             as_list: if true, return as a list of images, otherwise return a sage permutation.
         
-        TESTS::
+        EXAMPLES::
             sage: import cgt
             sage: ppf = cgt.PositionParadigmFramework(3)
             sage: ppf.cycles(ppf.one_row('(1,-2)(-1,2)')) == ppf.cycles('(1,-2)(-1,2)')
@@ -233,6 +233,7 @@ class PositionParadigmFramework:
         return self.genome_group()(string)
 
     def draw_instance(self, instance, shortened=False):
+        """Return a one-line drawing of a genome using arrows indicating orientation and elipsis indicating rotational symmetry"""
         permutation = instance.inverse()
         if shortened:
             left_tail, right_head = '\u2758', '\u276D'
@@ -305,7 +306,17 @@ class PositionParadigmFramework:
 
     @lru_cache(maxsize=10)
     def irreps(self, element=None):
-        """Return a complete list of pairwise irreducible representations of the genome group."""
+        """
+        Return a complete list of pairwise irreducible representations of the genome group.
+        
+        Args:
+            element: return the image of element for each irreducible representation.
+        
+        Returns:
+            a complete list of pairwise irreducible representations of the genome group, or a list of matrices if element is not None. 
+            Output is cached so that irreps are computed only once per session. 
+            Matrix entries sit inside the UniversalCyclotomicField and are exact expressions.
+        """
         representations = []
         def irrep_function_factory(irrep, signed):
             def representation(sigma, _irrep=irrep, _signed=signed):
@@ -347,6 +358,7 @@ class PositionParadigmFramework:
         return min(terms)
 
     def collect_genome_terms(self, formal_sum, display=DISPLAY.one_row):
+        """Return a weighted sum of genomes, represented as [canonical representation]z"""
         with warnings.catch_warnings():
             warnings.simplefilter('ignore')
             formal_sum = deepcopy(formal_sum)
