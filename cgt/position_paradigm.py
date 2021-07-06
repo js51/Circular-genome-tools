@@ -13,6 +13,7 @@ from copy import deepcopy
 from .structures import HyperoctahedralGroup
 from scipy.sparse import dok_matrix as dok
 from random import choice
+from functools import cache, lru_cache
 
 class PositionParadigmFramework:
     """Everything you need for working with genomes under the position paradigm"""
@@ -39,6 +40,9 @@ class PositionParadigmFramework:
     def __call__(self, x):
         """Return an object as a group algebra element if possible"""
         return self.genome_algebra()(self.cycles(x))
+
+    def __hash__(self):
+        return self.__str__().__hash__() # String rep is unique, so just hash that!
 
     def cycles(self, element):
         try: # See if it's already a group element
@@ -82,16 +86,13 @@ class PositionParadigmFramework:
                 row = Permutations(self.n)(row)
         return row
 
+    @cache
     def genome_group(self):
         """Return the permutation group containing genome instances."""
-        try:
-            return self.G
-        except AttributeError:
-            if self.oriented:
-                self.G = HyperoctahedralGroup(self.n)
-            else:
-                self.G = SymmetricGroup(self.n)
-        return self.G
+        if self.oriented:
+            return HyperoctahedralGroup(self.n)
+        else:
+            return SymmetricGroup(self.n)
 
     def canonical_instance(self, instance):
         """Return the 'canonical' instance of the genome represented by the permutation if there is one.
@@ -124,27 +125,21 @@ class PositionParadigmFramework:
         """Return a random genome"""
         return self.genome(self.random_instance(), format=format)
 
+    @cache
     def symmetry_group(self):
         """Return the symmetry group of the genomes."""
-        try:
-            return self.Z
-        except AttributeError:
-            if self.symmetry == SYMMETRY.circular:
-                gens = [self.standard_reflection(), self.standard_rotation()]
-            elif self.symmetry == SYMMETRY.linear:
-                gens = [self.standard_reflection()]
-            else:
-                gens = [self.genome_group().one()]
-            self.Z = self.G.subgroup(gens)
-        return self.Z
+        if self.symmetry == SYMMETRY.circular:
+            gens = [self.standard_reflection(), self.standard_rotation()]
+        elif self.symmetry == SYMMETRY.linear:
+            gens = [self.standard_reflection()]
+        else:
+            gens = [self.genome_group().one()]
+        return self.genome_group().subgroup(gens)
     
+    @cache
     def group_algebra(self):
         """Return the group alegbra, where the group is the group containing genome instances."""
-        try:
-            return self.CG
-        except AttributeError:
-            self.GA = self.genome_group().algebra(QQ)
-        return self.GA
+        return self.genome_group().algebra(QQ)
         
     def symmetry_element(self):
         """Return the symmetry element: a convex sum of elements from symmetry_group()."""
@@ -308,30 +303,27 @@ class PositionParadigmFramework:
         return matrix
 
 
+    @lru_cache(maxsize=10)
     def irreps(self, element=None):
         """Return a complete list of pairwise irreducible representations of the genome group."""
-        try:
-            representations = self.irreducible_representations
-        except AttributeError:
-            representations = []
-            def irrep_function_factory(irrep, signed):
-                def representation(sigma, _irrep=irrep, _signed=signed):
-                        result = 0
-                        if sigma in self.group_algebra(): # sigma is an algebra element
-                            for term in sigma:
-                                perm, coeff = term
-                                result += coeff * (gap.Image(_irrep, perm) if _signed else _irrep(perm))
-                        else: # sigma is a group element
-                            result = (gap.Image(_irrep, sigma) if _signed else _irrep(sigma))
-                        return matrix(UniversalCyclotomicField(), result)
-                return representation
-            if not self.oriented:
-                irreps = SymmetricGroupRepresentations(self.n)
-            else:
-                irreps = (gap.IrreducibleAffordingRepresentation(character) for character in gap.Irr(self.genome_group()))
-            for irrep in irreps:
-                representations.append(irrep_function_factory(irrep, self.oriented))
-            self.irreducible_representations = representations
+        representations = []
+        def irrep_function_factory(irrep, signed):
+            def representation(sigma, _irrep=irrep, _signed=signed):
+                    result = 0
+                    if sigma in self.group_algebra(): # sigma is an algebra element
+                        for term in sigma:
+                            perm, coeff = term
+                            result += coeff * (gap.Image(_irrep, perm) if _signed else _irrep(perm))
+                    else: # sigma is a group element
+                        result = (gap.Image(_irrep, sigma) if _signed else _irrep(sigma))
+                    return matrix(UniversalCyclotomicField(), result)
+            return representation
+        if not self.oriented:
+            irreps = SymmetricGroupRepresentations(self.n)
+        else:
+            irreps = (gap.IrreducibleAffordingRepresentation(character) for character in gap.Irr(self.genome_group()))
+        for irrep in irreps:
+            representations.append(irrep_function_factory(irrep, self.oriented))
         if element is not None:
             return [irrep(element) for irrep in representations]
         else:

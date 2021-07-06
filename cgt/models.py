@@ -4,6 +4,7 @@
 from sage.all_cmdline import QQ
 from .enums import *
 from . import rearrangements
+from functools import cache
 
 class Model:
     """Defines a model. A model consists of some collection of permutations and a map from these permutations to probabilities [0,1]"""
@@ -11,8 +12,18 @@ class Model:
         """Define a model from a dictionary of single permutations, with their probabilities as the values."""
         self.framework = framework
         self.generating_dictionary = generating_dictionary
-        self.s = {} # model elements
+        self.names = []
         # TODO: Implement checks for certain model properties, for example time reversibility, symmetry and missing rearrangements
+
+    def __repr__(self):
+        return f"Model({str(self.framework)}, {str(self.generating_dictionary)})"
+
+    def __str__(self):
+        """Return a descriptive string for the model"""
+        # TODO: #21 Make the model able to describe which permutations it allows after it is created
+        string = f"Model under the {str(self.framework).lower()}"
+        string += f" containing {' and '.join(str(name.value) for name in self.names) if self.names else 'generating perms: ' + str(self.generating_dictionary)}."
+        return string
 
     @classmethod
     def named_model_with_relative_probs(cls, framework, named_model_dictionary):
@@ -35,38 +46,31 @@ class Model:
                 gens = rearrangements.all_inversions_representatives(framework)
                 for generator in gens:
                     model[generator] = relative_prob/len(gens)
-        return cls(framework, model)
+        model = cls(framework, model)
+        model.names += list(named_model_dictionary.keys())
+        return model
 
+    @cache
     def reg_rep_of_zs(self):
         """Return the regular representation of zs as comptued by PositionParadigmFramework.reg_rep_zs, but store the sparse result"""
-        try:
-            return self._reg_rep_of_zs
-        except AttributeError:
-            self._reg_rep_of_zs = self.framework.reg_rep_of_zs(self, sparse=True)
-            return self._reg_rep_of_zs
+        return self.framework.reg_rep_of_zs(self, sparse=True)
 
-    def generators(self):
-        return self.generating_dictionary
-
+    @cache
     def s_element(self, in_algebra=ALGEBRA.group):
         if in_algebra not in {ALGEBRA.group, ALGEBRA.genome}:
             raise NotImplementedError(f"Model element for {str(in_algebra)} algebra not yet implemented")
-        try:
-            return self.s[in_algebra]
-        except (AttributeError, KeyError):
-            A = self.framework.group_algebra()
-            s = A(0) # Zero element in algebra
-            gens_dict = self.generators()
-            gens = {x for x in self.generators().keys()}
-            while len(gens) > 0:
-                gen = gens.pop()
-                prob = gens_dict[gen]
-                if in_algebra is ALGEBRA.group:
-                    conj_class = rearrangements.conjugacy_class(self.framework, gen)
-                elif in_algebra is ALGEBRA.genome:
-                    conj_class = {gen}
-                for perm in conj_class:
-                    s += QQ(prob/len(conj_class)) * A(perm)
-                gens -= conj_class
-            self.s[in_algebra] = s
-            return s
+        A = self.framework.group_algebra()
+        s = A(0) # Zero element in algebra
+        gens_dict = self.generating_dictionary
+        gens = {x for x in self.generating_dictionary.keys()}
+        while len(gens) > 0:
+            gen = gens.pop()
+            prob = gens_dict[gen]
+            if in_algebra is ALGEBRA.group:
+                conj_class = rearrangements.conjugacy_class(self.framework, gen)
+            elif in_algebra is ALGEBRA.genome:
+                conj_class = {gen}
+            for perm in conj_class:
+                s += QQ(prob/len(conj_class)) * A(perm)
+            gens -= conj_class
+        return s
