@@ -1,6 +1,6 @@
 """
-position_paradigm is the most important module in cgt. PositionParadigmFramework keeps track of important objects, can 
-convert group elements and genomes between different forms, and instances can be passed to functions from other modules so 
+position_paradigm is the most important module in cgt. PositionParadigmFramework keeps track of important objects, can
+convert group elements and genomes between different forms, and instances can be passed to functions from other modules so
 that they can acces information without it needing to be recreated.
 """
 
@@ -9,7 +9,7 @@ from sage.combinat.colored_permutations import SignedPermutations
 from .enums import *
 import numpy as np
 import warnings
-from copy import deepcopy 
+from copy import deepcopy
 from .structures import HyperoctahedralGroup
 from scipy.sparse import dok_matrix as dok
 from random import choice
@@ -70,7 +70,7 @@ class PositionParadigmFramework:
         Args:
             element: the genome instance to represent in one-row notation. Multiple formats accepted.
             as_list: if true, return as a list of images, otherwise return a sage permutation.
-        
+
         EXAMPLES::
             sage: import cgt
             sage: ppf = cgt.PositionParadigmFramework(3)
@@ -96,7 +96,7 @@ class PositionParadigmFramework:
 
     def canonical_instance(self, instance):
         """Return the 'canonical' instance of the genome represented by the permutation if there is one.
-        
+
         TESTS::
             sage: import cgt; ppf = cgt.PositionParadigmFramework(3, symmetry=cgt.SYMMETRY.circular)
             sage: ppf.canonical_instance('(1,-2)(-1,2)')
@@ -135,12 +135,12 @@ class PositionParadigmFramework:
         else:
             gens = [self.genome_group().one()]
         return self.genome_group().subgroup(gens)
-    
+
     @cache
     def group_algebra(self):
         """Return the group alegbra, where the group is the group containing genome instances."""
         return self.genome_group().algebra(QQ)
-        
+
     def symmetry_element(self):
         """Return the symmetry element: a convex sum of elements from symmetry_group()."""
         try:
@@ -152,7 +152,7 @@ class PositionParadigmFramework:
     def num_genomes(self):
         """Return the number of distinct genomes up to symmetries."""
         return self.genome_group().order()/self.symmetry_group().order()
-    
+
     def _sort_key(self, one_row_perm):
         return str(one_row_perm).replace('-', 'Z')
 
@@ -221,7 +221,7 @@ class PositionParadigmFramework:
             for i in range(1, int(self.n/2)):
                 string += f'({i+1},{self.n-(i-1)-1})'
         return self.genome_group()(string)
-        
+
     def standard_rotation(self):
         """Return a permutation which rotates positions clockwise by one position."""
         positive = tuple(i for i in range(1,self.n+1))
@@ -303,20 +303,26 @@ class PositionParadigmFramework:
         print('...done!')
         return matrix
 
-
-    @lru_cache(maxsize=10)
     def irreps(self, element=None):
         """
         Return a complete list of pairwise irreducible representations of the genome group.
-        
+
         Args:
             element: return the image of element for each irreducible representation.
-        
+
         Returns:
             a complete list of pairwise irreducible representations of the genome group, or a list of matrices if element is not None. 
-            Output is cached so that irreps are computed only once per session. 
+            Output is cached so that irreps are computed only once per session.
             Matrix entries sit inside the UniversalCyclotomicField and are exact expressions.
         """
+        representations = self._cached_irreps()
+        if element is not None:
+            return [irrep(element) for irrep in representations]
+        else:
+            return representations
+
+    @cache
+    def _cached_irreps(self):
         representations = []
         def irrep_function_factory(irrep, signed):
             def representation(sigma, _irrep=irrep, _signed=signed):
@@ -335,18 +341,15 @@ class PositionParadigmFramework:
             irreps = (gap.IrreducibleAffordingRepresentation(character) for character in gap.Irr(self.genome_group()))
         for irrep in irreps:
             representations.append(irrep_function_factory(irrep, self.oriented))
-        if element is not None:
-            return [irrep(element) for irrep in representations]
-        else:
-            return representations
+        return representations
 
-    def regular_representation(self, g): 
+    def regular_representation(self, g):
         """Return the regular representation of a single element"""
         warnings.warn("this function is untested! Use at your own risk.", DeprecationWarning)
         return matrix(QQbar, [(self.group_algebra()(g)*self.genome_group()(h)).to_vector(QQbar) for h in self.genome_group()]).transpose()
 
     def coefficient_in(self, more_terms, fewer_terms):
-        """For example, the coefficient of (a/2 + b/2) in x=(a/3 + b/3 + c/3) is 2/3, since x=2/3*(a/2 + b/2) + c/3""" 
+        """For example, the coefficient of (a/2 + b/2) in x=(a/3 + b/3 + c/3) is 2/3, since x=2/3*(a/2 + b/2) + c/3"""
         coefficients_in_larger_sum = {}
         for term in fewer_terms.terms():
             perm  = self.genome_group()(list(term)[0][0]) # a
