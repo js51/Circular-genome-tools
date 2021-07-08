@@ -22,7 +22,7 @@ def mles(framework, model, genome_reps, plots=False, attempt_exact=False):
     irreps_of_zs = (matrix(UCF, irrep_z*irrep_s) for irrep_z, irrep_s in zip(irreps_of_z, irreps_of_s))
     irreps_of_zs = [Matrix(UCF if attempt_exact else CDF, irrep_zs) for irrep_zs in irreps_of_zs]
     for irrep in irreps_of_zs:
-	    irrep.set_immutable()
+	    irrep.set_immutable() 
     dims = [irrep_of_zs.nrows() for irrep_of_zs in irreps_of_zs]
     eig_lists   = [_eigenvalues(irrep_zs, round_to=9, make_real=True, inc_repeated=False, attempt_exact=attempt_exact) for irrep_zs in irreps_of_zs]
     projections = [_projection_operators(*vals) for vals in zip(irreps_of_zs, eig_lists)]
@@ -38,7 +38,7 @@ def mles(framework, model, genome_reps, plots=False, attempt_exact=False):
     for r, irrep in enumerate(irreps): # Iterate over irreducible representations
         print(f'\rComputing partial traces for irrep {r} of {len(irreps)}', end="")
         for instance in genome_reps:
-            sigd = Matrix(UCF if attempt_exact else CDF, matrix(UCF, irrep(inv_sigmas[instance]))) * irreps_of_z[r]
+            sigd = Matrix(CDF, matrix(UCF, irrep(inv_sigmas[instance]))) * irreps_of_z[r]
             for e, eigenvalue in enumerate(eig_lists[r]):
                 traces[r][instance][eigenvalue] = round(real((sigd*projections[r][e]).trace()), 6)
         print("\nPartial traces computed. Building likelihood functions...")
@@ -70,7 +70,7 @@ def _projection_operators(mat, eigs):
         for e1, eig1 in enumerate(eigs):
             for eig2 in eigs:
                 if eig1 != eig2:
-                    projections[e1] *= (mat-(eig2*np.eye(dim)))*(1/(eig1-eig2))
+                    projections[e1] *= (mat-(eig2*matrix.identity(dim)))*(1/(eig1-eig2))
         return projections
 
 def _eigenvalues(mat, round_to=9, make_real=True, inc_repeated=False, attempt_exact=False):
