@@ -8,61 +8,6 @@ from scipy.optimize import minimize
 from warnings import warn
 import matplotlib.pyplot as plt
 
-def mles(framework, model, genome_reps, plots=False, attempt_exact=False):
-    """
-    Return dictionary of MLEs (if they exist) for time elapsed rearranging ref->genome for each genome
-    """
-    warn("This... might take a while!")
-    CDF, UCF = ComplexDoubleField(), UniversalCyclotomicField()
-    G = framework.genome_group()
-    Z = framework.symmetry_group()
-    z = framework.symmetry_element()
-    s = model.s_element(in_algebra=ALGEBRA.genome)
-    irreps_of_z, irreps_of_s = framework.irreps(z), framework.irreps(s)
-    irreps_of_zs = (matrix(UCF, irrep_z*irrep_s) for irrep_z, irrep_s in zip(irreps_of_z, irreps_of_s))
-    irreps_of_zs = [Matrix(UCF if attempt_exact else CDF, irrep_zs) for irrep_zs in irreps_of_zs]
-    for irrep in irreps_of_zs:
-	    irrep.set_immutable() 
-    dims = [irrep_of_zs.nrows() for irrep_of_zs in irreps_of_zs]
-    eig_lists   = [_eigenvalues(irrep_zs, round_to=9, make_real=True, inc_repeated=False, attempt_exact=attempt_exact) for irrep_zs in irreps_of_zs]
-    projections = [_projection_operators(*vals) for vals in zip(irreps_of_zs, eig_lists)]
-    traces = {
-        r: {
-            genome_rep: { 
-                eigenvalue: {} for eigenvalue in eig_lists[r]
-            } for genome_rep in genome_reps
-        } for r in range(len(irreps_of_zs))
-    }
-    inv_sigmas = { instance : framework.cycles(instance.inverse()) for instance in genome_reps } # pre-compute for efficiency
-    irreps = framework.irreps()
-    for r, irrep in enumerate(irreps): # Iterate over irreducible representations
-        print(f'\rComputing partial traces for irrep {r} of {len(irreps)}', end="")
-        for instance in genome_reps:
-            sigd = Matrix(CDF, matrix(UCF, irrep(inv_sigmas[instance]))) * irreps_of_z[r]
-            for e, eigenvalue in enumerate(eig_lists[r]):
-                traces[r][instance][eigenvalue] = round(real((sigd*projections[r][e]).trace()), 6)
-        print("\nPartial traces computed. Building likelihood functions...")
-    def likelihood(t, instance):
-        ans = 0
-        for r in range(len(irreps_of_zs)):
-            ans += Z.order()*(exp(-t)/G.order())*dims[r]*sum(exp(eigenvalue*CDF(t)) * traces[r][instance][eigenvalue] for eigenvalue in eig_lists[r])
-        return real(ans)
-    mle_dict = {}
-    bound = (0, 35)
-    for instance in genome_reps:
-        def L(time):
-            return -likelihood(time, instance)
-        mle = minimize(L, 0.1, method="TNC", bounds=[bound])
-        mle_dict[instance] = mle.x[0]
-        if plots:
-            plt.figure()
-            times = np.arange(bound[0], bound[1], 0.5)
-            likelihood_functional_values = [likelihood(time, instance) for time in times]
-            plt.plot(times, likelihood_functional_values)
-            plt.savefig(f'./cgt_{framework.one_row(instance)}')
-
-    return {framework.one_row(key) : value for key, value in mle_dict.items()}
-
 def _projection_operators(mat, eigs):
         """Return projection operators for given matrix and its eigenvalues"""
         dim = mat.nrows()
@@ -73,6 +18,17 @@ def _projection_operators(mat, eigs):
                     projections[e1] *= (mat-(eig2*matrix.identity(dim)))*(1/(eig1-eig2))
         return projections
 
+def _irreps_of_zs(framework, model, attempt_exact=False):
+    CDF, UCF = ComplexDoubleField(), UniversalCyclotomicField()
+    z = framework.symmetry_element()
+    s = model.s_element(in_algebra=ALGEBRA.genome)
+    irreps_of_z, irreps_of_s = framework.irreps(z), framework.irreps(s)
+    irreps_of_zs = (matrix(UCF, irrep_z*irrep_s) for irrep_z, irrep_s in zip(irreps_of_z, irreps_of_s))
+    irreps_of_zs = [Matrix(UCF if attempt_exact else CDF, irrep_zs) for irrep_zs in irreps_of_zs]
+    for irrep in irreps_of_zs:
+	    irrep.set_immutable()
+    return irreps_of_zs
+
 def _eigenvalues(mat, round_to=9, make_real=True, inc_repeated=False, attempt_exact=False):
     col = list if inc_repeated else set
     all_eigs = (eig for eig in mat.eigenvalues())
@@ -81,9 +37,38 @@ def _eigenvalues(mat, round_to=9, make_real=True, inc_repeated=False, attempt_ex
     else:
         return sorted(col(round(real(eig) if make_real else eig, round_to) for eig in all_eigs))
 
-def likelihood_function():
+def _partial_traces_for_genome(framework, instance, irreps, irreps_of_zs, projections, eig_lists):
+    irreps_of_z = [irrep(framework.symmetry_element()) for irrep in irreps]
+    CDF, UCF = ComplexDoubleField(), UniversalCyclotomicField()
+    traces = {
+        r: {
+            eigenvalue: {} for eigenvalue in eig_lists[r]
+        } for r in range(len(irreps_of_zs))
+    }
+    for r, irrep in enumerate(irreps): # Iterate over irreducible representations
+        print(f'\rComputing partial traces for irrep {r} of {len(irreps)}', end="")
+        sigd = Matrix(CDF, matrix(UCF, irrep(framework.cycles(instance.inverse())))) * irreps_of_z[r]
+        for e, eigenvalue in enumerate(eig_lists[r]):
+            traces[r][eigenvalue] = round(real((sigd*projections[r][e]).trace()), 6)
+    return traces
+
+def likelihood_function(framework, model, genome, attempt_exact=False):
     """Return the likelihood function for a given genome"""
-    pass
+    instance = genome
+    CDF, UCF = ComplexDoubleField(), UniversalCyclotomicField()
+    G, Z = framework.genome_group(), framework.symmetry_group()
+    irreps = framework.irreps()
+    irreps_of_zs = _irreps_of_zs(framework, model, attempt_exact=attempt_exact)
+    eig_lists = [_eigenvalues(irrep_zs, round_to=9, make_real=True, inc_repeated=False, attempt_exact=attempt_exact) for irrep_zs in irreps_of_zs]
+    projections = [_projection_operators(*vals) for vals in zip(irreps_of_zs, eig_lists)]
+    traces = _partial_traces_for_genome(framework, instance, irreps, irreps_of_zs, projections, eig_lists)
+    dims = [irrep_of_zs.nrows() for irrep_of_zs in irreps_of_zs]
+    def likelihood(t):
+        ans = 0
+        for r, dim in enumerate(dims):
+            ans += Z.order()*(exp(-t)/G.order())*dim*sum(exp(eigenvalue*CDF(t)) * traces[r][eigenvalue] for eigenvalue in eig_lists[r])
+        return real(ans)
+    return likelihood
 
 def min_distance(framework, model, weighted=False):
     """Return dictionary of minimum distances ref->genome, using inverse of model probabilities as weights (or not)"""
