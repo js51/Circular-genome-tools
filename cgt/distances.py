@@ -4,9 +4,6 @@ from cgt.enums import ALGEBRA
 import numpy as np
 import networkx as nx
 from sage.all import ComplexDoubleField, UniversalCyclotomicField, matrix, Matrix, real, exp, round
-from scipy.optimize import minimize
-from warnings import warn
-import matplotlib.pyplot as plt
 
 def _projection_operators(mat, eigs):
         """Return projection operators for given matrix and its eigenvalues"""
