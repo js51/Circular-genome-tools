@@ -71,6 +71,7 @@
 </div>
 <div class="section" id="module-cgt.distances">
 <span id="cgt-distances-module"></span><h2>cgt.distances module<a class="headerlink" href="#module-cgt.distances" title="Permalink to this headline">¶</a></h2>
+<p>Implements a number of distance measures for genomes under the position paradigm.</p>
 <dl class="py function">
 <dt id="cgt.distances.MFPT">
 <code class="sig-prename descclassname">cgt.distances.</code><code class="sig-name descname">MFPT</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">scale_by</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.MFPT" title="Permalink to this definition">¶</a></dt>
@@ -79,8 +80,14 @@
 
 <dl class="py function">
 <dt id="cgt.distances.likelihood_function">
-<code class="sig-prename descclassname">cgt.distances.</code><code class="sig-name descname">likelihood_function</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.likelihood_function" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">cgt.distances.</code><code class="sig-name descname">likelihood_function</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">genome</span></em>, <em class="sig-param"><span class="n">attempt_exact</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.likelihood_function" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the likelihood function for a given genome</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="cgt.distances.maximise">
+<code class="sig-prename descclassname">cgt.distances.</code><code class="sig-name descname">maximise</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">L</span></em>, <em class="sig-param"><span class="n">max_time</span><span class="o">=</span><span class="default_value">100</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.maximise" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the time that maximises likelihood function L, using additional information from the framework</p>
 </dd></dl>
 
 <dl class="py function">
@@ -90,9 +97,15 @@
 </dd></dl>
 
 <dl class="py function">
+<dt id="cgt.distances.mle">
+<code class="sig-prename descclassname">cgt.distances.</code><code class="sig-name descname">mle</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">genome_instance</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.mle" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return maximum likelihood estimates for a genome instance under the given model and framework</p>
+</dd></dl>
+
+<dl class="py function">
 <dt id="cgt.distances.mles">
-<code class="sig-prename descclassname">cgt.distances.</code><code class="sig-name descname">mles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">genome_reps</span></em>, <em class="sig-param"><span class="n">plots</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.mles" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return dictionary of MLEs (if they exist) for time elapsed rearranging ref-&gt;genome for each genome</p>
+<code class="sig-prename descclassname">cgt.distances.</code><code class="sig-name descname">mles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">genome_instances</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.mles" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return maximum likelihood estimates for a set of genome instances under the given model and framework</p>
 </dd></dl>
 
 </div>
@@ -198,22 +211,22 @@
 <p>An enumeration.</p>
 <dl class="py attribute">
 <dt id="cgt.enums.MODEL.all_inversions">
-<code class="sig-name descname">all_inversions</code><em class="property"> = 3</em><a class="headerlink" href="#cgt.enums.MODEL.all_inversions" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">all_inversions</code><em class="property"> = 'all inversions'</em><a class="headerlink" href="#cgt.enums.MODEL.all_inversions" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="cgt.enums.MODEL.one_region_inversions">
-<code class="sig-name descname">one_region_inversions</code><em class="property"> = 1</em><a class="headerlink" href="#cgt.enums.MODEL.one_region_inversions" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">one_region_inversions</code><em class="property"> = 'inversions of a single region'</em><a class="headerlink" href="#cgt.enums.MODEL.one_region_inversions" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="cgt.enums.MODEL.one_region_swaps">
-<code class="sig-name descname">one_region_swaps</code><em class="property"> = 4</em><a class="headerlink" href="#cgt.enums.MODEL.one_region_swaps" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">one_region_swaps</code><em class="property"> = 'adjacent transpositions'</em><a class="headerlink" href="#cgt.enums.MODEL.one_region_swaps" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt id="cgt.enums.MODEL.two_region_inversions">
-<code class="sig-name descname">two_region_inversions</code><em class="property"> = 2</em><a class="headerlink" href="#cgt.enums.MODEL.two_region_inversions" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">two_region_inversions</code><em class="property"> = 'inversions of two adjacent regions'</em><a class="headerlink" href="#cgt.enums.MODEL.two_region_inversions" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -351,11 +364,6 @@
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Defines a model. A model consists of some collection of permutations and a map from these permutations to probabilities [0,1]</p>
 <dl class="py method">
-<dt id="cgt.models.Model.generators">
-<code class="sig-name descname">generators</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cgt.models.Model.generators" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py method">
 <dt id="cgt.models.Model.named_model_with_relative_probs">
 <em class="property">classmethod </em><code class="sig-name descname">named_model_with_relative_probs</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">named_model_dictionary</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.models.Model.named_model_with_relative_probs" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -405,7 +413,8 @@ sage: ppf.canonical_instance(‘(1,-2)(-1,2)’)
 <dl class="py method">
 <dt id="cgt.position_paradigm.PositionParadigmFramework.collect_genome_terms">
 <code class="sig-name descname">collect_genome_terms</code><span class="sig-paren">(</span><em class="sig-param">formal_sum</em>, <em class="sig-param">display=&lt;DISPLAY.one_row: 2&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.collect_genome_terms" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Return a weighted sum of genomes, represented as [canonical representation]z</p>
+</dd></dl>
 
 <dl class="py method">
 <dt id="cgt.position_paradigm.PositionParadigmFramework.cycles">
@@ -415,7 +424,8 @@ sage: ppf.canonical_instance(‘(1,-2)(-1,2)’)
 <dl class="py method">
 <dt id="cgt.position_paradigm.PositionParadigmFramework.draw_instance">
 <code class="sig-name descname">draw_instance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">instance</span></em>, <em class="sig-param"><span class="n">shortened</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.draw_instance" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Return a one-line drawing of a genome using arrows indicating orientation and elipsis indicating rotational symmetry</p>
+</dd></dl>
 
 <dl class="py method">
 <dt id="cgt.position_paradigm.PositionParadigmFramework.genome">
@@ -449,6 +459,16 @@ sage: ppf.canonical_instance(‘(1,-2)(-1,2)’)
 <dt id="cgt.position_paradigm.PositionParadigmFramework.irreps">
 <code class="sig-name descname">irreps</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">element</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.irreps" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a complete list of pairwise irreducible representations of the genome group.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>element</strong> – return the image of element for each irreducible representation.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a complete list of pairwise irreducible representations of the genome group, or a list of matrices if element is not None.
+Output is cached so that irreps are computed only once per session.
+Matrix entries sit inside the UniversalCyclotomicField and are exact expressions.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -476,7 +496,7 @@ sage: ppf.canonical_instance(‘(1,-2)(-1,2)’)
 </dd>
 </dl>
 <dl class="simple">
-<dt>TESTS::</dt><dd><p>sage: import cgt
+<dt>EXAMPLES::</dt><dd><p>sage: import cgt
 sage: ppf = cgt.PositionParadigmFramework(3)
 sage: ppf.cycles(ppf.one_row(‘(1,-2)(-1,2)’)) == ppf.cycles(‘(1,-2)(-1,2)’)
 True</p>
