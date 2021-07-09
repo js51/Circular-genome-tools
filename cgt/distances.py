@@ -1,21 +1,43 @@
 """
+Implements a number of distance measures for genomes under the position paradigm.
 """
+
 from cgt.enums import ALGEBRA
 import numpy as np
 import networkx as nx
 from sage.all import ComplexDoubleField, UniversalCyclotomicField, matrix, Matrix, real, exp, round
+from scipy.optimize import minimize
+
+def mles(framework, model, genome_instances):
+    """Return maximum likelihood estimates for a set of genome instances under the given model and framework"""
+    mles = {}
+    for instance in genome_instances:
+        mles[instance] = mle(framework, model, instance)
+    return mles
+
+def mle(framework, model, genome_instance):
+    """Return maximum likelihood estimates for a genome instance under the given model and framework"""
+    return maximise(framework, likelihood_function(framework, model, genome_instance, attempt_exact=False))
+
+def maximise(framework, L, max_time=100):
+    """Return the time that maximises likelihood function L, using additional information from the framework"""
+    limit = 1/framework.num_genomes()
+    t_max = minimize(lambda t: -1*L(t), 10, bounds=[(0, max_time)])['x'][0]
+    mle = t_max if L(t_max)>limit else np.nan
+    return mle
 
 def _projection_operators(mat, eigs):
-        """Return projection operators for given matrix and its eigenvalues"""
-        dim = mat.nrows()
-        projections = [matrix.identity(dim) for _ in eigs]
-        for e1, eig1 in enumerate(eigs):
-            for eig2 in eigs:
-                if eig1 != eig2:
-                    projections[e1] *= (mat-(eig2*matrix.identity(dim)))*(1/(eig1-eig2))
-        return projections
+    """Return projection operators for given matrix and its eigenvalues"""
+    dim = mat.nrows()
+    projections = [matrix.identity(dim) for _ in eigs]
+    for e1, eig1 in enumerate(eigs):
+        for eig2 in eigs:
+            if eig1 != eig2:
+                projections[e1] *= (mat-(eig2*matrix.identity(dim)))*(1/(eig1-eig2))
+    return projections
 
 def _irreps_of_zs(framework, model, attempt_exact=False):
+    """Return a set of matrices---images of zs under each irrep"""
     CDF, UCF = ComplexDoubleField(), UniversalCyclotomicField()
     z = framework.symmetry_element()
     s = model.s_element(in_algebra=ALGEBRA.group)
@@ -27,6 +49,7 @@ def _irreps_of_zs(framework, model, attempt_exact=False):
     return irreps_of_zs
 
 def _eigenvalues(mat, round_to=9, make_real=True, inc_repeated=False, attempt_exact=False):
+    """Return all the eigenvalues for a given matrix mat"""
     col = list if inc_repeated else set
     all_eigs = (eig for eig in mat.eigenvalues())
     if attempt_exact: 
@@ -35,6 +58,7 @@ def _eigenvalues(mat, round_to=9, make_real=True, inc_repeated=False, attempt_ex
         return sorted(col(round(real(eig) if make_real else eig, round_to) for eig in all_eigs))
 
 def _partial_traces_for_genome(framework, instance, irreps, irreps_of_zs, projections, eig_lists):
+    """Return dictionary of partial traces, indexed first by irrep index and then by eigenvalaue"""
     irreps_of_z = [irrep(framework.symmetry_element()) for irrep in irreps]
     CDF, UCF = ComplexDoubleField(), UniversalCyclotomicField()
     traces = {
