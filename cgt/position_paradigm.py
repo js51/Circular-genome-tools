@@ -13,7 +13,7 @@ from copy import deepcopy
 from .structures import HyperoctahedralGroup
 from scipy.sparse import dok_matrix as dok
 from random import choice
-from functools import cache, lru_cache
+from functools import cache
 
 class PositionParadigmFramework:
     """Everything you need for working with genomes under the position paradigm"""
@@ -271,7 +271,7 @@ class PositionParadigmFramework:
             warnings.simplefilter("ignore", category=PendingDeprecationWarning)
             return np.array(self.one_row(self.cycles(element)).to_matrix())
 
-    def reg_rep_of_zs(self, model, to_adjacency_matrix=False, sparse=False):
+    def reg_rep_of_zs(self, model, to_adjacency_matrix=False, sparse=True):
         warnings.warn("Untested! Use at your own risk!")
         # TODO: #14 re-write to directly use model element from the genome algebra
         if self is not model.framework:
@@ -301,7 +301,7 @@ class PositionParadigmFramework:
                         coeff = 1/Z.order() * model.generating_dictionary[model_generators_cycles[model_generators.index(rearrangement)]] # * len(model_classes[rearrangement])
                     matrix[g, genome_lookup[self.canonical_instance(permutation * rearrangement)]] += coeff
         print('...done!')
-        return matrix
+        return matrix if sparse else matrix.toarray()
 
     def irreps(self, element=None):
         """
