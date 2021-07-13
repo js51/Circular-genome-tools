@@ -40,7 +40,7 @@ def _irreps_of_zs(framework, model, attempt_exact=False):
     """Return a set of matrices---images of zs under each irrep"""
     CDF, UCF = ComplexDoubleField(), UniversalCyclotomicField()
     z = framework.symmetry_element()
-    s = model.s_element(in_algebra=ALGEBRA.group)
+    s = model.s_element(in_algebra=ALGEBRA.genome)
     irreps_of_z, irreps_of_s = framework.irreps(z), framework.irreps(s)
     irreps_of_zs = (matrix(UCF, irrep_z*irrep_s) for irrep_z, irrep_s in zip(irreps_of_z, irreps_of_s))
     irreps_of_zs = [Matrix(UCF if attempt_exact else CDF, irrep_zs) for irrep_zs in irreps_of_zs]
@@ -67,7 +67,7 @@ def _partial_traces_for_genome(framework, instance, irreps, irreps_of_zs, projec
         } for r in range(len(irreps_of_zs))
     }
     for r, irrep in enumerate(irreps): # Iterate over irreducible representations
-        sigd = Matrix(CDF, matrix(UCF, irrep(framework.cycles(instance.inverse())))) * irreps_of_z[r]
+        sigd = irreps_of_z[r]* Matrix(CDF, matrix(UCF, irrep(framework.cycles(instance.inverse()))))
         for e, eigenvalue in enumerate(eig_lists[r]):
             traces[r][eigenvalue] = round(real((sigd*projections[r][e]).trace()), 6)
     return traces

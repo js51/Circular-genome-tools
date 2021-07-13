@@ -6,16 +6,19 @@
 Welcome to Circular Genome Tools's documentation!
 =================================================
 
+Readme File
+===========
+
+.. mdinclude:: ../../README.md
+
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 4
    :caption: Contents:
 
-   readme
-   modules
+   cgt	
 
 Indices and tables
 ==================
 
 * :ref:`genindex`
 * :ref:`modindex`
-* :ref:`search`

@@ -1,17 +1,6 @@
 cgt package
 ===========
 
-Subpackages
------------
-
-.. toctree::
-   :maxdepth: 4
-
-   cgt.tests
-
-Submodules
-----------
-
 cgt.distances module
 --------------------
 
@@ -80,14 +69,6 @@ cgt.visualisation module
 ------------------------
 
 .. automodule:: cgt.visualisation
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Module contents
----------------
-
-.. automodule:: cgt
    :members:
    :undoc-members:
    :show-inheritance:
