@@ -67,7 +67,7 @@ def _partial_traces_for_genome(framework, instance, irreps, irreps_of_zs, projec
         } for r in range(len(irreps_of_zs))
     }
     for r, irrep in enumerate(irreps): # Iterate over irreducible representations
-        sigd = irreps_of_z[r]* Matrix(CDF, matrix(UCF, irrep(framework.cycles(instance.inverse()))))
+        sigd = irreps_of_z[r] * Matrix(CDF, matrix(UCF, irrep(framework.cycles(instance.inverse()))))
         for e, eigenvalue in enumerate(eig_lists[r]):
             traces[r][eigenvalue] = round(real((sigd*projections[r][e]).trace()), 6)
     return traces

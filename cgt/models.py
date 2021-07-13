@@ -56,7 +56,7 @@ class Model:
         return self.framework.reg_rep_of_zs(self, sparse=True)
 
     @cache
-    def s_element(self, in_algebra=ALGEBRA.group):
+    def s_element(self, in_algebra=ALGEBRA.genome):
         if in_algebra not in {ALGEBRA.group, ALGEBRA.genome}:
             raise NotImplementedError(f"Model element for {str(in_algebra)} algebra not yet implemented")
         A = self.framework.group_algebra()

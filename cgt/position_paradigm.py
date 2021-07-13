@@ -25,7 +25,7 @@ class PositionParadigmFramework:
         self.n = num_regions
         self.oriented = oriented
         self.symmetry = symmetry
-
+        
     def __eq__(self, other): # String representation is unique and repr calls str
         return self.__repr__() == other.__repr__()
 
