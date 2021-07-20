@@ -30,10 +30,13 @@ def draw_genome_instance(framework, instance, show=False):
     region_labels     = [None for _ in range(1, n+1)]
     orientation_list  = [False for _ in range(1,n+1)]
 
-    for i, r in reversed(list(enumerate(framework.one_row(instance, as_list=True)))):
-        region_labels[abs(r)-1] = i+1
-        orientation_list[abs(r)-1] = r < 0
+    for r, p in list(enumerate(framework.one_row(instance, as_list=True))):
+        region_labels[abs(p)-1] = r+1
+        orientation_list[abs(p)-1] = p<0
     
+    region_labels = list(reversed(region_labels))
+    orientation_list = list(reversed(orientation_list))
+
     segment_sizes = [100/n for _ in range(n)]
     segment_colors = ['white' for _ in range(n)]
     
