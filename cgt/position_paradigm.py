@@ -333,7 +333,8 @@ class PositionParadigmFramework:
                             result += coeff * (gap.Image(_irrep, perm) if _signed else _irrep(perm))
                     else: # sigma is a group element
                         result = (gap.Image(_irrep, sigma) if _signed else _irrep(sigma))
-                    return matrix(UniversalCyclotomicField(), result)
+                    mat = matrix(UniversalCyclotomicField(), result)
+                    return mat.transpose() if _signed else mat
             return representation
         if not self.oriented:
             irreps = SymmetricGroupRepresentations(self.n)
