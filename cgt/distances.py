@@ -5,7 +5,7 @@ Implements a number of distance measures for genomes under the position paradigm
 from cgt.enums import ALGEBRA
 import numpy as np
 import networkx as nx
-from sage.all import ComplexDoubleField, UniversalCyclotomicField, matrix, Matrix, real, exp, round
+from sage.all import ComplexDoubleField, UniversalCyclotomicField, matrix, Matrix, real, exp, round, CC
 from scipy.optimize import minimize
 
 def mles(framework, model, genome_instances):
@@ -48,10 +48,14 @@ def _irreps_of_zs(framework, model, attempt_exact=False):
 	    irrep.set_immutable()
     return irreps_of_zs
 
-def _eigenvalues(mat, round_to=9, make_real=True, inc_repeated=False, attempt_exact=False):
+def _eigenvalues(mat, round_to=9, make_real=True, inc_repeated=False, attempt_exact=False, use_numpy=True):
     """Return all the eigenvalues for a given matrix mat"""
     col = list if inc_repeated else set
-    all_eigs = (eig for eig in mat.eigenvalues())
+    if use_numpy:
+        new_mat = np.array(matrix(CC, mat))
+        all_eigs = np.linalg.eigvals(new_mat)
+    else:
+        all_eigs = (eig for eig in mat.eigenvalues())
     if attempt_exact: 
         return sorted(col(all_eigs))
     else:
