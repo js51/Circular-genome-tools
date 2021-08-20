@@ -22,7 +22,7 @@ def mle(framework, model, genome_instance):
 def maximise(framework, L, max_time=100):
     """Return the time that maximises likelihood function L, using additional information from the framework"""
     limit = 1/framework.num_genomes()
-    t_max = minimize_scalar(lambda t: -1*L(t), bounds=[(0, max_time)])['x'][0]
+    t_max = minimize_scalar(lambda t: -1*L(t), method='bounded', bounds=[(0, max_time)])['x'][0]
     mle = t_max if L(t_max)>limit else np.nan
     return mle
 
