@@ -174,7 +174,7 @@ class PositionParadigmFramework:
         while len(instances) > 0:
             instance = instances.pop()
             if combine_inverse_classes:
-                dcoset = self._double_coset(instance) | self._double_coset(instance.inverse())
+                dcoset = sorted(set(self._double_coset(instance)+self._double_coset(instance.inverse())))
             else:
                 dcoset = self._double_coset(instance)
             instances -= set(dcoset)
