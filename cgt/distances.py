@@ -6,7 +6,7 @@ from cgt.enums import ALGEBRA
 import numpy as np
 import networkx as nx
 from sage.all import ComplexDoubleField, UniversalCyclotomicField, matrix, Matrix, real, exp, round, CC
-from scipy.optimize import minimize
+from scipy.optimize import minimize_scalar
 
 def mles(framework, model, genome_instances):
     """Return maximum likelihood estimates for a set of genome instances under the given model and framework"""
@@ -22,7 +22,7 @@ def mle(framework, model, genome_instance):
 def maximise(framework, L, max_time=100):
     """Return the time that maximises likelihood function L, using additional information from the framework"""
     limit = 1/framework.num_genomes()
-    t_max = minimize(lambda t: -1*L(t), 10, bounds=[(0, max_time)])['x'][0]
+    t_max = minimize_scalar(lambda t: -1*L(t), 10, bounds=[(0, max_time)])['x'][0]
     mle = t_max if L(t_max)>limit else np.nan
     return mle
 
