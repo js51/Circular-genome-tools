@@ -167,13 +167,16 @@ class PositionParadigmFramework:
         coset = set(d2 * instance * d1 for d1 in self.symmetry_group() for d2 in self.symmetry_group())
         return sorted(coset, key=self._sort_key_cycles)
 
-    def genome_equivalence_classes(self, sort_classes=True):
+    def genome_equivalence_classes(self, combine_inverse_classes=False, sort_classes=True):
         """Return double cosets of instances---genomes in the same class will have the same likelihood functions"""
         instances = set(self.genome_group())
         classes = {}
         while len(instances) > 0:
             instance = instances.pop()
-            dcoset = self._double_coset(instance)
+            if combine_inverse_classes:
+                dcoset = self._double_coset(instance) | self._double_coset(instance.inverse())
+            else:
+                dcoset = self._double_coset(instance)
             instances -= set(dcoset)
             classes[dcoset[0]] = dcoset
         if sort_classes:
