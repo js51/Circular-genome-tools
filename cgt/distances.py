@@ -91,9 +91,10 @@ def _eigenvectors(mat, tol=10^(-8)):
         q=q+c
     return binned_eigenvals, eigenvectors
 
-def _partial_traces_for_genome(framework, instance, irreps, irreps_of_zs, projections, eig_lists):
+def _partial_traces_for_genome(framework, instance, irreps, irreps_of_zs, projections, eig_lists, irreps_of_z=None):
     """Return dictionary of partial traces, indexed first by irrep index and then by eigenvalaue"""
-    irreps_of_z = [irrep(framework.symmetry_element()) for irrep in irreps]
+    if irreps_of_z is None:
+        irreps_of_z = [irrep(framework.symmetry_element()) for irrep in irreps]
     CDF, UCF = ComplexDoubleField(), UniversalCyclotomicField()
     traces = {
         r: {
