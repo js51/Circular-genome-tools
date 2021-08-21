@@ -7,6 +7,7 @@ import numpy as np
 import networkx as nx
 from sage.all import ComplexDoubleField, UniversalCyclotomicField, matrix, Matrix, real, exp, round, CC
 from scipy.optimize import minimize_scalar
+from functools import cache
 
 def mles(framework, model, genome_instances):
     """Return maximum likelihood estimates for a set of genome instances under the given model and framework"""
@@ -26,6 +27,7 @@ def maximise(framework, L, max_time=100):
     mle = t_max if L(t_max)>limit else np.nan
     return mle
 
+@cache
 def _projection_operators(mat, eigs):
     """Return projection operators for given matrix and its eigenvalues"""
     dim = mat.nrows()
@@ -36,6 +38,7 @@ def _projection_operators(mat, eigs):
                 projections[e1] *= (mat-(eig2*matrix.identity(dim)))*(1/(eig1-eig2))
     return projections
 
+@cache
 def _irreps_of_zs(framework, model, attempt_exact=False):
     """Return a set of matrices---images of zs under each irrep"""
     CDF, UCF = ComplexDoubleField(), UniversalCyclotomicField()
@@ -48,7 +51,8 @@ def _irreps_of_zs(framework, model, attempt_exact=False):
 	    irrep.set_immutable()
     return irreps_of_zs
 
-def _eigenvalues(mat, round_to=8, make_real=True, inc_repeated=False, attempt_exact=False, use_numpy=True, bin_eigs=False, tol=10^(-8)):
+@cache
+def _eigenvalues(mat, round_to=7, make_real=True, inc_repeated=False, attempt_exact=False, use_numpy=True, bin_eigs=False, tol=10^(-8)):
     """Return all the eigenvalues for a given matrix mat"""
     col = list if inc_repeated else set
     if use_numpy:
@@ -133,7 +137,7 @@ def likelihood_function(framework, model, genome, attempt_exact=False, use_proje
     irreps = framework.irreps()
     irreps_of_zs = _irreps_of_zs(framework, model, attempt_exact=attempt_exact)
     if use_projections:
-        eig_lists = [_eigenvalues(irrep_zs, round_to=8, make_real=True, inc_repeated=False, attempt_exact=attempt_exact) for irrep_zs in irreps_of_zs]
+        eig_lists = [_eigenvalues(irrep_zs, round_to=7, make_real=True, inc_repeated=False, attempt_exact=attempt_exact) for irrep_zs in irreps_of_zs]
         projections = [_projection_operators(*vals) for vals in zip(irreps_of_zs, eig_lists)]
         traces = _partial_traces_for_genome(framework, instance, irreps, irreps_of_zs, projections, eig_lists)
     else:
