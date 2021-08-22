@@ -47,7 +47,7 @@ class Model:
                 for generator in gens:
                     model[generator] = relative_prob/len(gens)
             if model_name is MODEL.two_region_adjacent_transpositions:
-                gens = rearrangements.all_transpositions_representatives(framework, num_regions=2)
+                gens = rearrangements.all_adjacent_transpositions_representatives(framework, num_regions=2)
                 for generator in gens:
                     model[generator] = relative_prob/len(gens)
         model = cls(framework, model)
