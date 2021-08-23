@@ -286,12 +286,12 @@ class PositionParadigmFramework:
         genomes = self.genomes()
         genome_list = list(genomes.values())
         reps = list(genomes.keys()) # Thousands of these
-        model_classes = list({frozenset({ d.inverse() * a * d for d in Z }) for a in model.generating_dictionary.keys()})
+        #model_classes = list({frozenset({ d.inverse() * a * d for d in Z }) for a in model.generating_dictionary.keys()})
         model_generators_cycles = list(model.generating_dictionary.keys()) #[sorted(list(model_class))[0] for model_class in model_classes]
         model_generators = [
             self.one_row(elt) for elt in model_generators_cycles
         ]
-        model_classes = { rep : list(model_classes[r]) for r, rep in enumerate(model_generators) }
+        #model_classes = { rep : list(model_classes[r]) for r, rep in enumerate(model_generators) }
         genome_lookup = { rep : r for r, rep in enumerate(reps) }
         num_genomes = len(genomes.keys())
         matrix = dok((num_genomes, num_genomes), dtype=np.float32)
