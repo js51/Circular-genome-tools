@@ -1,0 +1,10 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Stevenson"
+  given-names: "Joshua"
+  orcid: "https://orcid.org/0000-0002-1037-9996"
+title: "Circular Genome Tools"
+version: 0.1.X
+date-released: 2021-08-25
+url: "https://github.com/js51/Circular-genome-tools"
