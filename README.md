@@ -9,6 +9,8 @@ To install and use this package, paste the following command in your terminal
 
 and use `import cgt` in a sage script or environment.
 
-If you would like to contribute to `cgt`, please see [`CONTRIBUTING.md`](https://github.com/js51/Circular-genome-tools/blob/121f055b003be36abed7598cffcde6b01afee56a/CONTRIBUTING.md) for how to get set up.
+If you would like to contribute to `cgt`, please see [`CONTRIBUTING.md`](CONTRIBUTING.md) for how to get set up.
 
-**Note:** you will need to at least have Sage version 9.0 installed, and have the GAP package `repsn` installed for the copy of GAP that sits inside Sage. If you aren't sure how to do this, see the installation instructions in [`INSTALL.md`](https://github.com/js51/Circular-genome-tools/blob/a006bb522c370ec46831dd202c1a67b47ba72726/INSTALL.md).
+If you use this software in your work, please cite it use the citation function on the github page or see [`CITATION.cff`](CITATION.cff)
+
+**Note:** you will need to at least have Sage version 9.0 installed, and have the GAP package `repsn` installed for the copy of GAP that sits inside Sage. If you aren't sure how to do this, see the installation instructions in [`INSTALL.md`](INSTALL.md).
