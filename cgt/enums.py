@@ -8,6 +8,7 @@ class MODEL(Enum):
     two_region_inversions  = "inversions of two adjacent regions"
     all_inversions		   = "all inversions"
     one_region_swaps       = "adjacent transpositions"
+    two_region_adjacent_transpositions = "transpositions of two adjacent regions"
 
 class TYPE(Enum):
     reg_to_signed_pos = auto()

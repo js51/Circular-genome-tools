@@ -6,7 +6,8 @@ from cgt.enums import ALGEBRA
 import numpy as np
 import networkx as nx
 from sage.all import ComplexDoubleField, UniversalCyclotomicField, matrix, Matrix, real, exp, round, CC
-from scipy.optimize import minimize
+from scipy.optimize import minimize_scalar
+from functools import cache
 
 def mles(framework, model, genome_instances):
     """Return maximum likelihood estimates for a set of genome instances under the given model and framework"""
@@ -22,7 +23,7 @@ def mle(framework, model, genome_instance):
 def maximise(framework, L, max_time=100):
     """Return the time that maximises likelihood function L, using additional information from the framework"""
     limit = 1/framework.num_genomes()
-    t_max = minimize(lambda t: -1*L(t), 10, bounds=[(0, max_time)])['x'][0]
+    t_max = minimize_scalar(lambda t: -1*L(t), method='bounded', bounds=(0, max_time))['x']
     mle = t_max if L(t_max)>limit else np.nan
     return mle
 
@@ -48,7 +49,7 @@ def _irreps_of_zs(framework, model, attempt_exact=False):
 	    irrep.set_immutable()
     return irreps_of_zs
 
-def _eigenvalues(mat, round_to=8, make_real=True, inc_repeated=False, attempt_exact=False, use_numpy=True, bin_eigs=False, tol=10^(-8)):
+def _eigenvalues(mat, round_to=7, make_real=True, inc_repeated=False, attempt_exact=False, use_numpy=True, bin_eigs=False, tol=10^(-8)):
     """Return all the eigenvalues for a given matrix mat"""
     col = list if inc_repeated else set
     if use_numpy:
@@ -90,9 +91,10 @@ def _eigenvectors(mat, tol=10^(-8)):
         q=q+c
     return binned_eigenvals, eigenvectors
 
-def _partial_traces_for_genome(framework, instance, irreps, irreps_of_zs, projections, eig_lists):
+def _partial_traces_for_genome(framework, instance, irreps, irreps_of_zs, projections, eig_lists, irreps_of_z=None):
     """Return dictionary of partial traces, indexed first by irrep index and then by eigenvalaue"""
-    irreps_of_z = [irrep(framework.symmetry_element()) for irrep in irreps]
+    if irreps_of_z is None:
+        irreps_of_z = [irrep(framework.symmetry_element()) for irrep in irreps]
     CDF, UCF = ComplexDoubleField(), UniversalCyclotomicField()
     traces = {
         r: {
@@ -133,7 +135,7 @@ def likelihood_function(framework, model, genome, attempt_exact=False, use_proje
     irreps = framework.irreps()
     irreps_of_zs = _irreps_of_zs(framework, model, attempt_exact=attempt_exact)
     if use_projections:
-        eig_lists = [_eigenvalues(irrep_zs, round_to=8, make_real=True, inc_repeated=False, attempt_exact=attempt_exact) for irrep_zs in irreps_of_zs]
+        eig_lists = [_eigenvalues(irrep_zs, round_to=7, make_real=True, inc_repeated=False, attempt_exact=attempt_exact) for irrep_zs in irreps_of_zs]
         projections = [_projection_operators(*vals) for vals in zip(irreps_of_zs, eig_lists)]
         traces = _partial_traces_for_genome(framework, instance, irreps, irreps_of_zs, projections, eig_lists)
     else:

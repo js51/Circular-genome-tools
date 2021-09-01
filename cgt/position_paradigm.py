@@ -167,13 +167,16 @@ class PositionParadigmFramework:
         coset = set(d2 * instance * d1 for d1 in self.symmetry_group() for d2 in self.symmetry_group())
         return sorted(coset, key=self._sort_key_cycles)
 
-    def genome_equivalence_classes(self, sort_classes=True):
+    def genome_equivalence_classes(self, combine_inverse_classes=False, sort_classes=True):
         """Return double cosets of instances---genomes in the same class will have the same likelihood functions"""
         instances = set(self.genome_group())
         classes = {}
         while len(instances) > 0:
             instance = instances.pop()
-            dcoset = self._double_coset(instance)
+            if combine_inverse_classes:
+                dcoset = sorted(set(self._double_coset(instance)+self._double_coset(instance.inverse())), key=self._sort_key_cycles)
+            else:
+                dcoset = self._double_coset(instance)
             instances -= set(dcoset)
             classes[dcoset[0]] = dcoset
         if sort_classes:
@@ -283,12 +286,12 @@ class PositionParadigmFramework:
         genomes = self.genomes()
         genome_list = list(genomes.values())
         reps = list(genomes.keys()) # Thousands of these
-        model_classes = list({frozenset({ d.inverse() * a * d for d in Z }) for a in model.generating_dictionary.keys()})
+        #model_classes = list({frozenset({ d.inverse() * a * d for d in Z }) for a in model.generating_dictionary.keys()})
         model_generators_cycles = list(model.generating_dictionary.keys()) #[sorted(list(model_class))[0] for model_class in model_classes]
         model_generators = [
             self.one_row(elt) for elt in model_generators_cycles
         ]
-        model_classes = { rep : list(model_classes[r]) for r, rep in enumerate(model_generators) }
+        #model_classes = { rep : list(model_classes[r]) for r, rep in enumerate(model_generators) }
         genome_lookup = { rep : r for r, rep in enumerate(reps) }
         num_genomes = len(genomes.keys())
         matrix = dok((num_genomes, num_genomes), dtype=np.float32)

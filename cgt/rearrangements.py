@@ -60,8 +60,7 @@ def __all_canonical_inversions(framework, num_regions=None):
     else:
         raise NotImplementedError(f"inversions of length {num_regions} not yet implemented")
     
-def __one_region_adjacent_transposition_reps(framework):
-    warnings.warn("This function is currently untested! Generators might be incorrect")
+def __two_region_adjacent_transposition_reps(framework):
     if not framework.oriented or framework.symmetry != SYMMETRY.circular:
         raise NotImplementedError(f"not yet implemented for {str(framework)}")
     G = framework.genome_group()
@@ -103,3 +102,9 @@ def __representatives(framework, set_of_permutations, classes=CLASSES.double_cos
 
 def all_inversions_representatives(framework, num_regions=None):
     return __representatives(framework, __all_canonical_inversions(framework, num_regions=num_regions), classes=CLASSES.double_cosets)
+
+def all_adjacent_transpositions_representatives(framework, num_regions=None):
+    if num_regions == 2:
+        return __two_region_adjacent_transposition_reps(framework)
+    else:
+        raise NotImplementedError(f"model not yet implemented")
