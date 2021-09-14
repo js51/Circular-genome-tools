@@ -168,7 +168,7 @@ class PositionParadigmFramework:
         return sorted(coset, key=self._sort_key_cycles)
 
     def _conjugacy_class(self, instance):
-        conj_class = set(d.inverse() * instance * d.inverse for d in self.symmetry_group())
+        conj_class = set(d.inverse() * instance * d for d in self.symmetry_group())
         return sorted([self.one_row(g) for g in conj_class], key=self._sort_key)
 
     def genome_equivalence_classes(self, combine_inverse_classes=False, sort_classes=True):
