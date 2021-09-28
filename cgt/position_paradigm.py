@@ -71,7 +71,7 @@ class PositionParadigmFramework:
             element: the genome instance to represent in one-row notation. Multiple formats accepted.
             as_list: if true, return as a list of images, otherwise return a sage permutation.
 
-        EXAMPLES::
+        Examples:
             sage: import cgt
             sage: ppf = cgt.PositionParadigmFramework(3)
             sage: ppf.cycles(ppf.one_row('(1,-2)(-1,2)')) == ppf.cycles('(1,-2)(-1,2)')
@@ -97,7 +97,7 @@ class PositionParadigmFramework:
     def canonical_instance(self, instance):
         """Return the 'canonical' instance of the genome represented by the permutation if there is one.
 
-        TESTS::
+        Examples:
             sage: import cgt; ppf = cgt.PositionParadigmFramework(3, symmetry=cgt.SYMMETRY.circular)
             sage: ppf.canonical_instance('(1,-2)(-1,2)')
             [1, 2, -3]
@@ -167,6 +167,10 @@ class PositionParadigmFramework:
         coset = set(d2 * instance * d1 for d1 in self.symmetry_group() for d2 in self.symmetry_group())
         return sorted(coset, key=self._sort_key_cycles)
 
+    def _conjugacy_class(self, instance):
+        conj_class = set(d.inverse() * instance * d for d in self.symmetry_group())
+        return sorted([self.one_row(g) for g in conj_class], key=self._sort_key)
+
     def genome_equivalence_classes(self, combine_inverse_classes=False, sort_classes=True):
         """Return double cosets of instances---genomes in the same class will have the same likelihood functions"""
         instances = set(self.genome_group())
@@ -179,6 +183,19 @@ class PositionParadigmFramework:
                 dcoset = self._double_coset(instance)
             instances -= set(dcoset)
             classes[dcoset[0]] = dcoset
+        if sort_classes:
+            classes = dict(sorted(classes.items(), key=lambda x: self._sort_key_cycles(x[0])))
+        return classes
+    
+    def genome_conjugacy_classes(self, sort_classes=True):
+        """Return conjugacy classes of instances"""
+        instances = set(self.genome_group())
+        classes = {}
+        while len(instances) > 0:
+            instance = instances.pop()
+            conj_class = self._conjugacy_class(instance)
+            instances -= set(conj_class)
+            classes[conj_class[0]] = conj_class
         if sort_classes:
             classes = dict(sorted(classes.items(), key=lambda x: self._sort_key_cycles(x[0])))
         return classes
@@ -270,7 +287,7 @@ class PositionParadigmFramework:
 
     def matrix(self, element):
         """Return the defining representation matrix. Note that matrix(x)matrix(y) = matrix(yx)"""
-        with warnings.catch_warnings(): # Sage uses deprecated objects in to_matrix for coloured permutations
+        with warnings.catch_warnings(): # Sage uses deprecated objects in to_matrix for coloured permutations. We would like to not be reminded of this.
             warnings.simplefilter("ignore", category=PendingDeprecationWarning)
             return np.array(self.one_row(self.cycles(element)).to_matrix())
 
@@ -286,6 +303,7 @@ class PositionParadigmFramework:
         genomes = self.genomes()
         genome_list = list(genomes.values())
         reps = list(genomes.keys()) # Thousands of these
+        # Don't need the below line any more
         #model_classes = list({frozenset({ d.inverse() * a * d for d in Z }) for a in model.generating_dictionary.keys()})
         model_generators_cycles = list(model.generating_dictionary.keys()) #[sorted(list(model_class))[0] for model_class in model_classes]
         model_generators = [
