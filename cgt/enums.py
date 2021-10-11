@@ -47,3 +47,8 @@ class ALGEBRA(Enum):
     group        = auto()
     genome       = auto()
     genome_class = auto()
+
+class IRREP_TYPE(Enum):
+    specht = speck = auto()
+    orthogonal     = auto()
+    seminormal     = auto()
