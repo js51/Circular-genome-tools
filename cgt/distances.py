@@ -5,7 +5,7 @@ Implements a number of distance measures for genomes under the position paradigm
 from cgt.enums import ALGEBRA
 import numpy as np
 import networkx as nx
-from sage.all import ComplexDoubleField, UniversalCyclotomicField, matrix, Matrix, real, exp, round, CC
+from sage.all import ComplexDoubleField, UniversalCyclotomicField, matrix, Matrix, real, exp, round, CC, log
 from scipy.optimize import minimize_scalar
 from functools import cache
 
@@ -89,6 +89,28 @@ def _eigenvectors(mat, tol=10^(-8)):
         vec, _ = matrix([eigen_tuples[q+l][1][0].list() for l in range(c)]).gram_schmidt(orthonormal=True)
         eigenvectors.append(vec)
         q=q+c
+    return binned_eigenvals, eigenvectors
+
+def _eigenvectors_reduce_error(mat, tol=10^(-8)):
+    eigen_tuples = sorted(mat.eigenvectors_right())
+    binned_eigenvals = _bin([et[0] for et in eigen_tuples], tol=tol, return_bin_size=True)
+    # Orthogonalise the eigenvectors                      
+    q = 0
+    eigenvectors = []
+    for v in range(len(binned_eigenvals)):
+        c = binned_eigenvals[v][1] 
+        A = matrix([eigen_tuples[q+l][1][0].list() for l in range(c)]).transpose()
+        print(A.ncols(), A.nrows())
+        # If the rounded eigenvalue is zero
+        if round(binned_eigenvals[v][0], 8) == 0:
+            Q = None
+        else:
+            Q, _ = A.QR()
+            print(Q.nrows(), Q.ncols())
+            Q = Q.delete_columns(list(range(A.ncols(),A.nrows())))
+            print(Q.nrows(), Q.ncols())
+        eigenvectors.append(Q)
+        q += c
     return binned_eigenvals, eigenvectors
 
 def _partial_traces_for_genome(framework, instance, irreps, irreps_of_zs, projections, eig_lists, irreps_of_z=None):
