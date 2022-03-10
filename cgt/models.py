@@ -4,7 +4,6 @@
 from sage.all_cmdline import QQ
 from .enums import *
 from . import rearrangements
-from functools import cache
 
 class Model:
     """Defines a model. A model consists of some collection of permutations and a map from these permutations to probabilities [0,1]"""
@@ -54,12 +53,10 @@ class Model:
         model.names += list(named_model_dictionary.keys())
         return model
 
-    @cache
     def reg_rep_of_zs(self):
         """Return the regular representation of zs as comptued by PositionParadigmFramework.reg_rep_zs, but store the sparse result"""
         return self.framework.reg_rep_of_zs(self, sparse=True)
 
-    @cache
     def s_element(self, in_algebra=ALGEBRA.genome):
         if in_algebra not in {ALGEBRA.group, ALGEBRA.genome}:
             raise NotImplementedError(f"Model element for {str(in_algebra)} algebra not yet implemented")

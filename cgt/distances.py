@@ -7,7 +7,6 @@ import numpy as np
 import networkx as nx
 from sage.all import ComplexDoubleField, UniversalCyclotomicField, matrix, Matrix, real, exp, round, CC
 from scipy.optimize import minimize_scalar
-from functools import cache
 
 def mles(framework, model, genome_instances):
     """Return maximum likelihood estimates for a set of genome instances under the given model and framework"""

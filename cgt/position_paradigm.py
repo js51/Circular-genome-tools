@@ -13,7 +13,6 @@ from copy import deepcopy
 from .structures import HyperoctahedralGroup
 from scipy.sparse import dok_matrix as dok
 from random import choice
-from functools import cache
 
 class PositionParadigmFramework:
     """Everything you need for working with genomes under the position paradigm"""
@@ -86,7 +85,6 @@ class PositionParadigmFramework:
                 row = Permutations(self.n)(row)
         return row
 
-    @cache
     def genome_group(self):
         """Return the permutation group containing genome instances."""
         if self.oriented:
@@ -125,7 +123,6 @@ class PositionParadigmFramework:
         """Return a random genome"""
         return self.genome(self.random_instance(), format=format)
 
-    @cache
     def symmetry_group(self):
         """Return the symmetry group of the genomes."""
         if self.symmetry == SYMMETRY.circular:
@@ -136,7 +133,6 @@ class PositionParadigmFramework:
             gens = [self.genome_group().one()]
         return self.genome_group().subgroup(gens)
 
-    @cache
     def group_algebra(self):
         """Return the group alegbra, where the group is the group containing genome instances."""
         return self.genome_group().algebra(QQ)
@@ -342,7 +338,6 @@ class PositionParadigmFramework:
         else:
             return representations
 
-    @cache
     def _cached_irreps(self):
         representations = []
         def irrep_function_factory(irrep, signed):
