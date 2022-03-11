@@ -38,7 +38,7 @@ class PositionParadigmFramework:
 
     def __call__(self, x):
         """Return an object as a group algebra element if possible"""
-        return self.genome_algebra()(self.cycles(x))
+        return self.group_algebra()(self.cycles(x))
 
     def __hash__(self):
         return self.__str__().__hash__() # String rep is unique, so just hash that!
