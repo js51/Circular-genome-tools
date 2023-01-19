@@ -12,13 +12,18 @@ def css(cuts_set):
     if len(string) != len(cuts_set): print("something went very wrong here...")
     return string
 
-def cuts(framework, sigma):
-    sigma = deepcopy(framework.one_row(sigma))
-    n = framework.n
+
+def c_perm(n):
     pmN = structures.set_plus_minus(n)
     G = SymmetricGroup(pmN)
     c_string = f'({",".join(str(i) for i in list(range(1, n+1)))})({",".join(str(i) for i in list(range(-n, 0)))})'
     c = G(c_string)
+    return c
+
+def cuts(framework, sigma):
+    sigma = deepcopy(framework.one_row(sigma))
+    n = framework.n
+    c = c_perm(n)
     sigma = list(sigma)
     return set([ 
         tuple(([i+1,c(i+1)])) for i in range(len(sigma)) 
@@ -108,3 +113,41 @@ def all_adjacent_transpositions_representatives(framework, num_regions=None):
         return __two_region_adjacent_transposition_reps(framework)
     else:
         raise NotImplementedError(f"model not yet implemented")
+
+def permutation_with_cuts(framework, cuts, perm=None, start=None):
+    n = framework.n
+    c = c_perm(n)
+    if perm is None:
+        if not (framework.oriented and framework.symmetry == SYMMETRY.circular):
+            raise NotImplementedError(f"not yet implemented for {str(framework)}")
+        perm = {}
+        perm[1] = 1 # making the canonical instance
+        results = permutation_with_cuts(cuts, perm, 2)
+        for result in results:
+            if result:
+                yield list(result.values())
+    else: # recurse
+        possibilities = set(range(1, n+1)) | set(range(-n, 0))
+        for val in perm.values():
+            possibilities.remove(val)
+            possibilities.remove(-val)
+        if start-1 in cuts:
+            if c(perm[start-1]) in possibilities: possibilities.remove(c(perm[start-1]))
+        else:
+            possibilities = possibilities & {c(perm[start-1])}
+        if start == n: # also check if *start* is a cut
+            if start in cuts:
+                # add exclusions
+                if start in possibilities: possibilities.remove(start) # p[1]=1 so we can't have p[n]=n
+            else:
+                possibilities = possibilities & {n} # we must choose n
+            for possibility in possibilities:
+                bperm = perm.copy()
+                bperm[start] = possibility
+                yield bperm
+        else:
+            for possibility in possibilities:
+                bperm = perm.copy()
+                bperm[start] = possibility
+                for result in permutation_with_cuts(cuts, bperm, start+1):
+                    yield result
