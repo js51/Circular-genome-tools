@@ -4,6 +4,9 @@
 from sage.all_cmdline import QQ
 from .enums import *
 from . import rearrangements
+from scipy.sparse import dok_matrix as dok
+import numpy as np
+
 
 class Model:
     """Defines a model. A model consists of some collection of permutations and a map from these permutations to probabilities [0,1]"""
@@ -56,7 +59,27 @@ class Model:
     def reg_rep_of_zs(self):
         """Return the regular representation of zs as comptued by PositionParadigmFramework.reg_rep_zs, but store the sparse result"""
         return self.framework.reg_rep_of_zs(self, sparse=True)
+    
+    def reg_rep(self):
+        fw = self.framework
+        A = fw.group_algebra()
+        s = A(self.s_element())
+        z = A(fw.symmetry_element())
 
+        genomes = fw.genomes(format=FORMAT.formal_sum)
+        
+        model_generators_cycles = list(self.generating_dictionary.keys())
+        model_generators = [ fw.one_row(elt) for elt in model_generators_cycles ]
+
+        num_genomes = len(genomes.keys())
+        
+        matrix = dok((num_genomes, num_genomes), dtype=np.float32)
+        
+        for g, genome in enumerate(genomes.values()):
+            zszo = A(genome) * z * s * z
+            print(fw.collect_genome_terms(zszo))
+    
+    
     def s_element(self, in_algebra=ALGEBRA.genome):
         if in_algebra not in {ALGEBRA.group, ALGEBRA.genome}:
             raise NotImplementedError(f"Model element for {str(in_algebra)} algebra not yet implemented")
