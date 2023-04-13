@@ -24,6 +24,7 @@ class PositionParadigmFramework:
         self.n = num_regions
         self.oriented = oriented
         self.symmetry = symmetry
+        self.representations = None
         
     def __eq__(self, other): # String representation is unique and repr calls str
         return self.__repr__() == other.__repr__()
@@ -356,6 +357,8 @@ class PositionParadigmFramework:
             return representations
 
     def _cached_irreps(self):
+        if self.representations is not None:
+            return self.representations
         representations = []
         def irrep_function_factory(irrep, signed):
             def representation(sigma, _irrep=irrep, _signed=signed):
@@ -375,7 +378,8 @@ class PositionParadigmFramework:
             irreps = (gap.IrreducibleAffordingRepresentation(character) for character in gap.Irr(self.genome_group()))
         for irrep in irreps:
             representations.append(irrep_function_factory(irrep, self.oriented))
-        return representations
+        self.representations = representations
+        return self.representations
 
     def regular_representation(self, g):
         """Return the regular representation of a single element"""

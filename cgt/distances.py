@@ -237,7 +237,7 @@ def distance_matrix(framework, model, genomes, distance):
     elif distance == DISTANCE.min_weighted:
         distances = min_distance(framework, model, genome_reps=need_distances, weighted=True)
     elif distance == DISTANCE.MLE:
-        distances = mles(framework, model, genome_instances=need_distances)
+        distances = mles(framework, model, genome_instances=need_distances, verbose=True)
 
     # Construct the distance matrix
     D = np.zeros((len(genomes), len(genomes)))
