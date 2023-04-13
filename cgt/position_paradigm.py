@@ -42,6 +42,14 @@ class PositionParadigmFramework:
 
     def __hash__(self):
         return self.__str__().__hash__() # String rep is unique, so just hash that!
+    
+    def __contains__(self, item):
+        # If the item is an instance
+        if item in self.genome_group():
+            return True
+        if item in self.group_algebra():
+            raise NotImplementedError("Not yet implemented")
+        return False
 
     def cycles(self, element):
         try: # See if it's already a group element
@@ -62,6 +70,10 @@ class PositionParadigmFramework:
             return self.genome_group()(elt + other_half)
         else:
             raise ValueError("Invalid data for constructing a permutation")
+        
+    def instances(self, genome):
+        """Return a list of instances of the genome."""
+        return [instance[0] for instance in list(genome)]
 
     def one_row(self, element, as_list=False):
         """Return a given genome instance in one-row notation.
@@ -100,6 +112,11 @@ class PositionParadigmFramework:
             sage: ppf.canonical_instance('(1,-2)(-1,2)')
             [1, 2, -3]
         """
+        try:
+            instance = self.cycles(deepcopy(instance))
+        except:
+            # Probably accidentally given a genome instead of an instance
+            instance = self.instances(instance)[0]
         instance = deepcopy(self.one_row(self.cycles(instance)))
         if self.symmetry in {SYMMETRY.circular, SYMMETRY.linear}:
             f = self.one_row(self.standard_reflection())
@@ -365,7 +382,7 @@ class PositionParadigmFramework:
         warnings.warn("this function is untested! Use at your own risk.", DeprecationWarning)
         return matrix(QQbar, [(self.group_algebra()(g)*self.genome_group()(h)).to_vector(QQbar) for h in self.genome_group()]).transpose()
 
-    def coefficient_in(self, more_terms, fewer_terms):
+    def coefficient_in(self, more_terms, fewer_terms, none_if_fail=False):
         """For example, the coefficient of (a/2 + b/2) in x=(a/3 + b/3 + c/3) is 2/3, since x=2/3*(a/2 + b/2) + c/3"""
         coefficients_in_larger_sum = {}
         for term in fewer_terms.terms():
@@ -374,7 +391,10 @@ class PositionParadigmFramework:
             coefficients_in_larger_sum[perm] = more_terms.coefficient(perm) * (1/coeff) # 1/3 * 2 = 2/3
         terms = set(coefficients_in_larger_sum.values())
         if len(terms) != 1:
-            warnings.warn("Note that extra terms from the smaller sum remain in the larger sum!")
+            if none_if_fail:
+                return None
+            else:
+                warnings.warn("Note that extra terms from the smaller sum remain in the larger sum!")
         return min(terms)
 
     def collect_genome_terms(self, formal_sum, display=DISPLAY.one_row):
