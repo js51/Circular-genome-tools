@@ -15,6 +15,8 @@ class Model:
         self.framework = framework
         self.generating_dictionary = generating_dictionary
         self.names = []
+        self._reg_rep_of_zs = None # For caching the regular representation of zs
+        self.data_bundle = {} # Used to cache data for several functions
         # TODO: Implement checks for certain model properties, for example time reversibility, symmetry and missing rearrangements
 
     def __repr__(self):
@@ -58,7 +60,9 @@ class Model:
 
     def reg_rep_of_zs(self):
         """Return the regular representation of zs as comptued by PositionParadigmFramework.reg_rep_zs, but store the sparse result"""
-        return self.framework.reg_rep_of_zs(self, sparse=True)
+        if self._reg_rep_of_zs is None:
+            self._reg_rep_of_zs = self.framework.reg_rep_of_zs(self, sparse=True)
+        return self._reg_rep_of_zs
     
     def reg_rep(self):
         fw = self.framework

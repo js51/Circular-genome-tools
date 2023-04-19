@@ -39,17 +39,23 @@ def _projection_operators(mat, eigs):
                 projections[e1] *= (mat-(eig2*matrix.identity(dim)))*(1/(eig1-eig2))
     return projections
 
-def _irreps_of_zs(framework, model, attempt_exact=False):
+def _irreps_of_zs(framework, model, attempt_exact=False, force_recompute=False):
     """Return a set of matrices---images of zs under each irrep"""
-    CDF, UCF = ComplexDoubleField(), UniversalCyclotomicField()
-    z = framework.symmetry_element()
-    s = model.s_element(in_algebra=ALGEBRA.genome)
-    irreps_of_z, irreps_of_s = framework.irreps(z), framework.irreps(s)
-    irreps_of_zs = (matrix(UCF, irrep_z*irrep_s) for irrep_z, irrep_s in zip(irreps_of_z, irreps_of_s))
-    irreps_of_zs = [Matrix(UCF if attempt_exact else CDF, irrep_zs) for irrep_zs in irreps_of_zs]
-    for irrep in irreps_of_zs:
-        irrep.set_immutable()
+    key = "irreps_of_zs"
+    if key in model.data_bundle and not force_recompute:
+        irreps_of_zs =  model.data_bundle[key]
+    else:
+        CDF, UCF = ComplexDoubleField(), UniversalCyclotomicField()
+        z = framework.symmetry_element()
+        s = model.s_element(in_algebra=ALGEBRA.genome)
+        irreps_of_z, irreps_of_s = framework.irreps(z), framework.irreps(s)
+        irreps_of_zs = (matrix(UCF, irrep_z*irrep_s) for irrep_z, irrep_s in zip(irreps_of_z, irreps_of_s))
+        irreps_of_zs = [Matrix(UCF if attempt_exact else CDF, irrep_zs) for irrep_zs in irreps_of_zs]
+        for irrep in irreps_of_zs:
+            irrep.set_immutable()
+        model.data_bundle[key] = irreps_of_zs
     return irreps_of_zs
+
 
 def _eigenvalues(mat, round_to=7, make_real=True, inc_repeated=False, attempt_exact=False, use_numpy=True, bin_eigs=False, tol=10^(-8)):
     """Return all the eigenvalues for a given matrix mat"""
@@ -150,7 +156,6 @@ def _partial_traces_for_genome_using_eigenvectors(framework, instance, irreps, i
             traces[r][eigenvalue[0]]=round(real((sum([(eigenvectors[m,:].H)*eigenvectors[m,:] for m in range(eigenvalue[1])])*sigd).trace()),6)
     return traces
 
-
 def likelihood_function(framework, model, genome, attempt_exact=False, use_projections=True):
     """Return the likelihood function for a given genome"""
     instance = genome
@@ -159,8 +164,16 @@ def likelihood_function(framework, model, genome, attempt_exact=False, use_proje
     irreps = framework.irreps()
     irreps_of_zs = _irreps_of_zs(framework, model, attempt_exact=attempt_exact)
     if use_projections:
-        eig_lists = [_eigenvalues(irrep_zs, round_to=7, make_real=True, inc_repeated=False, attempt_exact=attempt_exact) for irrep_zs in irreps_of_zs]
-        projections = [_projection_operators(*vals) for vals in zip(irreps_of_zs, eig_lists)]
+        if "eig_lists" in model.data_bundle:
+            eig_lists = model.data_bundle["eig_lists"]
+        else:
+            eig_lists = [_eigenvalues(irrep_zs, round_to=7, make_real=True, inc_repeated=False, attempt_exact=attempt_exact) for irrep_zs in irreps_of_zs]
+            model.data_bundle["eig_lists"] = eig_lists
+        if "projections" in model.data_bundle:
+            projections = model.data_bundle["projections"]
+        else:
+            projections = [_projection_operators(*vals) for vals in zip(irreps_of_zs, eig_lists)]
+            model.data_bundle["projections"] = projections
         traces = _partial_traces_for_genome(framework, instance, irreps, irreps_of_zs, projections, eig_lists)
     else:
         eig_lists = [[x[0] for x in _eigenvectors(irrep_zs)[0]] for irrep_zs in irreps_of_zs]
@@ -177,7 +190,7 @@ def min_distance(framework, model, genome_reps=None, weighted=False):
     """Return dictionary of minimum distances ref->genome, using inverse of model probabilities as weights (or not)"""
     matrix = model.reg_rep_of_zs().toarray()
     if weighted:
-        matrix = np.reciprocal(matrix, where=matrix!=0)
+        matrix[matrix != 0] = 1 / matrix[matrix != 0]
     graph = nx.Graph(matrix)
     if genome_reps is None:
         genome_reps = framework.genomes().keys()
@@ -186,10 +199,10 @@ def min_distance(framework, model, genome_reps=None, weighted=False):
         for r, rep in enumerate(genome_reps) 
     }
 
-def MFPT(framework, model, genomes=None, scale_by=1):
+def MFPT(framework, model, genome_reps=None, scale_by=1):
     """Return the mean time elapsed rearranging ref->genome where the target is an absorbing state"""
-    if genomes is None: 
-        genomes = framework.genomes()
+    genomes = framework.genomes()
+    reps = list(genomes.keys())
     P = model.reg_rep_of_zs().toarray()
     P_0 = P.copy()
     for i in range(len(P)):
@@ -197,9 +210,10 @@ def MFPT(framework, model, genomes=None, scale_by=1):
     Z = np.linalg.inv(np.eye(len(P)) - P_0)
     def MFTP_dists():
         return (Z@P_0@Z)[:,0]
-    reps = list(genomes.keys())
     MFTP_distances = list(MFTP_dists())
     MFTP_distances = { rep : scale_by * MFTP_distances[r] for r, rep in enumerate(reps) }
+    if genome_reps is not None:
+        MFTP_distances = { rep : MFTP_distances[framework.canonical_instance(rep)] for rep in genome_reps }
     return MFTP_distances
 
 def dict_to_distance_matrix(distances, framework, genomes=None):
@@ -231,7 +245,7 @@ def distance_matrix(framework, model, genomes, distance):
 
     # Compute the distances:
     if distance == DISTANCE.MFPT:
-        distances = MFPT(framework, model, genomes=need_distances)
+        distances = MFPT(framework, model, genome_reps=need_distances)
     elif distance == DISTANCE.min:
         distances = min_distance(framework, model, genome_reps=need_distances)
     elif distance == DISTANCE.min_weighted:

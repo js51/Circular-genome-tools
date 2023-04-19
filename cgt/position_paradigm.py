@@ -25,6 +25,7 @@ class PositionParadigmFramework:
         self.oriented = oriented
         self.symmetry = symmetry
         self.representations = None
+        self._genomes = None
         
     def __eq__(self, other): # String representation is unique and repr calls str
         return self.__repr__() == other.__repr__()
@@ -226,13 +227,17 @@ class PositionParadigmFramework:
     def genomes(self, format=FORMAT.dictionary, sort_genomes=True):
         if format not in {FORMAT.dictionary, FORMAT.formal_sum}:
             raise NotImplementedError("Not yet implemented! Convert manually to other formats from FORMAT.dictionary")
-        instances = set(self.genome_group())
-        genomes = {}
-        while len(instances) > 0:
-            instance = instances.pop()
-            coset = self._genome_coset(instance)
-            instances -= set(coset)
-            genomes[coset[0]] = coset
+        if self._genomes is None:
+            instances = set(self.genome_group())
+            genomes = {}
+            while len(instances) > 0:
+                instance = instances.pop()
+                coset = self._genome_coset(instance)
+                instances -= set(coset)
+                genomes[coset[0]] = coset
+            self._genomes = genomes
+        else:
+            genomes = self._genomes
         if format == FORMAT.formal_sum:
             Z = self.symmetry_group()
             A = self.group_algebra()
@@ -306,7 +311,6 @@ class PositionParadigmFramework:
             return np.array(self.one_row(self.cycles(element)).to_matrix())
 
     def reg_rep_of_zs(self, model, to_adjacency_matrix=False, sparse=True):
-        warnings.warn("Untested! Use at your own risk!")
         # TODO: #14 re-write to directly use model element from the genome algebra
         if self is not model.framework:
             if self != model.framework:
