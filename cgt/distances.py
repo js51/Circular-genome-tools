@@ -192,10 +192,11 @@ def min_distance(framework, model, genome_reps=None, weighted=False):
     if weighted:
         matrix[matrix != 0] = 1 / matrix[matrix != 0]
     graph = nx.Graph(matrix)
+    genomes = list(framework.genomes().keys())
     if genome_reps is None:
-        genome_reps = framework.genomes().keys()
+        genome_reps = genomes
     return { 
-        rep : nx.shortest_path_length(graph, source=0, target=r, weight='weight' if weighted else None) 
+        rep : nx.shortest_path_length(graph, source=0, target=genomes.index(rep), weight='weight' if weighted else None) 
         for r, rep in enumerate(genome_reps) 
     }
 
