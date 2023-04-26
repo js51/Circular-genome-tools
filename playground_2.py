@@ -32,33 +32,13 @@ leaves = [n for n, d in new_tree.out_degree() if d==0]
 genomes = [new_tree.nodes[leaf]["genome"] for leaf in leaves]
 labels = [new_tree.nodes[leaf]["label"] for leaf in leaves]
 
-# %% Get the genomes g that we need dist(id -> g) for:
-need_distances = {}
-for i, g_i in enumerate(genomes):
-    for j, g_j in enumerate(genomes):
-        if i < j:
-            canonical_i = framework.canonical_instance(framework.random_instance(g_i))
-            canonical_j = framework.canonical_instance(framework.random_instance(g_j))
-            need_distances[(canonical_i, canonical_j)] = canonical_i.inverse() * canonical_j
+# %% Compute MLE distance matrix
+D_min = cgt.distances.distance_matrix(framework, model, genomes, cgt.DISTANCE.min)
 
-# %% Compute distance matrix
-min_distances = cgt.distances.min_distance(framework, model, weighted=False)
-
-# %% Likelihood distances
-L_distances = cgt.distances.mles(framework, model, genome_instances=need_distances.values(), verbose=True)
+# %% Compute MLE distance matrix
+D_MLE = cgt.distances.distance_matrix(framework, model, genomes, cgt.DISTANCE.MLE)
 
 # %%
-MFPT_distances = cgt.distances.MFPT(framework, model)
-
-#%%
-D_min = cgt.distances.dict_to_distance_matrix(min_distances, framework, genomes)
-D_MFPT = cgt.distances.dict_to_distance_matrix(MFPT_distances, framework, genomes)
-
-# %%
-tree1 = sp.phylogenetics.neighbour_joining(D_min, labels=labels)
-cgt.simulations.draw_tree(tree1)
-
-# %%
-tree2 = sp.phylogenetics.neighbour_joining(D_MFPT, labels=labels)
-cgt.simulations.draw_tree(tree2)
+reconstructed_tree = sp.phylogenetics.neighbour_joining(D_MLE, labels=labels)
+cgt.simulations.draw_tree(reconstructed_tree)
 # %%

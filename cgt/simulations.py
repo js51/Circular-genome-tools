@@ -50,13 +50,13 @@ def evolve_on_tree(tree, framework, model, root="random"):
             # Draw a rearrangement
             rearrangement = draw_rearrangement(model)
             # Apply the rearrangement
-            genome = tree.nodes[successor]["genome"] * rearrangement * framework.symmetry_element()
-            selected_genome = cgt.simulations.draw_genome(framework.collect_genome_terms(genome))
-            selected_genome = [int(x) for x in selected_genome[:-1].strip('][').split(',')]
-            selected_genome = framework.cycles(selected_genome) * framework.symmetry_element()
+            formal_sum = tree.nodes[successor]["genome"] * rearrangement
+            selected_genome_instance = cgt.simulations.draw_genome(formal_sum)
+            canonical_instance = framework.canonical_instance(selected_genome_instance)
+            genome = framework.genome(framework.cycles(framework.canonical_instance(selected_genome_instance)), format=cgt.FORMAT.formal_sum)
             # Update the genome at the successor node
-            tree.nodes[successor]["genome"] = selected_genome
-            tree.nodes[successor]["label"] = str(framework.collect_genome_terms(selected_genome)).replace(" ", "")
+            tree.nodes[successor]["genome"] = genome
+            tree.nodes[successor]["label"] = str(framework.collect_genome_terms(genome))
     
     return tree
 
@@ -115,7 +115,7 @@ def draw_rearrangement(model):
     return np.random.choice(rearrangements, p=probs)
 
 def draw_genome(formal_sum):
-    probs, genomes = zip(*list(formal_sum))
+    genomes, probs = tuple(zip(*list(formal_sum)))
     return np.random.choice(genomes, p=probs)
 
 def set_node(node, framework, genome):
