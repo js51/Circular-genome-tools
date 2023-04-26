@@ -172,9 +172,20 @@
 <p>Implements a number of distance measures for genomes under the position paradigm.</p>
 <dl class="py function">
 <dt id="cgt.distances.MFPT">
-<code class="sig-prename descclassname">cgt.distances.</code><code class="sig-name descname">MFPT</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">scale_by</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.MFPT" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">cgt.distances.</code><code class="sig-name descname">MFPT</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">genome_reps</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">scale_by</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.MFPT" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the mean time elapsed rearranging ref-&gt;genome where the target is an absorbing state</p>
 </dd></dl>
+
+<dl class="py function">
+<dt id="cgt.distances.dict_to_distance_matrix">
+<code class="sig-prename descclassname">cgt.distances.</code><code class="sig-name descname">dict_to_distance_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">distances</span></em>, <em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">genomes</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.dict_to_distance_matrix" title="Permalink to this definition">¶</a></dt>
+<dd><p>If need to convert to pairwise distances, supply a list of genomes.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="cgt.distances.distance_matrix">
+<code class="sig-prename descclassname">cgt.distances.</code><code class="sig-name descname">distance_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">genomes</span></em>, <em class="sig-param"><span class="n">distance</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.distance_matrix" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
 
 <dl class="py function">
 <dt id="cgt.distances.likelihood_function">
@@ -190,7 +201,7 @@
 
 <dl class="py function">
 <dt id="cgt.distances.min_distance">
-<code class="sig-prename descclassname">cgt.distances.</code><code class="sig-name descname">min_distance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">weighted</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.min_distance" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">cgt.distances.</code><code class="sig-name descname">min_distance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">genome_reps</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">weighted</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.min_distance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return dictionary of minimum distances ref-&gt;genome, using inverse of model probabilities as weights (or not)</p>
 </dd></dl>
 
@@ -202,7 +213,7 @@
 
 <dl class="py function">
 <dt id="cgt.distances.mles">
-<code class="sig-prename descclassname">cgt.distances.</code><code class="sig-name descname">mles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">genome_instances</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.mles" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">cgt.distances.</code><code class="sig-name descname">mles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">genome_instances</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.mles" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return maximum likelihood estimates for a set of genome instances under the given model and framework</p>
 </dd></dl>
 
@@ -276,6 +287,58 @@
 </dd></dl>
 
 <dl class="py class">
+<dt id="cgt.enums.DISTANCE">
+<em class="property">class </em><code class="sig-prename descclassname">cgt.enums.</code><code class="sig-name descname">DISTANCE</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.enums.DISTANCE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt id="cgt.enums.DISTANCE.MFPT">
+<code class="sig-name descname">MFPT</code><em class="property"> = 3</em><a class="headerlink" href="#cgt.enums.DISTANCE.MFPT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.DISTANCE.MLE">
+<code class="sig-name descname">MLE</code><em class="property"> = 4</em><a class="headerlink" href="#cgt.enums.DISTANCE.MLE" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.DISTANCE.maximum_likelihood_distance">
+<code class="sig-name descname">maximum_likelihood_distance</code><em class="property"> = 4</em><a class="headerlink" href="#cgt.enums.DISTANCE.maximum_likelihood_distance" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.DISTANCE.maximum_likelihood_estimate">
+<code class="sig-name descname">maximum_likelihood_estimate</code><em class="property"> = 4</em><a class="headerlink" href="#cgt.enums.DISTANCE.maximum_likelihood_estimate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.DISTANCE.min">
+<code class="sig-name descname">min</code><em class="property"> = 1</em><a class="headerlink" href="#cgt.enums.DISTANCE.min" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.DISTANCE.min_first_passage_time">
+<code class="sig-name descname">min_first_passage_time</code><em class="property"> = 3</em><a class="headerlink" href="#cgt.enums.DISTANCE.min_first_passage_time" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.DISTANCE.min_weighted">
+<code class="sig-name descname">min_weighted</code><em class="property"> = 2</em><a class="headerlink" href="#cgt.enums.DISTANCE.min_weighted" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.DISTANCE.minimum">
+<code class="sig-name descname">minimum</code><em class="property"> = 1</em><a class="headerlink" href="#cgt.enums.DISTANCE.minimum" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.DISTANCE.minimum_weighted">
+<code class="sig-name descname">minimum_weighted</code><em class="property"> = 2</em><a class="headerlink" href="#cgt.enums.DISTANCE.minimum_weighted" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt id="cgt.enums.FORMAT">
 <em class="property">class </em><code class="sig-prename descclassname">cgt.enums.</code><code class="sig-name descname">FORMAT</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.enums.FORMAT" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
@@ -298,6 +361,33 @@
 <dl class="py attribute">
 <dt id="cgt.enums.FORMAT.only_reps">
 <code class="sig-name descname">only_reps</code><em class="property"> = 4</em><a class="headerlink" href="#cgt.enums.FORMAT.only_reps" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="cgt.enums.IRREP_TYPE">
+<em class="property">class </em><code class="sig-prename descclassname">cgt.enums.</code><code class="sig-name descname">IRREP_TYPE</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">value</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.enums.IRREP_TYPE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="py attribute">
+<dt id="cgt.enums.IRREP_TYPE.orthogonal">
+<code class="sig-name descname">orthogonal</code><em class="property"> = 2</em><a class="headerlink" href="#cgt.enums.IRREP_TYPE.orthogonal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.IRREP_TYPE.seminormal">
+<code class="sig-name descname">seminormal</code><em class="property"> = 3</em><a class="headerlink" href="#cgt.enums.IRREP_TYPE.seminormal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.IRREP_TYPE.specht">
+<code class="sig-name descname">specht</code><em class="property"> = 1</em><a class="headerlink" href="#cgt.enums.IRREP_TYPE.specht" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt id="cgt.enums.IRREP_TYPE.speck">
+<code class="sig-name descname">speck</code><em class="property"> = 1</em><a class="headerlink" href="#cgt.enums.IRREP_TYPE.speck" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -472,6 +562,11 @@
 <dd></dd></dl>
 
 <dl class="py method">
+<dt id="cgt.models.Model.reg_rep">
+<code class="sig-name descname">reg_rep</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cgt.models.Model.reg_rep" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
 <dt id="cgt.models.Model.reg_rep_of_zs">
 <code class="sig-name descname">reg_rep_of_zs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cgt.models.Model.reg_rep_of_zs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the regular representation of zs as comptued by PositionParadigmFramework.reg_rep_zs, but store the sparse result</p>
@@ -492,24 +587,22 @@ convert group elements and genomes between different forms, and instances can be
 that they can acces information without it needing to be recreated.</p>
 <dl class="py class">
 <dt id="cgt.position_paradigm.PositionParadigmFramework">
-<em class="property">class </em><code class="sig-prename descclassname">cgt.position_paradigm.</code><code class="sig-name descname">PositionParadigmFramework</code><span class="sig-paren">(</span><em class="sig-param">num_regions</em>, <em class="sig-param">oriented=True</em>, <em class="sig-param">symmetry=None</em>, <em class="sig-param">genome_type=&lt;TYPE.reg_to_signed_pos: 1&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">cgt.position_paradigm.</code><code class="sig-name descname">PositionParadigmFramework</code><span class="sig-paren">(</span><em class="sig-param">num_regions</em>, <em class="sig-param">oriented=True</em>, <em class="sig-param">symmetry=&lt;SYMMETRY.circular: 1&gt;</em>, <em class="sig-param">genome_type=&lt;TYPE.reg_to_signed_pos: 1&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Everything you need for working with genomes under the position paradigm</p>
 <dl class="py method">
 <dt id="cgt.position_paradigm.PositionParadigmFramework.canonical_instance">
 <code class="sig-name descname">canonical_instance</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">instance</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.canonical_instance" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the ‘canonical’ instance of the genome represented by the permutation if there is one.</p>
-<dl class="simple">
-<dt>TESTS::</dt><dd><p>sage: import cgt; ppf = cgt.PositionParadigmFramework(3, symmetry=cgt.SYMMETRY.circular)
+<p class="rubric">Examples</p>
+<p>sage: import cgt; ppf = cgt.PositionParadigmFramework(3, symmetry=cgt.SYMMETRY.circular)
 sage: ppf.canonical_instance(‘(1,-2)(-1,2)’)
 [1, 2, -3]</p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py method">
 <dt id="cgt.position_paradigm.PositionParadigmFramework.coefficient_in">
-<code class="sig-name descname">coefficient_in</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">more_terms</span></em>, <em class="sig-param"><span class="n">fewer_terms</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.coefficient_in" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">coefficient_in</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">more_terms</span></em>, <em class="sig-param"><span class="n">fewer_terms</span></em>, <em class="sig-param"><span class="n">none_if_fail</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.coefficient_in" title="Permalink to this definition">¶</a></dt>
 <dd><p>For example, the coefficient of (a/2 + b/2) in x=(a/3 + b/3 + c/3) is 2/3, since x=2/3*(a/2 + b/2) + c/3</p>
 </dd></dl>
 
@@ -536,6 +629,12 @@ sage: ppf.canonical_instance(‘(1,-2)(-1,2)’)
 <dd></dd></dl>
 
 <dl class="py method">
+<dt id="cgt.position_paradigm.PositionParadigmFramework.genome_conjugacy_classes">
+<code class="sig-name descname">genome_conjugacy_classes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">sort_classes</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.genome_conjugacy_classes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return conjugacy classes of instances</p>
+</dd></dl>
+
+<dl class="py method">
 <dt id="cgt.position_paradigm.PositionParadigmFramework.genome_equivalence_classes">
 <code class="sig-name descname">genome_equivalence_classes</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">combine_inverse_classes</span><span class="o">=</span><span class="default_value">False</span></em>, <em class="sig-param"><span class="n">sort_classes</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.genome_equivalence_classes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return double cosets of instances—genomes in the same class will have the same likelihood functions</p>
@@ -556,6 +655,12 @@ sage: ppf.canonical_instance(‘(1,-2)(-1,2)’)
 <dt id="cgt.position_paradigm.PositionParadigmFramework.group_algebra">
 <code class="sig-name descname">group_algebra</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.group_algebra" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the group alegbra, where the group is the group containing genome instances.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgt.position_paradigm.PositionParadigmFramework.instances">
+<code class="sig-name descname">instances</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">genome</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.instances" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of instances of the genome.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -598,13 +703,11 @@ Matrix entries sit inside the UniversalCyclotomicField and are exact expressions
 </ul>
 </dd>
 </dl>
-<dl class="simple">
-<dt>EXAMPLES::</dt><dd><p>sage: import cgt
+<p class="rubric">Examples</p>
+<p>sage: import cgt
 sage: ppf = cgt.PositionParadigmFramework(3)
 sage: ppf.cycles(ppf.one_row(‘(1,-2)(-1,2)’)) == ppf.cycles(‘(1,-2)(-1,2)’)
 True</p>
-</dd>
-</dl>
 </dd></dl>
 
 <dl class="py method">
@@ -670,6 +773,11 @@ True</p>
 <dd></dd></dl>
 
 <dl class="py function">
+<dt id="cgt.rearrangements.c_perm">
+<code class="sig-prename descclassname">cgt.rearrangements.</code><code class="sig-name descname">c_perm</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.rearrangements.c_perm" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt id="cgt.rearrangements.conjugacy_class">
 <code class="sig-prename descclassname">cgt.rearrangements.</code><code class="sig-name descname">conjugacy_class</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">perm</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.rearrangements.conjugacy_class" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
@@ -687,6 +795,11 @@ True</p>
 <dl class="py function">
 <dt id="cgt.rearrangements.double_coset">
 <code class="sig-prename descclassname">cgt.rearrangements.</code><code class="sig-name descname">double_coset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">perm</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.rearrangements.double_coset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="cgt.rearrangements.permutation_with_cuts">
+<code class="sig-prename descclassname">cgt.rearrangements.</code><code class="sig-name descname">permutation_with_cuts</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">cuts</span></em>, <em class="sig-param"><span class="n">perm</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">start</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.rearrangements.permutation_with_cuts" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
