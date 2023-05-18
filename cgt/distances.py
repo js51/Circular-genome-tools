@@ -57,7 +57,7 @@ def _irreps_of_zs(framework, model, attempt_exact=False, force_recompute=False):
     return irreps_of_zs
 
 
-def _eigenvalues(mat, round_to=7, make_real=True, inc_repeated=False, attempt_exact=False, use_numpy=True, bin_eigs=False, tol=10^(-8)):
+def _eigenvalues(mat, round_to=7, make_real=True, inc_repeated=False, attempt_exact=False, use_numpy=True, bin_eigs=False, tol=10**(-8)):
     """Return all the eigenvalues for a given matrix mat"""
     col = list if inc_repeated else set
     if use_numpy:
@@ -72,7 +72,7 @@ def _eigenvalues(mat, round_to=7, make_real=True, inc_repeated=False, attempt_ex
     else:
         return sorted(col(round(real(eig) if make_real else eig, round_to) for eig in all_eigs))
 
-def _bin(eigenvalues, tol=10^(-8), return_bin_size=False):
+def _bin(eigenvalues, tol=10**(-8), return_bin_size=False):
     binned_eigenvals = []
     num_eigs = len(eigenvalues) # ??
     e = 0
@@ -86,7 +86,7 @@ def _bin(eigenvalues, tol=10^(-8), return_bin_size=False):
         e=e+len(bin)
     return binned_eigenvals
 
-def _eigenvectors(mat, tol=10^(-8)):
+def _eigenvectors(mat, tol=10**(-8)):
     eigen_tuples = sorted(mat.eigenvectors_right())
     binned_eigenvals = _bin([et[0] for et in eigen_tuples], tol=tol, return_bin_size=True)
     # Orthogonalise the eigenvectors                      
@@ -99,7 +99,7 @@ def _eigenvectors(mat, tol=10^(-8)):
         q=q+c
     return binned_eigenvals, eigenvectors
 
-def _eigenvectors_reduce_error(mat, tol=10^(-8)):
+def _eigenvectors_reduce_error(mat, tol=10**(-8)):
     eigen_tuples = sorted(mat.eigenvectors_right())
     binned_eigenvals = _bin([et[0] for et in eigen_tuples], tol=tol, return_bin_size=True)
     # Orthogonalise the eigenvectors                      
