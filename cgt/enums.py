@@ -52,3 +52,9 @@ class IRREP_TYPE(Enum):
     specht = speck = auto()
     orthogonal     = auto()
     seminormal     = auto()
+
+class DISTANCE(Enum):
+    min = minimum = auto()
+    min_weighted = minimum_weighted = auto()
+    MFPT = min_first_passage_time = auto()
+    MLE = maximum_likelihood_distance = maximum_likelihood_estimate = auto()

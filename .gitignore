@@ -142,3 +142,4 @@ _site
 *.out
 *.gz
 *.tex
+.github/Circular-genome-tools.code-workspace

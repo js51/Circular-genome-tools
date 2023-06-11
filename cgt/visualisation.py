@@ -13,7 +13,7 @@ def draw_genome_instance(framework, instance, show=False):
     if not framework.oriented:
         raise NotImplementedError("not implemented for linear genomes.")
     try:
-        instance = framework(instance)
+        instance = framework.cycles(instance)
     except:
         TypeError(f"{instance} does not belong in {str(framework)}")
 
