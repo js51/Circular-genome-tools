@@ -132,13 +132,13 @@ class hyperoctahedral_group:
             id_rep = rep(C2n_wr_SlxSm.one())
             rep_dimension = (id_rep.nrows(), id_rep.ncols())
             Y = [[None for _ in range(len(tv))] for _ in range(len(tv))]
-            for i in range(len(tv)):
-                for j in range(len(tv)):
-                    element = tv[i] * g * tv[j].inverse()
+            for r in range(len(tv)):
+                for l in range(len(tv)):
+                    element = tv[l] * g * tv[r].inverse()
                     if element in C2n_wr_SlxSm:
-                        Y[i][j] = rep(element)
+                        Y[r][l] = rep(element)
                     else:  # A matrix of zeros
-                        Y[i][j] = matrix(*rep_dimension)
+                        Y[r][l] = matrix(*rep_dimension)
             return block_matrix(Y, subdivide=False)
         
         return _irrep
