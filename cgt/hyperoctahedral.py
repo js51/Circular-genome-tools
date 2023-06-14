@@ -12,6 +12,7 @@ from sage.all_cmdline import (
     matrix,
     block_matrix,
     Partitions,
+    Permutation
 )
 
 
@@ -25,10 +26,11 @@ def HyperoctahedralGroupRepresentations(n):
         for partition_left in Partitions(little_subgroup_pair[0]):
             for partition_right in Partitions(little_subgroup_pair[1]):
                 partition_pair = (partition_left, partition_right)
-                rep = Hn.irrep(partition_pair)
-                irreps[partition_pair] = rep
+                irrep = Hn.irrep(partition_pair)
+                def wrapped_irrep(elt, _irrep=irrep):
+                    return _irrep(Hn.Phi_inv(elt))
+                irreps[partition_pair] = wrapped_irrep
     return irreps
-
 
 class hyperoctahedral_group:
     _n = None
@@ -48,9 +50,7 @@ class hyperoctahedral_group:
         self._Sn = SymmetricGroup(self._n)
         self._C2 = SymmetricGroup(2)
         self._C2n = cartesian_product(tuple(SymmetricGroup(2) for _ in range(self._n)))
-        self._semidirect_product = self.wreath_product_with_hyperoctahedral_twist(
-            self._C2n, self._Sn
-        )
+        self._semidirect_product = self.wreath_product_with_hyperoctahedral_twist(self._C2n, self._Sn)
 
     def hyperoctahedral_twist(self, s, c):
         try:
@@ -86,14 +86,13 @@ class hyperoctahedral_group:
         return [
             self.little_subgroup(l, m) for l, m in self.little_subgroup_pairs(self._n)
         ]
-
+    
     def orbit_representative(self, l, m):
         return self._C2n(tuple(() for _ in range(l)) + tuple((1, 2) for _ in range(m)))
-
+    
     def character_for_tuple(self, c):
         return tuple(
-            (lambda x: 1) if entry == self._C2(()) else (lambda x: x.sign())
-            for entry in c
+            (lambda x: 1) if entry == self._C2(()) else (lambda x: x.sign()) for entry in c
         )
 
     def representation_little_subgroup(self, partition_pair):
@@ -141,7 +140,7 @@ class hyperoctahedral_group:
                     else:  # A matrix of zeros
                         Y[i][j] = matrix(*rep_dimension)
             return block_matrix(Y, subdivide=False)
-
+        
         return _irrep
 
     def element_in_little_subgroup(self, elt, l, m):
@@ -166,10 +165,7 @@ class hyperoctahedral_group:
 
     def wreath_product_with_hyperoctahedral_twist(self, H, G):
         semidirect_product = GroupSemidirectProduct(
-            H,
-            G,
-            act_to_right=False,
-            twist=lambda s, c: self.hyperoctahedral_twist(s, c),
+            H, G, act_to_right=False, twist=lambda s, c: self.hyperoctahedral_twist(s, c)
         )
 
         def random_element():
@@ -196,3 +192,9 @@ class hyperoctahedral_group:
             if all(elt.inverse() * t not in subgroup for t in transversal):
                 transversal.append(elt)
         return transversal
+    
+    def Phi_inv(self, elt):
+        c = tuple(self._C2(() if elt(k) > 1 else (1, 2)) for k in range(1, self._n + 1))
+        s = self._Sn(Permutation([abs(elt(k)) for k in range(1, self._n + 1)]))
+        return self._semidirect_product((c, s))
+# %%
