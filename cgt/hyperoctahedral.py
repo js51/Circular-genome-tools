@@ -189,7 +189,7 @@ class hyperoctahedral_group:
         num_cosets = group.order() / subgroup.order()
         while len(transversal) < num_cosets:
             elt = group.random_element()
-            if all(elt.inverse() * t not in subgroup for t in transversal):
+            if all(t * elt.inverse() not in subgroup for t in transversal):
                 transversal.append(elt)
         return transversal
     
