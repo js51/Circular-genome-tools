@@ -56,6 +56,23 @@ def _irreps_of_zs(framework, model, attempt_exact=False, force_recompute=False):
         model.data_bundle[key] = irreps_of_zs
     return irreps_of_zs
 
+def _irreps_of_z(framework, model, attempt_exact=False, force_recompute=False):
+    """Return a set of matrices---images of z under each irrep"""
+    key = "irreps_of_z"
+    if key in model.data_bundle and not force_recompute:
+        irreps_of_z =  model.data_bundle[key]
+    else:
+        CDF, UCF = ComplexDoubleField(), UniversalCyclotomicField()
+        z = framework.symmetry_element()
+        irreps_of_z = framework.irreps(z)
+        irreps_of_z = (matrix(UCF, irrep_z) for irrep_z in irreps_of_z)
+        irreps_of_z = [Matrix(UCF if attempt_exact else CDF, irrep_z) for irrep_z in irreps_of_z]
+        for irrep in irreps_of_z:
+            irrep.set_immutable()
+        model.data_bundle[key] = irreps_of_z
+    return irreps_of_z
+
+
 
 def _eigenvalues(mat, round_to=7, make_real=True, inc_repeated=False, attempt_exact=False, use_numpy=True, bin_eigs=False, tol=10**(-8)):
     """Return all the eigenvalues for a given matrix mat"""
@@ -121,20 +138,20 @@ def _eigenvectors_reduce_error(mat, tol=10**(-8)):
         q += c
     return binned_eigenvals, eigenvectors
 
+
 def _partial_traces_for_genome(framework, instance, irreps, irreps_of_zs, projections, eig_lists, irreps_of_z=None):
     """Return dictionary of partial traces, indexed first by irrep index and then by eigenvalaue"""
     if irreps_of_z is None:
         irreps_of_z = [irrep(framework.symmetry_element()) for irrep in irreps]
-    CDF, UCF = ComplexDoubleField(), UniversalCyclotomicField()
     traces = {
         r: {
             eigenvalue: {} for eigenvalue in eig_lists[r]
         } for r in range(len(irreps_of_zs))
     }
     for r, irrep in enumerate(irreps): # Iterate over irreducible representations
-        sigd = irreps_of_z[r] * Matrix(CDF, matrix(UCF, irrep(framework.cycles(instance.inverse()))))
+        sigd = irreps_of_z[r] * irrep(instance.inverse())
         for e, eigenvalue in enumerate(eig_lists[r]):
-            traces[r][eigenvalue] = round(real((sigd*projections[r][e]).trace()), 6)
+            traces[r][eigenvalue] = real((sigd*projections[r][e]).trace())
     return traces
 
 def _partial_traces_for_genome_using_eigenvectors(framework, instance, irreps, irreps_of_zs):
@@ -148,13 +165,14 @@ def _partial_traces_for_genome_using_eigenvectors(framework, instance, irreps, i
         } for r in range(len(irreps_of_zs))
     }
     for r, irrep in enumerate(irreps): # Iterate over irreducible representations
-        sigd = irreps_of_z[r] * Matrix(CDF, matrix(UCF, irrep(framework.cycles(instance.inverse()))))
+        sigd = irreps_of_z[r] * Matrix(CDF, matrix(UCF, irrep(instance.inverse())))
         eigenvalues = eigenvectors_list[r][0]
         eigenvector_list = eigenvectors_list[r][1]
         for e, eigenvalue in enumerate(eigenvalues):
             eigenvectors = eigenvector_list[e]
             traces[r][eigenvalue[0]]=round(real((sum([(eigenvectors[m,:].H)*eigenvectors[m,:] for m in range(eigenvalue[1])])*sigd).trace()),6)
     return traces
+
 
 def likelihood_function(framework, model, genome, attempt_exact=False, use_projections=True):
     """Return the likelihood function for a given genome"""
@@ -163,6 +181,7 @@ def likelihood_function(framework, model, genome, attempt_exact=False, use_proje
     G, Z = framework.genome_group(), framework.symmetry_group()
     irreps = framework.irreps()
     irreps_of_zs = _irreps_of_zs(framework, model, attempt_exact=attempt_exact)
+    irreps_of_z = _irreps_of_z(framework, model, attempt_exact=attempt_exact)
     if use_projections:
         if "eig_lists" in model.data_bundle:
             eig_lists = model.data_bundle["eig_lists"]
@@ -174,7 +193,7 @@ def likelihood_function(framework, model, genome, attempt_exact=False, use_proje
         else:
             projections = [_projection_operators(*vals) for vals in zip(irreps_of_zs, eig_lists)]
             model.data_bundle["projections"] = projections
-        traces = _partial_traces_for_genome(framework, instance, irreps, irreps_of_zs, projections, eig_lists)
+        traces = _partial_traces_for_genome(framework, instance, irreps, irreps_of_zs, projections, eig_lists, irreps_of_z)
     else:
         eig_lists = [[x[0] for x in _eigenvectors(irrep_zs)[0]] for irrep_zs in irreps_of_zs]
         traces = _partial_traces_for_genome_using_eigenvectors(framework, instance, irreps, irreps_of_zs)

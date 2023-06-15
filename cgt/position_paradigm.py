@@ -374,8 +374,8 @@ class PositionParadigmFramework:
                             result += coeff * _irrep(perm)
                     else: # sigma is a group element
                         result = _irrep(sigma)
-                    mat = matrix(UniversalCyclotomicField(), result)
-                    return mat.transpose() if _signed else mat
+                    mat = result
+                    return mat.transpose() if _signed else matrix(mat)
             return representation
         if not self.oriented:
             irreps = SymmetricGroupRepresentations(self.n)
