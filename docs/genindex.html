@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Index &mdash; Circular Genome Tools 0.1.1 documentation</title>
+  <title>Index &mdash; Circular Genome Tools 0.2.0 documentation</title>
   
 
   
@@ -231,6 +231,13 @@
 </li>
       </ul></li>
       <li>
+    cgt.hyperoctahedral
+
+      <ul>
+        <li><a href="cgt.html#module-cgt.hyperoctahedral">module</a>
+</li>
+      </ul></li>
+      <li>
     cgt.models
 
       <ul>
@@ -251,27 +258,20 @@
         <li><a href="cgt.html#module-cgt.rearrangements">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    cgt.simulations
+
+      <ul>
+        <li><a href="cgt.html#module-cgt.simulations">module</a>
+</li>
+      </ul></li>
       <li>
     cgt.structures
 
       <ul>
         <li><a href="cgt.html#module-cgt.structures">module</a>
-</li>
-      </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li>
-    cgt.tests
-
-      <ul>
-        <li><a href="cgt.tests.html#module-cgt.tests">module</a>
-</li>
-      </ul></li>
-      <li>
-    cgt.tests.test_conversions
-
-      <ul>
-        <li><a href="cgt.tests.html#module-cgt.tests.test_conversions">module</a>
 </li>
       </ul></li>
       <li>
@@ -281,6 +281,8 @@
         <li><a href="cgt.html#module-cgt.visualisation">module</a>
 </li>
       </ul></li>
+      <li><a href="cgt.html#cgt.hyperoctahedral.hyperoctahedral_group.character_for_tuple">character_for_tuple() (cgt.hyperoctahedral.hyperoctahedral_group method)</a>
+</li>
       <li><a href="cgt.html#cgt.enums.SYMMETRY.circular">circular (cgt.enums.SYMMETRY attribute)</a>
 </li>
       <li><a href="cgt.html#cgt.enums.CLASSES">CLASSES (class in cgt.enums)</a>
@@ -319,19 +321,27 @@
 </li>
       <li><a href="cgt.html#cgt.enums.DISPLAY">DISPLAY (class in cgt.enums)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cgt.html#cgt.enums.DISTANCE">DISTANCE (class in cgt.enums)</a>
 </li>
       <li><a href="cgt.html#cgt.distances.distance_matrix">distance_matrix() (in module cgt.distances)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cgt.html#cgt.rearrangements.double_coset">double_coset() (in module cgt.rearrangements)</a>
 </li>
       <li><a href="cgt.html#cgt.enums.CLASSES.double_cosets">double_cosets (cgt.enums.CLASSES attribute)</a>
 </li>
+      <li><a href="cgt.html#cgt.simulations.draw_branch_length">draw_branch_length() (in module cgt.simulations)</a>
+</li>
+      <li><a href="cgt.html#cgt.simulations.draw_genome">draw_genome() (in module cgt.simulations)</a>
+</li>
       <li><a href="cgt.html#cgt.visualisation.draw_genome_instance">draw_genome_instance() (in module cgt.visualisation)</a>
 </li>
       <li><a href="cgt.html#cgt.position_paradigm.PositionParadigmFramework.draw_instance">draw_instance() (cgt.position_paradigm.PositionParadigmFramework method)</a>
+</li>
+      <li><a href="cgt.html#cgt.simulations.draw_rearrangement">draw_rearrangement() (in module cgt.simulations)</a>
+</li>
+      <li><a href="cgt.html#cgt.simulations.draw_tree">draw_tree() (in module cgt.simulations)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -339,13 +349,15 @@
 <h2 id="E">E</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="cgt.html#cgt.hyperoctahedral.hyperoctahedral_group.element_in_little_subgroup">element_in_little_subgroup() (cgt.hyperoctahedral.hyperoctahedral_group method)</a>
+</li>
       <li><a href="cgt.html#cgt.enums.FORMAT.equiv_classes">equiv_classes (cgt.enums.FORMAT attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="cgt.html#cgt.examples.example">example() (in module cgt.examples)</a>
+      <li><a href="cgt.html#cgt.simulations.evolve_on_tree">evolve_on_tree() (in module cgt.simulations)</a>
 </li>
-      <li><a href="cgt.tests.html#cgt.tests.test_conversions.example_framework">example_framework() (in module cgt.tests.test_conversions)</a>
+      <li><a href="cgt.html#cgt.examples.example">example() (in module cgt.examples)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -389,13 +401,23 @@
 </li>
       <li><a href="cgt.html#cgt.position_paradigm.PositionParadigmFramework.group_algebra">group_algebra() (cgt.position_paradigm.PositionParadigmFramework method)</a>
 </li>
+      <li><a href="cgt.html#cgt.simulations.grow_tree">grow_tree() (in module cgt.simulations)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="H">H</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="cgt.html#cgt.hyperoctahedral.hyperoctahedral_group">hyperoctahedral_group (class in cgt.hyperoctahedral)</a>
+</li>
+      <li><a href="cgt.html#cgt.hyperoctahedral.hyperoctahedral_group.hyperoctahedral_twist">hyperoctahedral_twist() (cgt.hyperoctahedral.hyperoctahedral_group method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cgt.html#cgt.structures.HyperoctahedralGroup">HyperoctahedralGroup() (in module cgt.structures)</a>
+</li>
+      <li><a href="cgt.html#cgt.hyperoctahedral.HyperoctahedralGroupRepresentations">HyperoctahedralGroupRepresentations() (in module cgt.hyperoctahedral)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -404,6 +426,8 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cgt.html#cgt.position_paradigm.PositionParadigmFramework.instances">instances() (cgt.position_paradigm.PositionParadigmFramework method)</a>
+</li>
+      <li><a href="cgt.html#cgt.hyperoctahedral.hyperoctahedral_group.irrep">irrep() (cgt.hyperoctahedral.hyperoctahedral_group method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -419,9 +443,15 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cgt.html#cgt.distances.likelihood_function">likelihood_function() (in module cgt.distances)</a>
 </li>
+      <li><a href="cgt.html#cgt.enums.SYMMETRY.linear">linear (cgt.enums.SYMMETRY attribute)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="cgt.html#cgt.enums.SYMMETRY.linear">linear (cgt.enums.SYMMETRY attribute)</a>
+      <li><a href="cgt.html#cgt.hyperoctahedral.hyperoctahedral_group.little_subgroup">little_subgroup() (cgt.hyperoctahedral.hyperoctahedral_group method)</a>
+</li>
+      <li><a href="cgt.html#cgt.hyperoctahedral.hyperoctahedral_group.little_subgroup_pairs">little_subgroup_pairs() (cgt.hyperoctahedral.hyperoctahedral_group method)</a>
+</li>
+      <li><a href="cgt.html#cgt.hyperoctahedral.hyperoctahedral_group.little_subgroups">little_subgroups() (cgt.hyperoctahedral.hyperoctahedral_group method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -477,17 +507,17 @@
 </li>
         <li><a href="cgt.html#module-cgt.genome">cgt.genome</a>
 </li>
+        <li><a href="cgt.html#module-cgt.hyperoctahedral">cgt.hyperoctahedral</a>
+</li>
         <li><a href="cgt.html#module-cgt.models">cgt.models</a>
 </li>
         <li><a href="cgt.html#module-cgt.position_paradigm">cgt.position_paradigm</a>
 </li>
         <li><a href="cgt.html#module-cgt.rearrangements">cgt.rearrangements</a>
 </li>
+        <li><a href="cgt.html#module-cgt.simulations">cgt.simulations</a>
+</li>
         <li><a href="cgt.html#module-cgt.structures">cgt.structures</a>
-</li>
-        <li><a href="cgt.tests.html#module-cgt.tests">cgt.tests</a>
-</li>
-        <li><a href="cgt.tests.html#module-cgt.tests.test_conversions">cgt.tests.test_conversions</a>
 </li>
         <li><a href="cgt.html#module-cgt.visualisation">cgt.visualisation</a>
 </li>
@@ -502,6 +532,8 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="cgt.html#cgt.simulations.newick_to_tree">newick_to_tree() (in module cgt.simulations)</a>
+</li>
       <li><a href="cgt.html#cgt.position_paradigm.PositionParadigmFramework.num_genomes">num_genomes() (cgt.position_paradigm.PositionParadigmFramework method)</a>
 </li>
   </ul></td>
@@ -526,6 +558,8 @@
 </li>
       <li><a href="cgt.html#cgt.enums.FORMAT.only_reps">only_reps (cgt.enums.FORMAT attribute)</a>
 </li>
+      <li><a href="cgt.html#cgt.hyperoctahedral.hyperoctahedral_group.orbit_representative">orbit_representative() (cgt.hyperoctahedral.hyperoctahedral_group method)</a>
+</li>
       <li><a href="cgt.html#cgt.enums.IRREP_TYPE.orthogonal">orthogonal (cgt.enums.IRREP_TYPE attribute)</a>
 </li>
   </ul></td>
@@ -535,6 +569,8 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cgt.html#cgt.rearrangements.permutation_with_cuts">permutation_with_cuts() (in module cgt.rearrangements)</a>
+</li>
+      <li><a href="cgt.html#cgt.hyperoctahedral.hyperoctahedral_group.Phi_inv">Phi_inv() (cgt.hyperoctahedral.hyperoctahedral_group method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -556,17 +592,21 @@
 </li>
       <li><a href="cgt.html#cgt.models.Model.reg_rep">reg_rep() (cgt.models.Model method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cgt.html#cgt.models.Model.reg_rep_of_zs">reg_rep_of_zs() (cgt.models.Model method)</a>
 
       <ul>
         <li><a href="cgt.html#cgt.position_paradigm.PositionParadigmFramework.reg_rep_of_zs">(cgt.position_paradigm.PositionParadigmFramework method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cgt.html#cgt.enums.TYPE.reg_to_signed_pos">reg_to_signed_pos (cgt.enums.TYPE attribute)</a>
 </li>
       <li><a href="cgt.html#cgt.position_paradigm.PositionParadigmFramework.regular_representation">regular_representation() (cgt.position_paradigm.PositionParadigmFramework method)</a>
+</li>
+      <li><a href="cgt.html#cgt.hyperoctahedral.hyperoctahedral_group.representation_little_subgroup">representation_little_subgroup() (cgt.hyperoctahedral.hyperoctahedral_group method)</a>
+</li>
+      <li><a href="cgt.html#cgt.hyperoctahedral.hyperoctahedral_group.right_transversal">right_transversal() (cgt.hyperoctahedral.hyperoctahedral_group method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -578,9 +618,13 @@
 </li>
       <li><a href="cgt.html#cgt.models.Model.s_element">s_element() (cgt.models.Model method)</a>
 </li>
+      <li><a href="cgt.html#cgt.hyperoctahedral.hyperoctahedral_group.semidirect_product_with_hyperoctahedral_twist">semidirect_product_with_hyperoctahedral_twist() (cgt.hyperoctahedral.hyperoctahedral_group method)</a>
+</li>
       <li><a href="cgt.html#cgt.enums.IRREP_TYPE.seminormal">seminormal (cgt.enums.IRREP_TYPE attribute)</a>
 </li>
       <li><a href="cgt.html#cgt.enums.SET">SET (class in cgt.enums)</a>
+</li>
+      <li><a href="cgt.html#cgt.simulations.set_node">set_node() (in module cgt.simulations)</a>
 </li>
       <li><a href="cgt.html#cgt.structures.set_plus_minus">set_plus_minus() (in module cgt.structures)</a>
 </li>
@@ -588,10 +632,10 @@
 </li>
       <li><a href="cgt.html#cgt.enums.TYPE.signed_pos_to_reg">signed_pos_to_reg (cgt.enums.TYPE attribute)</a>
 </li>
-      <li><a href="cgt.html#cgt.enums.TYPE.signed_reg_to_pos">signed_reg_to_pos (cgt.enums.TYPE attribute)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="cgt.html#cgt.enums.TYPE.signed_reg_to_pos">signed_reg_to_pos (cgt.enums.TYPE attribute)</a>
+</li>
       <li><a href="cgt.html#cgt.rearrangements.single_coset">single_coset() (in module cgt.rearrangements)</a>
 </li>
       <li><a href="cgt.html#cgt.enums.IRREP_TYPE.specht">specht (cgt.enums.IRREP_TYPE attribute)</a>
@@ -614,14 +658,10 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="cgt.tests.html#cgt.tests.test_conversions.test_matrix_and_cycles_random">test_matrix_and_cycles_random() (in module cgt.tests.test_conversions)</a>
-</li>
-      <li><a href="cgt.tests.html#cgt.tests.test_conversions.test_one_row_and_cycles_random">test_one_row_and_cycles_random() (in module cgt.tests.test_conversions)</a>
+      <li><a href="cgt.html#cgt.enums.MODEL.two_region_adjacent_transpositions">two_region_adjacent_transpositions (cgt.enums.MODEL attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="cgt.html#cgt.enums.MODEL.two_region_adjacent_transpositions">two_region_adjacent_transpositions (cgt.enums.MODEL attribute)</a>
-</li>
       <li><a href="cgt.html#cgt.enums.MODEL.two_region_inversions">two_region_inversions (cgt.enums.MODEL attribute)</a>
 </li>
       <li><a href="cgt.html#cgt.enums.TYPE">TYPE (class in cgt.enums)</a>
@@ -660,7 +700,7 @@
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2021, Joshua Stevenson.
+        &#169; Copyright 2023, Joshua Stevenson.
 
     </p>
   </div>

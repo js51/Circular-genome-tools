@@ -72,3 +72,20 @@ cgt.visualisation module
    :members:
    :undoc-members:
    :show-inheritance:
+
+cgt.simulations module
+----------------------
+
+.. automodule:: cgt.simulations
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+cgt.hyperoctahedral module
+--------------------------
+
+.. automodule:: cgt.hyperoctahedral
+   :members:
+   :undoc-members:
+   :show-inheritance:
+

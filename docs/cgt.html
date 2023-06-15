@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>cgt package &mdash; Circular Genome Tools 0.1.1 documentation</title>
+  <title>cgt package &mdash; Circular Genome Tools 0.2.0 documentation</title>
   
 
   
@@ -96,6 +96,8 @@
 <li class="toctree-l2"><a class="reference internal" href="#module-cgt.rearrangements">cgt.rearrangements module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-cgt.structures">cgt.structures module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#module-cgt.visualisation">cgt.visualisation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-cgt.simulations">cgt.simulations module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-cgt.hyperoctahedral">cgt.hyperoctahedral module</a></li>
 </ul>
 </li>
 </ul>
@@ -170,6 +172,17 @@
 <div class="section" id="module-cgt.distances">
 <span id="cgt-distances-module"></span><h2>cgt.distances module<a class="headerlink" href="#module-cgt.distances" title="Permalink to this headline">¶</a></h2>
 <p>Implements a number of distance measures for genomes under the position paradigm.</p>
+<p>The primary function of this module is the distance_matrix function, which returns a distance matrix for a given set of genomes and distance measure.</p>
+<dl class="simple">
+<dt>The distance measures implemented are:</dt><dd><ul class="simple">
+<li><p>min: the minimum number of rearrangements required to transform one genome into another</p></li>
+<li><p>min_weighted: the minimum number of rearrangements required to transform one genome into another, weighted by the inverse of the probability of the rearrangement</p></li>
+<li><p>MFPT: the mean first passage time from the identity to a given genome, where the target is an absorbing state</p></li>
+<li><p>MLE: the maximum likelihood estimate of the time elapsed between the identity and a given genome</p></li>
+</ul>
+</dd>
+</dl>
+<p>Individual likelihood functions for the time elapsed between the identity and a given genome can also be obtained</p>
 <dl class="py function">
 <dt id="cgt.distances.MFPT">
 <code class="sig-prename descclassname">cgt.distances.</code><code class="sig-name descname">MFPT</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">genome_reps</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">scale_by</span><span class="o">=</span><span class="default_value">1</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.MFPT" title="Permalink to this definition">¶</a></dt>
@@ -185,7 +198,18 @@
 <dl class="py function">
 <dt id="cgt.distances.distance_matrix">
 <code class="sig-prename descclassname">cgt.distances.</code><code class="sig-name descname">distance_matrix</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">genomes</span></em>, <em class="sig-param"><span class="n">distance</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.distance_matrix" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Compute a distance matrix for a given set of genomes and distance measure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>framework</strong> (<em>Framework</em>) – the framework</p></li>
+<li><p><strong>model</strong> (<a class="reference internal" href="#cgt.models.Model" title="cgt.models.Model"><em>Model</em></a>) – the model</p></li>
+<li><p><strong>genomes</strong> (<em>list</em>) – a list of genomes to compute distances for</p></li>
+<li><p><strong>distance</strong> (<a class="reference internal" href="#cgt.enums.DISTANCE" title="cgt.enums.DISTANCE"><em>DISTANCE</em></a>) – the distance measure to use</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
 
 <dl class="py function">
 <dt id="cgt.distances.likelihood_function">
@@ -197,6 +221,21 @@
 <dt id="cgt.distances.maximise">
 <code class="sig-prename descclassname">cgt.distances.</code><code class="sig-name descname">maximise</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">L</span></em>, <em class="sig-param"><span class="n">max_time</span><span class="o">=</span><span class="default_value">100</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.maximise" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the time that maximises likelihood function L, using additional information from the framework</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>framework</strong> (<em>Framework</em>) – the framework</p></li>
+<li><p><strong>L</strong> (<em>function</em>) – the likelihood function</p></li>
+<li><p><strong>max_time</strong> (<em>float</em>) – the maximum time to consider</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the time that maximises the likelihood function</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -208,13 +247,44 @@
 <dl class="py function">
 <dt id="cgt.distances.mle">
 <code class="sig-prename descclassname">cgt.distances.</code><code class="sig-name descname">mle</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">genome_instance</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.mle" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return maximum likelihood estimates for a genome instance under the given model and framework</p>
+<dd><p>Returns the maximum likelihood estimate for a given genome instance under the given model and framework.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>framework</strong> (<em>Framework</em>) – the framework</p></li>
+<li><p><strong>model</strong> (<a class="reference internal" href="#cgt.models.Model" title="cgt.models.Model"><em>Model</em></a>) – the model</p></li>
+<li><p><strong>genome_instance</strong> (<em>group element</em>) – the genome instance to compute the MLE for</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>the maximum likelihood estimate</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>float</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="cgt.distances.mles">
 <code class="sig-prename descclassname">cgt.distances.</code><code class="sig-name descname">mles</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">genome_instances</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">verbose</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.mles" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return maximum likelihood estimates for a set of genome instances under the given model and framework</p>
+<dd><p>Returns a dictionary of maximum likelihood estimates for each genome instance under the given model and framework.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>framework</strong> (<em>Framework</em>) – the framework</p></li>
+<li><p><strong>model</strong> (<a class="reference internal" href="#cgt.models.Model" title="cgt.models.Model"><em>Model</em></a>) – the model</p></li>
+<li><p><strong>genome_instances</strong> (<em>list</em>) – a list of genome instances to compute MLEs for. If None, all genomes in the framework are used.</p></li>
+<li><p><strong>verbose</strong> (<em>bool</em>) – whether to print progress</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>a dictionary of maximum likelihood estimates, indexed by genome instance</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
@@ -832,6 +902,180 @@ True</p>
 </dd></dl>
 
 </div>
+<div class="section" id="module-cgt.simulations">
+<span id="cgt-simulations-module"></span><h2>cgt.simulations module<a class="headerlink" href="#module-cgt.simulations" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="cgt.simulations.draw_branch_length">
+<code class="sig-prename descclassname">cgt.simulations.</code><code class="sig-name descname">draw_branch_length</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cgt.simulations.draw_branch_length" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="cgt.simulations.draw_genome">
+<code class="sig-prename descclassname">cgt.simulations.</code><code class="sig-name descname">draw_genome</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">formal_sum</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.simulations.draw_genome" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="cgt.simulations.draw_rearrangement">
+<code class="sig-prename descclassname">cgt.simulations.</code><code class="sig-name descname">draw_rearrangement</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">model</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.simulations.draw_rearrangement" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="cgt.simulations.draw_tree">
+<code class="sig-prename descclassname">cgt.simulations.</code><code class="sig-name descname">draw_tree</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tree</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.simulations.draw_tree" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="cgt.simulations.evolve_on_tree">
+<code class="sig-prename descclassname">cgt.simulations.</code><code class="sig-name descname">evolve_on_tree</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tree</span></em>, <em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">root</span><span class="o">=</span><span class="default_value">'random'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.simulations.evolve_on_tree" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="cgt.simulations.grow_tree">
+<code class="sig-prename descclassname">cgt.simulations.</code><code class="sig-name descname">grow_tree</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">model</span></em>, <em class="sig-param"><span class="n">num_taxa</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.simulations.grow_tree" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="cgt.simulations.newick_to_tree">
+<code class="sig-prename descclassname">cgt.simulations.</code><code class="sig-name descname">newick_to_tree</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">newick_string</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.simulations.newick_to_tree" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt id="cgt.simulations.set_node">
+<code class="sig-prename descclassname">cgt.simulations.</code><code class="sig-name descname">set_node</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">node</span></em>, <em class="sig-param"><span class="n">framework</span></em>, <em class="sig-param"><span class="n">genome</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.simulations.set_node" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-cgt.hyperoctahedral">
+<span id="cgt-hyperoctahedral-module"></span><h2>cgt.hyperoctahedral module<a class="headerlink" href="#module-cgt.hyperoctahedral" title="Permalink to this headline">¶</a></h2>
+<p>This file contains the class for the hyperoctahedral group.</p>
+<dl class="py function">
+<dt id="cgt.hyperoctahedral.HyperoctahedralGroupRepresentations">
+<code class="sig-prename descclassname">cgt.hyperoctahedral.</code><code class="sig-name descname">HyperoctahedralGroupRepresentations</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.HyperoctahedralGroupRepresentations" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function returns the irreducible representations of the hyperoctahedral group of order 2^n * n!, indexed by pairs of partitions of l and m, where l + m = n.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>n</strong> (<em>int</em>) – The order of the hyperoctahedral group.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A dictionary of the irreducible representations of the hyperoctahedral group of order 2^n * n!</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt id="cgt.hyperoctahedral.hyperoctahedral_group">
+<em class="property">class </em><code class="sig-prename descclassname">cgt.hyperoctahedral.</code><code class="sig-name descname">hyperoctahedral_group</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">n</span></em>, <em class="sig-param"><span class="n">default_element_type</span><span class="o">=</span><span class="default_value">'signed_permutation'</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.hyperoctahedral_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class represents the hyperoctahedral group of order 2^n * n!. It stores the group as a number of different isomorphic structures, as well as a number of other things that are helpful to keep track of in the context of genome rearrangements. It implements functions to compute the irreducible representations of the hyperoctahedral group.</p>
+<dl class="py method">
+<dt id="cgt.hyperoctahedral.hyperoctahedral_group.Phi_inv">
+<code class="sig-name descname">Phi_inv</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">elt</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.hyperoctahedral_group.Phi_inv" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="cgt.hyperoctahedral.hyperoctahedral_group.character_for_tuple">
+<code class="sig-name descname">character_for_tuple</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">c</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.hyperoctahedral_group.character_for_tuple" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="cgt.hyperoctahedral.hyperoctahedral_group.element_in_little_subgroup">
+<code class="sig-name descname">element_in_little_subgroup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">elt</span></em>, <em class="sig-param"><span class="n">l</span></em>, <em class="sig-param"><span class="n">m</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.hyperoctahedral_group.element_in_little_subgroup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes elt as an element of the little subgroup of Sn of order l!m! and returns an element of the direct product of S_l and S_m.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgt.hyperoctahedral.hyperoctahedral_group.hyperoctahedral_twist">
+<code class="sig-name descname">hyperoctahedral_twist</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">s</span></em>, <em class="sig-param"><span class="n">c</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.hyperoctahedral_group.hyperoctahedral_twist" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function implements the twist of the hyperoctahedral group, which is the action of S_n on (C_2)^n by permuting the factors.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>s</strong> (<em>Permutation</em>) – A permutation in S_n.</p></li>
+<li><p><strong>c</strong> (<em>tuple</em>) – A tuple of elements of C_2.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The tuple of elements of C_2 obtained by applying s to the tuple c.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>an element of (C_2)^n</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgt.hyperoctahedral.hyperoctahedral_group.irrep">
+<code class="sig-name descname">irrep</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">partition_pair</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.hyperoctahedral_group.irrep" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the irreducible representation of the hyperoctahedral group of order 2^n * n! indexed by the pair of partitions of l and m where l + m = n. The representation is given as a function that takes an element of the hyperoctahedral group as input and returns the corresponding matrix.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>partition_pair</strong> (<em>tuple</em>) – A pair of partitions of l and m where l + m = n.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A function that takes an element of the hyperoctahedral group as input and returns the corresponding matrix.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>function (group element -&gt; real matrix)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="cgt.hyperoctahedral.hyperoctahedral_group.little_subgroup">
+<code class="sig-name descname">little_subgroup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">l</span></em>, <em class="sig-param"><span class="n">m</span></em>, <em class="sig-param"><span class="n">as_direct_product</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.hyperoctahedral_group.little_subgroup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="cgt.hyperoctahedral.hyperoctahedral_group.little_subgroup_pairs">
+<code class="sig-name descname">little_subgroup_pairs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.hyperoctahedral_group.little_subgroup_pairs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="cgt.hyperoctahedral.hyperoctahedral_group.little_subgroups">
+<code class="sig-name descname">little_subgroups</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.hyperoctahedral_group.little_subgroups" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="cgt.hyperoctahedral.hyperoctahedral_group.orbit_representative">
+<code class="sig-name descname">orbit_representative</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">l</span></em>, <em class="sig-param"><span class="n">m</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.hyperoctahedral_group.orbit_representative" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="cgt.hyperoctahedral.hyperoctahedral_group.representation_little_subgroup">
+<code class="sig-name descname">representation_little_subgroup</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">partition_pair</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.hyperoctahedral_group.representation_little_subgroup" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="cgt.hyperoctahedral.hyperoctahedral_group.right_transversal">
+<code class="sig-name descname">right_transversal</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">group</span></em>, <em class="sig-param"><span class="n">subgroup</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.hyperoctahedral_group.right_transversal" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt id="cgt.hyperoctahedral.hyperoctahedral_group.semidirect_product_with_hyperoctahedral_twist">
+<code class="sig-name descname">semidirect_product_with_hyperoctahedral_twist</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">H</span></em>, <em class="sig-param"><span class="n">G</span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.hyperoctahedral_group.semidirect_product_with_hyperoctahedral_twist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute a semi-direct product of H and G with the hyperoctahedral twist (G acts on H^n by permuting factors). The group returned is a group of pairs (c, s) where c is an element of H^n and s is an element of G. The group operation is given by (c1, s1) * (c2, s2) = (c1 * s1(c2), s1 * s2).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>H</strong> (<em>group</em>) – the direct product of n copies of some group.</p></li>
+<li><p><strong>G</strong> (<em>group</em>) – A group.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The wreath product of H and G with the hyperoctahedral twist.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>group</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 </div>
 
 
@@ -847,7 +1091,7 @@ True</p>
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright 2021, Joshua Stevenson.
+        &#169; Copyright 2023, Joshua Stevenson.
 
     </p>
   </div>

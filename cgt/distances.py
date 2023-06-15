@@ -1,5 +1,15 @@
 """
 Implements a number of distance measures for genomes under the position paradigm.
+
+The primary function of this module is the distance_matrix function, which returns a distance matrix for a given set of genomes and distance measure.
+
+The distance measures implemented are:
+    - min: the minimum number of rearrangements required to transform one genome into another
+    - min_weighted: the minimum number of rearrangements required to transform one genome into another, weighted by the inverse of the probability of the rearrangement
+    - MFPT: the mean first passage time from the identity to a given genome, where the target is an absorbing state
+    - MLE: the maximum likelihood estimate of the time elapsed between the identity and a given genome
+
+Individual likelihood functions for the time elapsed between the identity and a given genome can also be obtained
 """
 
 from cgt.enums import ALGEBRA, DISTANCE
@@ -9,7 +19,18 @@ from sage.all import ComplexDoubleField, UniversalCyclotomicField, matrix, Matri
 from scipy.optimize import minimize_scalar
 
 def mles(framework, model, genome_instances=None, verbose=False):
-    """Return maximum likelihood estimates for a set of genome instances under the given model and framework"""
+    """
+    Returns a dictionary of maximum likelihood estimates for each genome instance under the given model and framework.
+
+    Args:
+        framework (Framework): the framework
+        model (Model): the model
+        genome_instances (list): a list of genome instances to compute MLEs for. If None, all genomes in the framework are used.
+        verbose (bool): whether to print progress
+    
+    Returns:
+        dict: a dictionary of maximum likelihood estimates, indexed by genome instance
+    """
     mles = {}
     if genome_instances is None:
         genome_instances = [framework.canonical_instance(g) for g in framework.genomes()]
@@ -19,18 +40,47 @@ def mles(framework, model, genome_instances=None, verbose=False):
     return mles
 
 def mle(framework, model, genome_instance):
-    """Return maximum likelihood estimates for a genome instance under the given model and framework"""
+    """
+    Returns the maximum likelihood estimate for a given genome instance under the given model and framework.
+
+    Args:
+        framework (Framework): the framework
+        model (Model): the model
+        genome_instance (group element): the genome instance to compute the MLE for
+
+    Returns:
+        float: the maximum likelihood estimate
+    """
     return maximise(framework, likelihood_function(framework, model, genome_instance, attempt_exact=False))
 
 def maximise(framework, L, max_time=100):
-    """Return the time that maximises likelihood function L, using additional information from the framework"""
+    """
+    Return the time that maximises likelihood function L, using additional information from the framework
+    
+    Args:
+        framework (Framework): the framework
+        L (function): the likelihood function
+        max_time (float): the maximum time to consider
+    
+    Returns:
+        float: the time that maximises the likelihood function
+    """
     limit = 1/framework.num_genomes()
     t_max = minimize_scalar(lambda t: -1*L(t), method='bounded', bounds=(0, max_time))['x']
     mle = t_max if L(t_max)>limit else np.nan
     return mle
 
 def _projection_operators(mat, eigs):
-    """Return projection operators for given matrix and its eigenvalues"""
+    """
+    Return projection operators for given matrix and its eigenvalues
+    
+    Args:
+        mat (matrix): a representation of zs
+        eigs (list): a list of eigenvalues of mat
+
+    Returns:
+        list: a list of projection operators
+    """
     dim = mat.nrows()
     projections = [matrix.identity(dim) for _ in eigs]
     for e1, eig1 in enumerate(eigs):
@@ -40,7 +90,18 @@ def _projection_operators(mat, eigs):
     return projections
 
 def _irreps_of_zs(framework, model, attempt_exact=False, force_recompute=False):
-    """Return a set of matrices---images of zs under each irrep"""
+    """
+    Return a set of matrices---images of zs under each irrep
+    
+    Args:
+        framework (Framework): the framework
+        model (Model): the model
+        attempt_exact (bool): whether to attempt exact computation
+        force_recompute (bool): whether to force recomputation and invalidate cache
+
+    Returns:
+        list: a list of irredicuble representations of the group applied to zs
+    """
     key = "irreps_of_zs"
     if key in model.data_bundle and not force_recompute:
         irreps_of_zs =  model.data_bundle[key]
@@ -57,7 +118,18 @@ def _irreps_of_zs(framework, model, attempt_exact=False, force_recompute=False):
     return irreps_of_zs
 
 def _irreps_of_z(framework, model, attempt_exact=False, force_recompute=False):
-    """Return a set of matrices---images of z under each irrep"""
+    """
+    Return a set of matrices---images of z (the symmetry element) under each irrep
+    
+    Args:
+        framework (Framework): the framework
+        model (Model): the model
+        attempt_exact (bool): whether to attempt exact computation
+        force_recompute (bool): whether to force recomputation and invalidate cache
+
+    Returns:
+        list: a list of irredicuble representations of the group applied to z
+    """
     key = "irreps_of_z"
     if key in model.data_bundle and not force_recompute:
         irreps_of_z =  model.data_bundle[key]
@@ -253,6 +325,15 @@ def dict_to_distance_matrix(distances, framework, genomes=None):
     return D
 
 def distance_matrix(framework, model, genomes, distance):
+    """
+    Compute a distance matrix for a given set of genomes and distance measure.
+
+    Args:
+        framework (Framework): the framework
+        model (Model): the model
+        genomes (list): a list of genomes to compute distances for
+        distance (DISTANCE): the distance measure to use
+    """
     instances = [framework.canonical_instance(g) for g in genomes]
     # Get the genomes g that we need dist(id -> g) for:
     need_distances = {}
