@@ -194,7 +194,7 @@ class hyperoctahedral_group:
         return transversal
     
     def Phi_inv(self, elt):
-        c = tuple(self._C2(() if elt(k) > 1 else (1, 2)) for k in range(1, self._n + 1))
+        c = tuple(self._C2(() if elt(k) > 0 else (1, 2)) for k in range(1, self._n + 1))
         s = self._Sn(Permutation([abs(elt(k)) for k in range(1, self._n + 1)]))
         return self._semidirect_product((c, s))
 # %%
