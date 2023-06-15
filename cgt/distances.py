@@ -23,7 +23,7 @@ def mles(framework, model, genome_instances=None, verbose=False):
     Returns a dictionary of maximum likelihood estimates for each genome instance under the given model and framework.
 
     Args:
-        framework (Framework): the framework
+        framework (PositionParadigmFramework): the framework
         model (Model): the model
         genome_instances (list): a list of genome instances to compute MLEs for. If None, all genomes in the framework are used.
         verbose (bool): whether to print progress
@@ -44,7 +44,7 @@ def mle(framework, model, genome_instance):
     Returns the maximum likelihood estimate for a given genome instance under the given model and framework.
 
     Args:
-        framework (Framework): the framework
+        framework (PositionParadigmFramework): the framework
         model (Model): the model
         genome_instance (group element): the genome instance to compute the MLE for
 
@@ -58,7 +58,7 @@ def maximise(framework, L, max_time=100):
     Return the time that maximises likelihood function L, using additional information from the framework
     
     Args:
-        framework (Framework): the framework
+        framework (PositionParadigmFramework): the framework
         L (function): the likelihood function
         max_time (float): the maximum time to consider
     
@@ -94,7 +94,7 @@ def _irreps_of_zs(framework, model, attempt_exact=False, force_recompute=False):
     Return a set of matrices---images of zs under each irrep
     
     Args:
-        framework (Framework): the framework
+        framework (PositionParadigmFramework): the framework
         model (Model): the model
         attempt_exact (bool): whether to attempt exact computation
         force_recompute (bool): whether to force recomputation and invalidate cache
@@ -122,7 +122,7 @@ def _irreps_of_z(framework, model, attempt_exact=False, force_recompute=False):
     Return a set of matrices---images of z (the symmetry element) under each irrep
     
     Args:
-        framework (Framework): the framework
+        framework (PositionParadigmFramework): the framework
         model (Model): the model
         attempt_exact (bool): whether to attempt exact computation
         force_recompute (bool): whether to force recomputation and invalidate cache
@@ -329,7 +329,7 @@ def distance_matrix(framework, model, genomes, distance):
     Compute a distance matrix for a given set of genomes and distance measure.
 
     Args:
-        framework (Framework): the framework
+        framework (PositionParadigmFramework): the framework
         model (Model): the model
         genomes (list): a list of genomes to compute distances for
         distance (DISTANCE): the distance measure to use
