@@ -37,7 +37,7 @@ def mles(framework, model, genome_instances=None, verbose=False):
     for instance in genome_instances:
         if verbose: print(f"Computing MLE for {instance}")
         mles[instance] = mle(framework, model, instance)
-    return mles
+        return mles
 
 def mle(framework, model, genome_instance):
     """
@@ -51,7 +51,7 @@ def mle(framework, model, genome_instance):
     Returns:
         float: the maximum likelihood estimate
     """
-    return maximise(framework, likelihood_function(framework, model, genome_instance, attempt_exact=False))
+    return maximise(framework, likelihood_function(framework, model, genome_instance))
 
 def maximise(framework, L, max_time=100):
     """
@@ -59,8 +59,8 @@ def maximise(framework, L, max_time=100):
     
     Args:
         framework (PositionParadigmFramework): the framework
-        L (function): the likelihood function
-        max_time (float): the maximum time to consider
+        L (function): the likelihood function to maximise
+        max_time (float): the maximum time to consider (default: 100)
     
     Returns:
         float: the time that maximises the likelihood function
@@ -89,15 +89,14 @@ def _projection_operators(mat, eigs):
                 projections[e1] *= (mat-(eig2*matrix.identity(dim)))*(1/(eig1-eig2))
     return projections
 
-def _irreps_of_zs(framework, model, attempt_exact=False, force_recompute=False):
+def _irreps_of_zs(framework, model, force_recompute=False):
     """
     Return a set of matrices---images of zs under each irrep
     
     Args:
         framework (PositionParadigmFramework): the framework
-        model (Model): the model
-        attempt_exact (bool): whether to attempt exact computation
-        force_recompute (bool): whether to force recomputation and invalidate cache
+        model (Model): the model 
+        force_recompute (bool): whether to force recomputation and invalidate cache (default: False)
 
     Returns:
         list: a list of irredicuble representations of the group applied to zs
@@ -111,21 +110,20 @@ def _irreps_of_zs(framework, model, attempt_exact=False, force_recompute=False):
         s = model.s_element(in_algebra=ALGEBRA.genome)
         irreps_of_z, irreps_of_s = framework.irreps(z), framework.irreps(s)
         irreps_of_zs = (matrix(UCF, irrep_z*irrep_s) for irrep_z, irrep_s in zip(irreps_of_z, irreps_of_s))
-        irreps_of_zs = [Matrix(UCF if attempt_exact else CDF, irrep_zs) for irrep_zs in irreps_of_zs]
+        irreps_of_zs = [Matrix(CDF, irrep_zs) for irrep_zs in irreps_of_zs]
         for irrep in irreps_of_zs:
             irrep.set_immutable()
         model.data_bundle[key] = irreps_of_zs
     return irreps_of_zs
 
-def _irreps_of_z(framework, model, attempt_exact=False, force_recompute=False):
+def _irreps_of_z(framework, model, force_recompute=False):
     """
     Return a set of matrices---images of z (the symmetry element) under each irrep
     
     Args:
         framework (PositionParadigmFramework): the framework
         model (Model): the model
-        attempt_exact (bool): whether to attempt exact computation
-        force_recompute (bool): whether to force recomputation and invalidate cache
+        force_recompute (bool): whether to force recomputation and invalidate cache (default: False)
 
     Returns:
         list: a list of irredicuble representations of the group applied to z
@@ -138,15 +136,14 @@ def _irreps_of_z(framework, model, attempt_exact=False, force_recompute=False):
         z = framework.symmetry_element()
         irreps_of_z = framework.irreps(z)
         irreps_of_z = (matrix(UCF, irrep_z) for irrep_z in irreps_of_z)
-        irreps_of_z = [Matrix(UCF if attempt_exact else CDF, irrep_z) for irrep_z in irreps_of_z]
+        irreps_of_z = [Matrix(CDF, irrep_z) for irrep_z in irreps_of_z]
         for irrep in irreps_of_z:
             irrep.set_immutable()
         model.data_bundle[key] = irreps_of_z
     return irreps_of_z
 
 
-
-def _eigenvalues(mat, round_to=7, make_real=True, inc_repeated=False, attempt_exact=False, use_numpy=True, bin_eigs=False, tol=10**(-8)):
+def _eigenvalues(mat, round_to=7, make_real=True, inc_repeated=False, use_numpy=True, bin_eigs=False, tol=10**(-8)):
     """Return all the eigenvalues for a given matrix mat"""
     col = list if inc_repeated else set
     if use_numpy:
@@ -154,9 +151,7 @@ def _eigenvalues(mat, round_to=7, make_real=True, inc_repeated=False, attempt_ex
         all_eigs = np.linalg.eigvals(new_mat)
     else:
         all_eigs = (eig for eig in mat.eigenvalues())
-    if attempt_exact: 
-        return sorted(col(all_eigs))
-    elif bin_eigs:
+    if bin_eigs:
         return _bin(sorted(all_eigs), return_bin_size=False, tol=tol)
     else:
         return sorted(col(round(real(eig) if make_real else eig, round_to) for eig in all_eigs))
@@ -188,29 +183,6 @@ def _eigenvectors(mat, tol=10**(-8)):
         q=q+c
     return binned_eigenvals, eigenvectors
 
-def _eigenvectors_reduce_error(mat, tol=10**(-8)):
-    eigen_tuples = sorted(mat.eigenvectors_right())
-    binned_eigenvals = _bin([et[0] for et in eigen_tuples], tol=tol, return_bin_size=True)
-    # Orthogonalise the eigenvectors                      
-    q = 0
-    eigenvectors = []
-    for v in range(len(binned_eigenvals)):
-        c = binned_eigenvals[v][1] 
-        A = matrix([eigen_tuples[q+l][1][0].list() for l in range(c)]).transpose()
-        print(A.ncols(), A.nrows())
-        # If the rounded eigenvalue is zero
-        if round(binned_eigenvals[v][0], 8) == 0:
-            Q = None
-        else:
-            Q, _ = A.QR()
-            print(Q.nrows(), Q.ncols())
-            Q = Q.delete_columns(list(range(A.ncols(),A.nrows())))
-            print(Q.nrows(), Q.ncols())
-        eigenvectors.append(Q)
-        q += c
-    return binned_eigenvals, eigenvectors
-
-
 def _partial_traces_for_genome(framework, instance, irreps, irreps_of_zs, projections, eig_lists, irreps_of_z=None):
     """Return dictionary of partial traces, indexed first by irrep index and then by eigenvalaue"""
     if irreps_of_z is None:
@@ -226,49 +198,25 @@ def _partial_traces_for_genome(framework, instance, irreps, irreps_of_zs, projec
             traces[r][eigenvalue] = real((sigd*projections[r][e]).trace())
     return traces
 
-def _partial_traces_for_genome_using_eigenvectors(framework, instance, irreps, irreps_of_zs):
-    """Return dictionary of partial traces, indexed first by irrep index and then by eigenvalaue"""
-    irreps_of_z = [irrep(framework.symmetry_element()) for irrep in irreps]
-    eigenvectors_list = [_eigenvectors(irrep_zs) for irrep_zs in irreps_of_zs]
-    CDF, UCF = ComplexDoubleField(), UniversalCyclotomicField()
-    traces = {
-        r: {
-            eigenvalue[0]: {} for eigenvalue in eigenvectors_list[r][0]
-        } for r in range(len(irreps_of_zs))
-    }
-    for r, irrep in enumerate(irreps): # Iterate over irreducible representations
-        sigd = irreps_of_z[r] * Matrix(CDF, matrix(UCF, irrep(instance.inverse())))
-        eigenvalues = eigenvectors_list[r][0]
-        eigenvector_list = eigenvectors_list[r][1]
-        for e, eigenvalue in enumerate(eigenvalues):
-            eigenvectors = eigenvector_list[e]
-            traces[r][eigenvalue[0]]=round(real((sum([(eigenvectors[m,:].H)*eigenvectors[m,:] for m in range(eigenvalue[1])])*sigd).trace()),6)
-    return traces
-
-
-def likelihood_function(framework, model, genome, attempt_exact=False, use_projections=True):
+def likelihood_function(framework, model, genome):
     """Return the likelihood function for a given genome"""
     instance = genome
     CDF, UCF = ComplexDoubleField(), UniversalCyclotomicField()
     G, Z = framework.genome_group(), framework.symmetry_group()
     irreps = framework.irreps()
-    irreps_of_zs = _irreps_of_zs(framework, model, attempt_exact=attempt_exact)
-    irreps_of_z = _irreps_of_z(framework, model, attempt_exact=attempt_exact)
-    if use_projections:
-        if "eig_lists" in model.data_bundle:
-            eig_lists = model.data_bundle["eig_lists"]
-        else:
-            eig_lists = [_eigenvalues(irrep_zs, round_to=7, make_real=True, inc_repeated=False, attempt_exact=attempt_exact) for irrep_zs in irreps_of_zs]
-            model.data_bundle["eig_lists"] = eig_lists
-        if "projections" in model.data_bundle:
-            projections = model.data_bundle["projections"]
-        else:
-            projections = [_projection_operators(*vals) for vals in zip(irreps_of_zs, eig_lists)]
-            model.data_bundle["projections"] = projections
-        traces = _partial_traces_for_genome(framework, instance, irreps, irreps_of_zs, projections, eig_lists, irreps_of_z)
+    irreps_of_zs = _irreps_of_zs(framework, model)
+    irreps_of_z = _irreps_of_z(framework, model)
+    if "eig_lists" in model.data_bundle:
+        eig_lists = model.data_bundle["eig_lists"]
     else:
-        eig_lists = [[x[0] for x in _eigenvectors(irrep_zs)[0]] for irrep_zs in irreps_of_zs]
-        traces = _partial_traces_for_genome_using_eigenvectors(framework, instance, irreps, irreps_of_zs)
+        eig_lists = [_eigenvalues(irrep_zs) for irrep_zs in irreps_of_zs]
+        model.data_bundle["eig_lists"] = eig_lists
+    if "projections" in model.data_bundle:
+        projections = model.data_bundle["projections"]
+    else:
+        projections = [_projection_operators(*vals) for vals in zip(irreps_of_zs, eig_lists)]
+        model.data_bundle["projections"] = projections
+    traces = _partial_traces_for_genome(framework, instance, irreps, irreps_of_zs, projections, eig_lists, irreps_of_z)
     dims = [irrep_of_zs.nrows() for irrep_of_zs in irreps_of_zs]
     def likelihood(t):
         ans = 0
