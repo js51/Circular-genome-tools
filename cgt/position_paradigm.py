@@ -13,6 +13,7 @@ from copy import deepcopy
 from .structures import HyperoctahedralGroup
 from scipy.sparse import dok_matrix as dok
 from random import choice
+from .hyperoctahedral import HyperoctahedralGroupRepresentations
 
 class PositionParadigmFramework:
     """Everything you need for working with genomes under the position paradigm"""
@@ -370,16 +371,16 @@ class PositionParadigmFramework:
                     if sigma in self.group_algebra(): # sigma is an algebra element
                         for term in sigma:
                             perm, coeff = term
-                            result += coeff * (gap.Image(_irrep, perm) if _signed else _irrep(perm))
+                            result += coeff * _irrep(perm)
                     else: # sigma is a group element
-                        result = (gap.Image(_irrep, sigma) if _signed else _irrep(sigma))
-                    mat = matrix(UniversalCyclotomicField(), result)
-                    return mat.transpose() if _signed else mat
+                        result = _irrep(sigma)
+                    mat = result
+                    return mat.transpose() if _signed else matrix(mat)
             return representation
         if not self.oriented:
             irreps = SymmetricGroupRepresentations(self.n)
         else:
-            irreps = (gap.IrreducibleAffordingRepresentation(character) for character in gap.Irr(self.genome_group()))
+            irreps = list(HyperoctahedralGroupRepresentations(self.n).values()) #(gap.IrreducibleAffordingRepresentation(character) for character in gap.Irr(self.genome_group()))
         for irrep in irreps:
             representations.append(irrep_function_factory(irrep, self.oriented))
         self.representations = representations

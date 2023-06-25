@@ -13,4 +13,4 @@ If you would like to contribute to `cgt`, please see [`CONTRIBUTING.md`](CONTRIB
 
 If you use this software in your work, please cite it use the citation function on the github page or see [`CITATION.cff`](CITATION.cff)
 
-**Note:** you will need to at least have Sage version 9.0 installed, and have the GAP package `repsn` installed for the copy of GAP that sits inside Sage. If you aren't sure how to do this, see the installation instructions in [`INSTALL.md`](INSTALL.md).
+**Note:** you will need to at least have Sage version 9.0 installed. If you aren't sure how to do this, see the installation instructions in [`INSTALL.md`](INSTALL.md).

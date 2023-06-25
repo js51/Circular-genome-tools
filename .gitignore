@@ -143,3 +143,4 @@ _site
 *.gz
 *.tex
 .github/Circular-genome-tools.code-workspace
+cgt/.vscode/settings.json
