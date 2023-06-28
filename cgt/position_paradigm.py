@@ -18,7 +18,7 @@ from .hyperoctahedral import HyperoctahedralGroupRepresentations
 class PositionParadigmFramework:
     """Everything you need for working with genomes under the position paradigm"""
 
-    def __init__(self, num_regions, oriented=True, symmetry=SYMMETRY.circular, genome_type=TYPE.reg_to_signed_pos):
+    def __init__(self, num_regions, oriented=True, symmetry=SYMMETRY.circular, genome_type=TYPE.reg_to_signed_pos, precompute_irreps=False):
         """Instantiate a system of position paradigm genomes with given set of symmetries and number of regions."""
         if genome_type != TYPE.reg_to_signed_pos:
             raise NotImplementedError("Genome type not yet supported. For now use TYPE.reg_to_signed_pos")
@@ -27,6 +27,8 @@ class PositionParadigmFramework:
         self.symmetry = symmetry
         self.representations = None
         self._genomes = None
+        if precompute_irreps:
+            _ = self.irreps() # gets cached
         
     def __eq__(self, other): # String representation is unique and repr calls str
         return self.__repr__() == other.__repr__()
