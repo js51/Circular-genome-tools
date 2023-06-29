@@ -2,18 +2,77 @@
 """
 
 from copy import deepcopy
-from sage.all_cmdline import SymmetricGroup, floor
+from sage.all_cmdline import SymmetricGroup, floor, ceil
 import warnings
 from . import structures
 from .enums import *
 
 def css(cuts_set):
     string = ''.join(sorted([str(cut[0]) for cut in cuts_set]))
-    if len(string) != len(cuts_set): print("something went very wrong here...")
+    if len(string) != len(cuts_set): 
+        print("something went very wrong here...")
     return string
 
+def signed_inversion(framework, about_position, length):
+    """
+    Return an instance of the inversion that inverts a segment in a genome.
+
+    Args:
+        framework (PositionParadigmFramework): The framework to create the inversion in
+        about_position (int): The position to invert about
+        length (int): The length of the segment to invert
+    
+    Returns:
+        Permutation: An instance representing the inversion that inverts the segment
+    """
+    if not framework.oriented or framework.symmetry != SYMMETRY.circular:
+        raise NotImplementedError(f"not yet implemented for {str(framework)}")
+    n = framework.n
+    r = (about_position - 2) % n + 1 
+    string_rep = ''
+    if length % 2 == 0:
+        k = length / 2
+        for i in range(1, k+1):
+            string_rep += f'({(r-(i-1)-1) % n + 1}, {-((r+i-1) % n + 1)})({-((r-(i-1)-1) % n + 1)}, {(r+i-1) % n + 1})'
+    else:
+        k = (length - 1)/2
+        string_rep += f'({about_position},{-about_position})'
+        for i in range(1, k+1):
+            string_rep += f'({(r-(i-1)-1) % n + 1},{-((r+(i+1)-1) % n + 1)})({-((r-(i-1)-1) % n + 1)},{(r+(i+1)-1) % n + 1})'
+    return framework.cycles(string_rep)
+
+def transposition(framework, sec_1, sec_2, inv_1=False, inv_2=False):
+    """
+    Return an instance of the transposition that swaps two segments in a genome.
+
+    Args:
+        framework (PositionParadigmFramework): The framework to create the transposition in
+        sec_1 (tuple): The first section to transpose (tuple of start (included) and end (excluded) positions)
+        sec_2 (tuple): The second section to transpose (tuple of start (included) and end (excluded) positions)
+        inv_1 (bool, optional): Whether to also invert the first section. Defaults to False.
+        inv_2 (bool, optional): Whether to also invert the second section. Defaults to False.
+
+    Returns:
+        Permutation: An instance representing the transposition that swaps the two segments
+    """
+    if not framework.oriented or framework.symmetry != SYMMETRY.circular:
+        raise NotImplementedError(f"not yet implemented for {str(framework)}")
+    if all((inv_1, inv_2)):
+        raise ValueError("for circular genomes, inverting both segments is not allowed")
+    n = framework.n
+    def length(start, end):
+        return (end - start - 1) % n + 1
+    def mid(start, end):
+        return (start + floor(length(start, end)/2) - 1) % n + 1
+    if sec_1[1] != sec_2[0]:
+        raise ValueError("sections must be adjacent")
+    full_inversion = signed_inversion(framework, mid(sec_1[0],sec_2[1]), length(sec_1[0],sec_2[1]))
+    left_inversion = signed_inversion(framework, mid(*sec_1), length(*sec_1)) if not inv_1 else framework.cycles('()')
+    right_inversion = signed_inversion(framework, mid(*sec_2), length(*sec_2)) if not inv_2 else framework.cycles('()')
+    return left_inversion * right_inversion * full_inversion
 
 def c_perm(n):
+    """Return the permutation (1,...,n)(-n,...,1))"""
     pmN = structures.set_plus_minus(n)
     G = SymmetricGroup(pmN)
     c_string = f'({",".join(str(i) for i in list(range(1, n+1)))})({",".join(str(i) for i in list(range(-n, 0)))})'
@@ -21,6 +80,16 @@ def c_perm(n):
     return c
 
 def cuts(framework, sigma):
+    """
+    The set of cuts required to perform a rearrangement represented by sigma
+
+    Args:
+        framework (PositionParadigmFramework): The framework to create the transposition in
+        sigma (Permutation): The permutation representing the rearrangement
+
+    Returns:
+        set: The set of cuts required to perform the rearrangement represented by sigma
+    """
     sigma = deepcopy(framework.one_row(sigma))
     n = framework.n
     c = c_perm(n)
@@ -72,14 +141,17 @@ def __two_region_adjacent_transposition_reps(framework):
     return { G('(-2,-1)(1,2)'), G('(-2,1,2,-1)'), G('(-2,-1,2,1)'), G('(-2,2)(-1,1)') }
 
 def double_coset(framework, perm):
+    """Return the double coset of perm in the symmetry group of framework"""
     Z = framework.symmetry_group()
     return { d1 * perm * d2 for d1 in Z for d2 in Z }
 
 def conjugacy_class(framework, perm):
+    """Return the conjugacy class of perm in the symmetry group of framework"""
     Z = framework.symmetry_group()
     return { d.inverse() * perm * d for d in Z }
 
 def single_coset(framework, perm):
+    """Return the single coset of perm in the symmetry group of framework"""
     Z = framework.symmetry_group()
     return { perm * d for d in Z }
 
@@ -106,6 +178,16 @@ def __representatives(framework, set_of_permutations, classes=CLASSES.double_cos
     return reps
 
 def all_inversions_representatives(framework, num_regions=None):
+    """
+    Return the representatives of all inversions in the symmetry group of framework
+    
+    Args:
+        framework (PositionParadigmFramework): The framework to create the transposition in
+        num_regions (int, optional): The number of regions to invert. Defaults to None (all inversions).
+
+    Returns:
+        set: The set of representatives of all inversions in the symmetry group of framework
+    """
     return __representatives(framework, __all_canonical_inversions(framework, num_regions=num_regions), classes=CLASSES.double_cosets)
 
 def all_adjacent_transpositions_representatives(framework, num_regions=None):
@@ -115,6 +197,16 @@ def all_adjacent_transpositions_representatives(framework, num_regions=None):
         raise NotImplementedError(f"model not yet implemented")
 
 def permutation_with_cuts(framework, cuts, perm=None, start=None):
+    """
+    A generator for all permutations with the specified set of cuts.
+
+    Args:
+        framework (PositionParadigmFramework): The framework to create the transposition in
+        cuts (set): The set of cuts to use
+
+    Yields:
+        Permutation: A permutation with the specified set of cuts
+    """
     n = framework.n
     c = c_perm(n)
     if perm is None:

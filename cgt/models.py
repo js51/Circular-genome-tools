@@ -31,6 +31,16 @@ class Model:
 
     @classmethod
     def named_model_with_relative_probs(cls, framework, named_model_dictionary):
+        """
+        Create a model from a dictionary of named classes of rearrangements and their relative probabilities. 
+
+        Args:
+            framework (PositionParadigmFramework): The framework to create the model in
+            named_model_dictionary (dict): A dictionary of named classes of rearrangements and their relative probabilities.
+
+        Returns:
+            Model: A model with the specified named classes of rearrangements and their relative probabilities.
+        """
         if not framework.oriented:
             raise NotImplementedError(f"not yet implemented for {str(framework)}")
         # look through all specified model names and handle them appropriately
