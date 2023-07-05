@@ -200,8 +200,8 @@ def _partial_traces_for_genome(framework, instance, irreps, irreps_of_zs, projec
 
 def likelihood_function(framework, model, genome):
     """Return the likelihood function for a given genome"""
-    instance = genome
-    CDF, UCF = ComplexDoubleField(), UniversalCyclotomicField()
+    instance = framework.cycles(genome)
+    CDF = ComplexDoubleField()
     G, Z = framework.genome_group(), framework.symmetry_group()
     irreps = framework.irreps()
     irreps_of_zs = _irreps_of_zs(framework, model)
