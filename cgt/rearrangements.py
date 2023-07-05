@@ -7,11 +7,6 @@ import warnings
 from . import structures
 from .enums import *
 
-def css(cuts_set):
-    string = ''.join(sorted([str(cut[0]) for cut in cuts_set]))
-    if len(string) != len(cuts_set): 
-        print("something went very wrong here...")
-    return string
 
 def signed_inversion(framework, about_position, length):
     """
@@ -21,27 +16,28 @@ def signed_inversion(framework, about_position, length):
         framework (PositionParadigmFramework): The framework to create the inversion in
         about_position (int): The position to invert about
         length (int): The length of the segment to invert
-    
+
     Returns:
         Permutation: An instance representing the inversion that inverts the segment
     """
     if not framework.oriented or framework.symmetry != SYMMETRY.circular:
         raise NotImplementedError(f"not yet implemented for {str(framework)}")
     n = framework.n
-    r = (about_position - 2) % n + 1 
-    string_rep = ''
+    r = (about_position - 2) % n + 1
+    string_rep = ""
     if length % 2 == 0:
         k = length / 2
-        for i in range(1, k+1):
-            string_rep += f'({(r-(i-1)-1) % n + 1}, {-((r+i-1) % n + 1)})({-((r-(i-1)-1) % n + 1)}, {(r+i-1) % n + 1})'
+        for i in range(1, k + 1):
+            string_rep += f"({(r-(i-1)-1) % n + 1}, {-((r+i-1) % n + 1)})({-((r-(i-1)-1) % n + 1)}, {(r+i-1) % n + 1})"
     else:
-        k = (length - 1)/2
-        string_rep += f'({about_position},{-about_position})'
-        for i in range(1, k+1):
-            string_rep += f'({(r-(i-1)-1) % n + 1},{-((r+(i+1)-1) % n + 1)})({-((r-(i-1)-1) % n + 1)},{(r+(i+1)-1) % n + 1})'
+        k = (length - 1) / 2
+        string_rep += f"({about_position},{-about_position})"
+        for i in range(1, k + 1):
+            string_rep += f"({(r-(i-1)-1) % n + 1},{-((r+(i+1)-1) % n + 1)})({-((r-(i-1)-1) % n + 1)},{(r+(i+1)-1) % n + 1})"
     return framework.cycles(string_rep)
 
-def transposition(framework, sec_1, sec_2, inv_1=False, inv_2=False):
+
+def transposition(framework, sec_1, sec_2, inv_1=False, inv_2=False, revrev=False):
     """
     Return an instance of the transposition that swaps two segments in a genome.
 
@@ -57,19 +53,38 @@ def transposition(framework, sec_1, sec_2, inv_1=False, inv_2=False):
     """
     if not framework.oriented or framework.symmetry != SYMMETRY.circular:
         raise NotImplementedError(f"not yet implemented for {str(framework)}")
-    if all((inv_1, inv_2)):
-        raise ValueError("for circular genomes, inverting both segments is not allowed")
+    if all((inv_1, inv_2)) and not revrev:
+        raise ValueError("for circular genomes, inverting both segments is not allowed. Explicitly allow revrevs by setting allow_revrev=True")
+    if revrev:
+        if not all((inv_1, inv_2)):
+            raise ValueError("revrevs are only allowed if both segments are inverted")
+        else:
+            inv_1 = inv_2 = False
     n = framework.n
+
     def length(start, end):
         return (end - start - 1) % n + 1
+
     def mid(start, end):
-        return (start + floor(length(start, end)/2) - 1) % n + 1
+        return (start + floor(length(start, end) / 2) - 1) % n + 1
+
     if sec_1[1] != sec_2[0]:
         raise ValueError("sections must be adjacent")
-    full_inversion = signed_inversion(framework, mid(sec_1[0],sec_2[1]), length(sec_1[0],sec_2[1]))
-    left_inversion = signed_inversion(framework, mid(*sec_1), length(*sec_1)) if not inv_1 else framework.cycles('()')
-    right_inversion = signed_inversion(framework, mid(*sec_2), length(*sec_2)) if not inv_2 else framework.cycles('()')
+    full_inversion = signed_inversion(
+        framework, mid(sec_1[0], sec_2[1]), length(sec_1[0], sec_2[1])
+    ) if not revrev else framework.cycles("()")
+    left_inversion = (
+        signed_inversion(framework, mid(*sec_1), length(*sec_1))
+        if not inv_1
+        else framework.cycles("()")
+    )
+    right_inversion = (
+        signed_inversion(framework, mid(*sec_2), length(*sec_2))
+        if not inv_2
+        else framework.cycles("()")
+    )
     return left_inversion * right_inversion * full_inversion
+
 
 def c_perm(n):
     """Return the permutation (1,...,n)(-n,...,1))"""
@@ -79,7 +94,8 @@ def c_perm(n):
     c = G(c_string)
     return c
 
-def cuts(framework, sigma):
+
+def cut_positions(framework, sigma):
     """
     The set of cuts required to perform a rearrangement represented by sigma
 
@@ -94,66 +110,87 @@ def cuts(framework, sigma):
     n = framework.n
     c = c_perm(n)
     sigma = list(sigma)
-    return set([ 
-        tuple(([i+1,c(i+1)])) for i in range(len(sigma)) 
-        if (sigma[c(i + 1)-1] != c(sigma[i]))
-    ])
+    return set(
+        [
+            tuple(([i + 1, c(i + 1)]))
+            for i in range(len(sigma))
+            if (sigma[c(i + 1) - 1] != c(sigma[i]))
+        ]
+    )
+
 
 def __all_canonical_inversions(framework, num_regions=None):
     if not framework.oriented:
         raise NotImplementedError(f"not yet implemented for {str(framework)}")
     if framework.symmetry not in {SYMMETRY.circular, SYMMETRY.linear}:
-        raise NotImplementedError(f"not implemented for framework with {str(framework.symmetry)} symmetry")
+        raise NotImplementedError(
+            f"not implemented for framework with {str(framework.symmetry)} symmetry"
+        )
     n = framework.n
     G = framework.genome_group()
     if num_regions == 1:
-        return {G(f'({i},-{i})') for i in range(1, n+1)} if framework.oriented else {}
+        return {G(f"({i},-{i})") for i in range(1, n + 1)} if framework.oriented else {}
     elif num_regions == 2:
         if framework.oriented:
-            perms = {G(f'({i},{-1*(i+1)})({-1*i},{i+1})') for i in range(1,n)}
+            perms = {G(f"({i},{-1*(i+1)})({-1*i},{i+1})") for i in range(1, n)}
             if framework.symmetry is not SYMMETRY.linear:
-                perms.union({G(f'({n},-1)(-{n},1)')})
+                perms.union({G(f"({n},-1)(-{n},1)")})
         else:
-            perms = {G(f'({i},{i+1})') for i in range(1,n)} 
+            perms = {G(f"({i},{i+1})") for i in range(1, n)}
             if framework.symmetry is not SYMMETRY.linear:
-                perms.union({G(f'(1,{n})')})
+                perms.union({G(f"(1,{n})")})
         return perms
-    elif num_regions == None: # Return all inversions up to length floor(n/2)
-        up_to_length = floor(framework.n/2)
-        if framework.oriented: 
+    elif num_regions == None:  # Return all inversions up to length floor(n/2)
+        up_to_length = floor(framework.n / 2)
+        if framework.oriented:
             perms = set()
             for permutation in G:
                 cycle_type = list(permutation.cycle_type())
-                if set(cycle_type)=={1,2} and list(cycle_type).count(2)<=up_to_length and len(cuts(framework, permutation))==2:
+                if (
+                    set(cycle_type) == {1, 2}
+                    and list(cycle_type).count(2) <= up_to_length
+                    and len(cut_positions(framework, permutation)) == 2
+                ):
                     perms.add(permutation)
             if framework.symmetry is SYMMETRY.linear:
-                perms = {perm for perm in perms if not ('1' in str(perm) and str(n) in str(perm))}
+                perms = {
+                    perm
+                    for perm in perms
+                    if not ("1" in str(perm) and str(n) in str(perm))
+                }
             return perms
         else:
             raise NotImplementedError(f"not yet implemented for {framework}")
     else:
-        raise NotImplementedError(f"inversions of length {num_regions} not yet implemented")
-    
+        raise NotImplementedError(
+            f"inversions of length {num_regions} not yet implemented"
+        )
+
+
 def __two_region_adjacent_transposition_reps(framework):
     if not framework.oriented or framework.symmetry != SYMMETRY.circular:
         raise NotImplementedError(f"not yet implemented for {str(framework)}")
     G = framework.genome_group()
-    return { G('(-2,-1)(1,2)'), G('(-2,1,2,-1)'), G('(-2,-1,2,1)'), G('(-2,2)(-1,1)') }
+    return {G("(-2,-1)(1,2)"), G("(-2,1,2,-1)"), G("(-2,-1,2,1)"), G("(-2,2)(-1,1)")}
+
 
 def double_coset(framework, perm):
     """Return the double coset of perm in the symmetry group of framework"""
     Z = framework.symmetry_group()
-    return { d1 * perm * d2 for d1 in Z for d2 in Z }
+    return {d1 * perm * d2 for d1 in Z for d2 in Z}
+
 
 def conjugacy_class(framework, perm):
     """Return the conjugacy class of perm in the symmetry group of framework"""
     Z = framework.symmetry_group()
-    return { d.inverse() * perm * d for d in Z }
+    return {d.inverse() * perm * d for d in Z}
+
 
 def single_coset(framework, perm):
     """Return the single coset of perm in the symmetry group of framework"""
     Z = framework.symmetry_group()
-    return { perm * d for d in Z }
+    return {perm * d for d in Z}
+
 
 def __representatives(framework, set_of_permutations, classes=CLASSES.double_cosets):
     if not framework.oriented:
@@ -174,13 +211,23 @@ def __representatives(framework, set_of_permutations, classes=CLASSES.double_cos
         cosets.append(coset)
     reps = set()
     for coset in cosets:
-        reps.add(sorted(list(coset), key=lambda x: (sum(set(x.cycle_type())), list(x.cycle_type()).count(2), str(x)) )[0])
+        reps.add(
+            sorted(
+                list(coset),
+                key=lambda x: (
+                    sum(set(x.cycle_type())),
+                    list(x.cycle_type()).count(2),
+                    str(x),
+                ),
+            )[0]
+        )
     return reps
+
 
 def all_inversions_representatives(framework, num_regions=None):
     """
     Return the representatives of all inversions in the symmetry group of framework
-    
+
     Args:
         framework (PositionParadigmFramework): The framework to create the transposition in
         num_regions (int, optional): The number of regions to invert. Defaults to None (all inversions).
@@ -188,13 +235,19 @@ def all_inversions_representatives(framework, num_regions=None):
     Returns:
         set: The set of representatives of all inversions in the symmetry group of framework
     """
-    return __representatives(framework, __all_canonical_inversions(framework, num_regions=num_regions), classes=CLASSES.double_cosets)
+    return __representatives(
+        framework,
+        __all_canonical_inversions(framework, num_regions=num_regions),
+        classes=CLASSES.double_cosets,
+    )
+
 
 def all_adjacent_transpositions_representatives(framework, num_regions=None):
     if num_regions == 2:
         return __two_region_adjacent_transposition_reps(framework)
     else:
         raise NotImplementedError(f"model not yet implemented")
+
 
 def permutation_with_cuts(framework, cuts, perm=None, start=None):
     """
@@ -213,26 +266,28 @@ def permutation_with_cuts(framework, cuts, perm=None, start=None):
         if not (framework.oriented and framework.symmetry == SYMMETRY.circular):
             raise NotImplementedError(f"not yet implemented for {str(framework)}")
         perm = {}
-        perm[1] = 1 # making the canonical instance
+        perm[1] = 1  # making the canonical instance
         results = permutation_with_cuts(cuts, perm, 2)
         for result in results:
             if result:
                 yield list(result.values())
-    else: # recurse
-        possibilities = set(range(1, n+1)) | set(range(-n, 0))
+    else:  # recurse
+        possibilities = set(range(1, n + 1)) | set(range(-n, 0))
         for val in perm.values():
             possibilities.remove(val)
             possibilities.remove(-val)
-        if start-1 in cuts:
-            if c(perm[start-1]) in possibilities: possibilities.remove(c(perm[start-1]))
+        if start - 1 in cuts:
+            if c(perm[start - 1]) in possibilities:
+                possibilities.remove(c(perm[start - 1]))
         else:
-            possibilities = possibilities & {c(perm[start-1])}
-        if start == n: # also check if *start* is a cut
+            possibilities = possibilities & {c(perm[start - 1])}
+        if start == n:  # also check if *start* is a cut
             if start in cuts:
                 # add exclusions
-                if start in possibilities: possibilities.remove(start) # p[1]=1 so we can't have p[n]=n
+                if start in possibilities:
+                    possibilities.remove(start)  # p[1]=1 so we can't have p[n]=n
             else:
-                possibilities = possibilities & {n} # we must choose n
+                possibilities = possibilities & {n}  # we must choose n
             for possibility in possibilities:
                 bperm = perm.copy()
                 bperm[start] = possibility
@@ -241,5 +296,5 @@ def permutation_with_cuts(framework, cuts, perm=None, start=None):
             for possibility in possibilities:
                 bperm = perm.copy()
                 bperm[start] = possibility
-                for result in permutation_with_cuts(cuts, bperm, start+1):
+                for result in permutation_with_cuts(cuts, bperm, start + 1):
                     yield result
