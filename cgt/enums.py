@@ -56,5 +56,6 @@ class IRREP_TYPE(Enum):
 class DISTANCE(Enum):
     min = minimum = auto()
     min_weighted = minimum_weighted = auto()
-    MFPT = min_first_passage_time = auto()
+    MFPT = mean_first_passage_time = auto()
     MLE = maximum_likelihood_distance = maximum_likelihood_estimate = auto()
+    discrete_MFPT = DMFPT = discrete_mean_first_passage_time = auto()

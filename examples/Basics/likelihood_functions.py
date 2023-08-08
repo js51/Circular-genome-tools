@@ -56,7 +56,7 @@ for i in range(dim):
             instance = next(instance_gen)
         except StopIteration:
             break
-        L = likelihood_function(framework, model, instance)
+        L = likelihood_function(framework, model, framework.cycles(framework.canonical_instance(instance)))
         times = np.arange(0, 25, 0.5)
         ax[i, j].plot(times, [L(t) for t in times], color='black')
         ax[i, j].set_title(str(framework.one_row(instance)))

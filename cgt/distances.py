@@ -37,7 +37,7 @@ def mles(framework, model, genome_instances=None, verbose=False):
     for instance in genome_instances:
         if verbose: print(f"Computing MLE for {instance}")
         mles[instance] = mle(framework, model, instance)
-        return mles
+    return mles
 
 def mle(framework, model, genome_instance):
     """
@@ -142,6 +142,31 @@ def _irreps_of_z(framework, model, force_recompute=False):
         model.data_bundle[key] = irreps_of_z
     return irreps_of_z
 
+def _irreps_of_s(framework, model, force_recompute=False):
+    """
+    Return a set of matrices---images of s (the model element) under each irrep
+    
+    Args:
+        framework (PositionParadigmFramework): the framework
+        model (Model): the model
+        force_recompute (bool): whether to force recomputation and invalidate cache (default: False)
+
+    Returns:
+        list: a list of irredicuble representations of the group applied to s
+    """
+    key = "irreps_of_s"
+    if key in model.data_bundle and not force_recompute:
+        irreps_of_s =  model.data_bundle[key]
+    else:
+        CDF, UCF = ComplexDoubleField(), UniversalCyclotomicField()
+        s = model.s_element()
+        irreps_of_s = framework.irreps(s)
+        irreps_of_s = (matrix(UCF, irrep_s) for irrep_s in irreps_of_s)
+        irreps_of_s = [Matrix(CDF, irrep_s) for irrep_s in irreps_of_s]
+        for irrep in irreps_of_s:
+            irrep.set_immutable()
+        model.data_bundle[key] = irreps_of_s
+    return irreps_of_s
 
 def _eigenvalues(mat, round_to=7, make_real=True, inc_repeated=False, use_numpy=True, bin_eigs=False, tol=10**(-8)):
     """Return all the eigenvalues for a given matrix mat"""
@@ -155,6 +180,71 @@ def _eigenvalues(mat, round_to=7, make_real=True, inc_repeated=False, use_numpy=
         return _bin(sorted(all_eigs), return_bin_size=False, tol=tol)
     else:
         return sorted(col(round(real(eig) if make_real else eig, round_to) for eig in all_eigs))
+    
+def probability_to_reach_in_steps(framework, model, sigma, k):
+    alpha = prob_to_reach_in_steps_func(framework, model, sigma)
+    return alpha(k)
+
+def prob_to_reach_in_steps_func(framework, model, sigma):
+    G, Z = framework.genome_group(), framework.symmetry_group()
+    instance = framework.cycles(sigma)
+    irreps = framework.irreps()
+    irreps_of_zs = _irreps_of_zs(framework, model)
+    irreps_of_z = _irreps_of_z(framework, model)
+    irreps_of_s = _irreps_of_s(framework, model)
+    if "eig_lists" in model.data_bundle:
+        eig_lists = model.data_bundle["eig_lists"]
+    else:
+        eig_lists = [_eigenvalues(irrep_zs) for irrep_zs in irreps_of_zs]
+        model.data_bundle["eig_lists"] = eig_lists
+    if "projections" in model.data_bundle:
+        projections = model.data_bundle["projections"]
+    else:
+        projections = [_projection_operators(*vals) for vals in zip(irreps_of_zs, eig_lists)]
+        model.data_bundle["projections"] = projections
+    traces = _partial_traces_for_genome(framework, instance, irreps, irreps_of_zs, projections, eig_lists, irreps_of_z)
+    dims = [irrep_of_zs.nrows() for irrep_of_zs in irreps_of_zs]
+    def prob_in_steps(k, _traces=traces, _dims=dims, _eig_lists=eig_lists):
+        alpha = 0
+        for (ptrace, dim, eig_list) in zip(traces.values(), dims, eig_lists):
+            term = 0
+            for e, eig in enumerate(eig_list):
+                term += ((eig**k) * ptrace[eig])
+            alpha += dim * term
+        return (Z.order()/G.order()) * alpha
+    return prob_in_steps
+
+def discrete_MFPT(framework, model, genome_reps=None, verbose=False):
+    if genome_reps is None:
+        genomes = list(framework.genomes().keys())
+        genome_reps = genomes
+    dists = {}
+    a_star = framework.symmetry_group().order()/framework.genome_group().order()
+    identity = framework.one_row(framework.genome_group().identity())
+    for instance in genome_reps:
+        if instance == identity:
+            dists[instance] = 0
+        else:
+            a = prob_to_reach_in_steps_func(framework, model, instance)
+            summands = [0]
+            a_values = [0]
+            k = 1
+            prod = 1
+            while True:
+                a_k = a(k)
+                a_values.append(a_k)
+                prod *= (1 - a_values[k-1])
+                summands.append(k * a_k * prod)
+                if abs(a_values[k] - a_values[k-1]) < 10**(-16) and abs(a_values[k] - a_star) < 10**(-16):
+                    if verbose: print(f'Terms {a_values[k]} and {a_values[k-1]} are close enough to {a_star}')
+                    break
+                k += 1
+            c = k
+            if verbose: print(f'Converged at {k=}')
+            adjustment_term = sum(j * a_star * (1-a_star)**j for j in range(0, c+1))
+            remaining_sum = ((prod * a_star)/((1-a_star)**(c+1))) * ( ((1-a_star)/(a_star**2)) - adjustment_term )
+            dists[instance] = sum(summands) + remaining_sum
+    return dists
 
 def _bin(eigenvalues, tol=10**(-8), return_bin_size=False):
     binned_eigenvals = []
@@ -201,7 +291,6 @@ def _partial_traces_for_genome(framework, instance, irreps, irreps_of_zs, projec
 def likelihood_function(framework, model, genome):
     """Return the likelihood function for a given genome"""
     instance = framework.cycles(genome)
-    CDF = ComplexDoubleField()
     G, Z = framework.genome_group(), framework.symmetry_group()
     irreps = framework.irreps()
     irreps_of_zs = _irreps_of_zs(framework, model)
@@ -221,7 +310,7 @@ def likelihood_function(framework, model, genome):
     def likelihood(t):
         ans = 0
         for r, dim in enumerate(dims):
-            ans += Z.order()*(exp(-t)/G.order())*dim*sum(exp(eigenvalue*CDF(t)) * traces[r][eigenvalue] for eigenvalue in eig_lists[r])
+            ans += Z.order()*(exp(-t)/G.order())*dim*sum(exp(eigenvalue*t) * traces[r][eigenvalue] for eigenvalue in eig_lists[r])
         return real(ans)
     return likelihood
 
@@ -238,6 +327,21 @@ def min_distance(framework, model, genome_reps=None, weighted=False):
         rep : nx.shortest_path_length(graph, source=0, target=genomes.index(rep), weight='weight' if weighted else None) 
         for r, rep in enumerate(genome_reps) 
     }
+
+def min_distance_using_irreps(framework, model, genome_reps=None):
+    num_genomes = int(framework.genome_group().order()/framework.symmetry_group().order())
+    if genome_reps is None:
+        genomes = list(framework.genomes().keys())
+        genome_reps = genomes
+    dists = {}
+    for rep in genome_reps:
+        a = prob_to_reach_in_steps_func(framework, model, rep)
+        for k in range(0, num_genomes):
+            if a(k) > 10**(-8):
+                dists[rep] = k
+                break
+    return dists
+
 
 def MFPT(framework, model, genome_reps=None, scale_by=1):
     """Return the mean time elapsed rearranging ref->genome where the target is an absorbing state"""
@@ -272,6 +376,17 @@ def dict_to_distance_matrix(distances, framework, genomes=None):
             D[i,j] = distance
     return D
 
+def genomes_for_dist_matrix(framework, genomes):
+    instances = [framework.canonical_instance(g) for g in genomes]
+    # Get the genomes g that we need dist(id -> g) for:
+    need_distances = {}
+    for i, _ in enumerate(genomes):
+        for j, _ in enumerate(genomes):
+            if i < j:
+                canonical_i, canonical_j = instances[i], instances[j]
+                need_distances[(i, j)] = canonical_i.inverse() * canonical_j
+    return need_distances
+
 def distance_matrix(framework, model, genomes, distance):
     """
     Compute a distance matrix for a given set of genomes and distance measure.
@@ -282,21 +397,16 @@ def distance_matrix(framework, model, genomes, distance):
         genomes (list): a list of genomes to compute distances for
         distance (DISTANCE): the distance measure to use
     """
-    instances = [framework.canonical_instance(g) for g in genomes]
-    # Get the genomes g that we need dist(id -> g) for:
-    need_distances = {}
-    for i, _ in enumerate(genomes):
-        for j, _ in enumerate(genomes):
-            if i < j:
-                canonical_i, canonical_j = instances[i], instances[j]
-                need_distances[(i, j)] = canonical_i.inverse() * canonical_j
+    need_distances = genomes_for_dist_matrix(framework, genomes)
     pairs, need_distances = map(list, zip(*need_distances.items()))
 
     # Compute the distances:
     if distance == DISTANCE.MFPT:
         distances = MFPT(framework, model, genome_reps=need_distances)
+    elif distance == DISTANCE.discrete_MFPT:
+        distances = discrete_MFPT(framework, model, genome_reps=need_distances)
     elif distance == DISTANCE.min:
-        distances = min_distance(framework, model, genome_reps=need_distances)
+        distances = min_distance_using_irreps(framework, model, genome_reps=need_distances)
     elif distance == DISTANCE.min_weighted:
         distances = min_distance(framework, model, genome_reps=need_distances, weighted=True)
     elif distance == DISTANCE.MLE:
