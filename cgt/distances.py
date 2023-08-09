@@ -387,7 +387,7 @@ def genomes_for_dist_matrix(framework, genomes):
                 need_distances[(i, j)] = canonical_i.inverse() * canonical_j
     return need_distances
 
-def distance_matrix(framework, model, genomes, distance):
+def distance_matrix(framework, model, genomes, distance, replace_nan_with=np.nan):
     """
     Compute a distance matrix for a given set of genomes and distance measure.
 
@@ -417,4 +417,7 @@ def distance_matrix(framework, model, genomes, distance):
     for p, (i, j) in enumerate(pairs):
         D[i,j] = distances[need_distances[p]]
     
+    if replace_nan_with != np.nan:
+        D[np.isnan(D)] = replace_nan_with
+
     return D
