@@ -66,7 +66,7 @@ def transposition(framework, sec_1, sec_2, inv_1=False, inv_2=False, revrev=Fals
         return (end - start - 1) % n + 1
 
     def mid(start, end):
-        return (start + floor(length(start, end) / 2) - 1) % n + 1
+        return ((start + floor((length(start, end)-1)/2) - 1) % n) + 1
 
     if sec_1[1] != sec_2[0]:
         raise ValueError("sections must be adjacent")
