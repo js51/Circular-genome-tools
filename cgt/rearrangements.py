@@ -7,7 +7,6 @@ import warnings
 from . import structures
 from .enums import *
 
-
 def signed_inversion(framework, about_position, length):
     """
     Return an instance of the inversion that inverts a segment in a genome.
@@ -23,17 +22,18 @@ def signed_inversion(framework, about_position, length):
     if not framework.oriented or framework.symmetry != SYMMETRY.circular:
         raise NotImplementedError(f"not yet implemented for {str(framework)}")
     n = framework.n
-    r = (about_position - 2) % n + 1
+    r = about_position
     string_rep = ""
     if length % 2 == 0:
         k = length / 2
         for i in range(1, k + 1):
-            string_rep += f"({(r-(i-1)-1) % n + 1}, {-((r+i-1) % n + 1)})({-((r-(i-1)-1) % n + 1)}, {(r+i-1) % n + 1})"
+            string_rep += f"({(r-(i-1)) % n}, -{(r+i) % n})(-{(r-(i-1)) % n}, {(r+i) % n})"
     else:
         k = (length - 1) / 2
         string_rep += f"({about_position},{-about_position})"
         for i in range(1, k + 1):
-            string_rep += f"({(r-(i-1)-1) % n + 1},{-((r+(i+1)-1) % n + 1)})({-((r-(i-1)-1) % n + 1)},{(r+(i+1)-1) % n + 1})"
+            string_rep += f"({(r-i) % n},-{(r+i) % n})(-{(r-i) % n},{(r+i) % n})"
+    string_rep = string_rep.replace("0", str(n))
     return framework.cycles(string_rep)
 
 
