@@ -249,6 +249,10 @@ class PositionParadigmFramework:
             genomes = dict(sorted(genomes.items(), key=lambda x: self._sort_key(x[0])))
         return genomes
 
+    def genome_canonical_instances(self):
+        """Return a dictionary of genomes with their canonical instances"""
+        return {self.one_row(elt) for elt in self.genome_group() if elt(1) == 1}
+
     def standard_reflection(self):
         """Return a permutation which reflects a genome instance about the center region (n odd), or the center two regions (n even)."""
         if self.oriented:
