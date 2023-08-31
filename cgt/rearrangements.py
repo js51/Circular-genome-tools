@@ -289,6 +289,8 @@ def __representatives(framework, set_of_permutations, classes=CLASSES.double_cos
         )
     return reps
 
+representatives = __representatives
+
 
 def all_inversions_representatives(framework, num_regions=None):
     """

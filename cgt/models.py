@@ -70,8 +70,8 @@ class Model:
                     model[generator] = relative_prob/len(gens)
 
             if model_name is MODEL.all_transpositions:
-                gens = rearrangements.all_canonical_transposition_instances(framework)
-                gens = rearrangements.__representatives(framework, gens)
+                gens = rearrangements.all_transposition_instances(framework)
+                gens = rearrangements.representatives(framework, gens)
                 for generator in gens:
                     model[generator] = relative_prob/len(gens)
 
