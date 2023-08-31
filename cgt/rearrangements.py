@@ -114,6 +114,37 @@ def transposition(framework, sec_1, sec_2, inv_1=False, inv_2=False, revrev=Fals
     return left_inversion * right_inversion * full_inversion
 
 
+def all_transposition_instances(framework):
+    """
+    Return all instances that represent a transposition of the given length
+
+    Args:
+        framework (PositionParadigmFramework): The framework to create the transposition in
+    Returns:
+        set: The set of all instances that represent a transposition
+    """
+    if not framework.oriented or framework.symmetry != SYMMETRY.circular:
+        raise NotImplementedError(f"not yet implemented for {str(framework)}")
+
+    n = framework.n
+    rearrangements = set()
+
+    for full_length in range(2,n): # Scope of the rearrangement
+        for start in range(1, n+1): # Start of first segment
+            for l1 in range(1, full_length): # Length of first segment
+                l2 = full_length - l1 # length of second segment
+                middle = (start + l1 - 1) % n + 1
+                end = (middle + l2 - 1) % n + 1
+                s, m, e = start, middle, end
+                possible_transpositions = {
+                    transposition(framework, (s, m), (m, e)),
+                    transposition(framework, (s, m), (m, e), inv_1=True),
+                    transposition(framework, (s, m), (m, e), inv_2=True)
+                }
+                rearrangements = rearrangements.union(possible_transpositions)
+
+    return rearrangements
+
 def c_perm(n):
     """Return the permutation (1,...,n)(-n,...,1))"""
     pmN = structures.set_plus_minus(n)
