@@ -7,6 +7,7 @@ import warnings
 from . import structures
 from .enums import *
 
+
 def inversion(framework, about_position, length):
     """
     Return an instance of the inversion that inverts a segment in a genome.
@@ -25,18 +26,46 @@ def inversion(framework, about_position, length):
     r = about_position
     string_rep = ""
     if length % 2 == 0:
-        k = length / 2
+        k = int(length / 2)
         for i in range(1, k + 1):
-            string_rep += f"({(r-(i-1)) % n}, -{(r+i) % n})(-{(r-(i-1)) % n}, {(r+i) % n})"
+            string_rep += (
+                f"({(r-(i-1)) % n}, -{(r+i) % n})(-{(r-(i-1)) % n}, {(r+i) % n})"
+            )
     else:
-        k = (length - 1) / 2
+        k = int((length - 1) / 2)
         string_rep += f"({about_position},{-about_position})"
         for i in range(1, k + 1):
             string_rep += f"({(r-i) % n},-{(r+i) % n})(-{(r-i) % n},{(r+i) % n})"
     string_rep = string_rep.replace("0", str(n))
     return framework.cycles(string_rep)
 
-signed_inversion = inversion # old name
+
+signed_inversion = inversion  # old name
+
+
+def all_inversion_instances(framework, length=None):
+    """
+    Return all instances that represent an inversion of the given length
+
+    Args:
+        framework (PositionParadigmFramework): The framework to create the inversion in
+        length (int, optional): The length of the inversion. Defaults to None (all inversions).
+
+    Returns:
+        set: The set of all instances that represent an inversion of the given length
+    """
+    if not framework.oriented or framework.symmetry != SYMMETRY.circular:
+        raise NotImplementedError(f"not yet implemented for {str(framework)}")
+
+    n = framework.n
+    rearrangements = []
+
+    for r in range(1, n + 1):
+        for l in (length,) if length is not None else range(1, n + 1):
+            rearrangements.append(inversion(framework, r, l))
+
+    return rearrangements
+
 
 def transposition(framework, sec_1, sec_2, inv_1=False, inv_2=False, revrev=False):
     """
@@ -55,7 +84,9 @@ def transposition(framework, sec_1, sec_2, inv_1=False, inv_2=False, revrev=Fals
     if not framework.oriented or framework.symmetry != SYMMETRY.circular:
         raise NotImplementedError(f"not yet implemented for {str(framework)}")
     if all((inv_1, inv_2)) and not revrev:
-        raise ValueError("for circular genomes, inverting both segments is not allowed. Explicitly allow revrevs by setting allow_revrev=True")
+        raise ValueError(
+            "for circular genomes, inverting both segments is not allowed. Explicitly allow revrevs by setting allow_revrev=True"
+        )
     if revrev:
         if not all((inv_1, inv_2)):
             raise ValueError("revrevs are only allowed if both segments are inverted")
@@ -63,24 +94,20 @@ def transposition(framework, sec_1, sec_2, inv_1=False, inv_2=False, revrev=Fals
             inv_1 = inv_2 = False
     n = framework.n
 
-    def length(start, end):
-        return (end - start - 1) % n + 1
-
-    def mid(start, end):
-        return ((start + floor((length(start, end)-1)/2) - 1) % n) + 1
-
     if sec_1[1] != sec_2[0]:
         raise ValueError("sections must be adjacent")
-    full_inversion = signed_inversion(
-        framework, mid(sec_1[0], sec_2[1]), length(sec_1[0], sec_2[1])
-    ) if not revrev else framework.cycles("()")
+    full_inversion = (
+        signed_inversion(framework, segment_midpoint(n, sec_1[0], sec_2[1]), segment_length(n, sec_1[0], sec_2[1]))
+        if not revrev
+        else framework.cycles("()")
+    )
     left_inversion = (
-        signed_inversion(framework, mid(*sec_1), length(*sec_1))
+        signed_inversion(framework, segment_midpoint(n, *sec_1), segment_length(n, *sec_1))
         if not inv_1
         else framework.cycles("()")
     )
     right_inversion = (
-        signed_inversion(framework, mid(*sec_2), length(*sec_2))
+        signed_inversion(framework, segment_midpoint(n, *sec_2), segment_length(n, *sec_2))
         if not inv_2
         else framework.cycles("()")
     )
@@ -192,6 +219,13 @@ def single_coset(framework, perm):
     Z = framework.symmetry_group()
     return {perm * d for d in Z}
 
+def segment_length(n, start, end):
+    """Return the length of the segment from start to end"""
+    return (end - start - 1) % n + 1
+
+def segment_midpoint(n, start, end):
+    """Return the midpoint of the segment from start to end"""
+    return ((start + floor((segment_length(n,start, end) - 1) / 2) - 1) % n) + 1
 
 def __representatives(framework, set_of_permutations, classes=CLASSES.double_cosets):
     if not framework.oriented:

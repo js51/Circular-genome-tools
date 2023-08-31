@@ -47,23 +47,28 @@ class Model:
         model = {}
         if abs(sum(named_model_dictionary.values()) - 1) > 0.00001: 
             raise ValueError("supplied probabilities do not sum to 1")
+        
         for model_name, relative_prob in named_model_dictionary.items():
             if model_name is MODEL.one_region_inversions:
                 gens = rearrangements.all_inversions_representatives(framework, num_regions=1)
                 for generator in gens:
                     model[generator] = relative_prob/len(gens)
+
             if model_name is MODEL.two_region_inversions:
                 gens = rearrangements.all_inversions_representatives(framework, num_regions=2)
                 for generator in gens:
                     model[generator] = relative_prob/len(gens)
+
             if model_name is MODEL.all_inversions:
                 gens = rearrangements.all_inversions_representatives(framework)
                 for generator in gens:
                     model[generator] = relative_prob/len(gens)
+
             if model_name is MODEL.two_region_adjacent_transpositions:
                 gens = rearrangements.all_adjacent_transpositions_representatives(framework, num_regions=2)
                 for generator in gens:
                     model[generator] = relative_prob/len(gens)
+
         model = cls(framework, model)
         model.names += list(named_model_dictionary.keys())
         return model
@@ -73,26 +78,6 @@ class Model:
         if self._reg_rep_of_zs is None:
             self._reg_rep_of_zs = self.framework.reg_rep_of_zs(self, sparse=True)
         return self._reg_rep_of_zs
-    
-    def reg_rep(self):
-        fw = self.framework
-        A = fw.group_algebra()
-        s = A(self.s_element())
-        z = A(fw.symmetry_element())
-
-        genomes = fw.genomes(format=FORMAT.formal_sum)
-        
-        model_generators_cycles = list(self.generating_dictionary.keys())
-        model_generators = [ fw.one_row(elt) for elt in model_generators_cycles ]
-
-        num_genomes = len(genomes.keys())
-        
-        matrix = dok((num_genomes, num_genomes), dtype=np.float32)
-        
-        for g, genome in enumerate(genomes.values()):
-            zszo = A(genome) * z * s * z
-            print(fw.collect_genome_terms(zszo))
-    
     
     def s_element(self, in_algebra=ALGEBRA.genome):
         if in_algebra not in {ALGEBRA.group, ALGEBRA.genome}:
