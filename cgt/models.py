@@ -69,6 +69,12 @@ class Model:
                 for generator in gens:
                     model[generator] = relative_prob/len(gens)
 
+            if model_name is MODEL.all_transpositions:
+                gens = rearrangements.all_canonical_transposition_instances(framework)
+                gens = rearrangements.__representatives(framework, gens)
+                for generator in gens:
+                    model[generator] = relative_prob/len(gens)
+
         model = cls(framework, model)
         model.names += list(named_model_dictionary.keys())
         return model
