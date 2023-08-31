@@ -7,7 +7,7 @@ import warnings
 from . import structures
 from .enums import *
 
-def signed_inversion(framework, about_position, length):
+def inversion(framework, about_position, length):
     """
     Return an instance of the inversion that inverts a segment in a genome.
 
@@ -36,6 +36,7 @@ def signed_inversion(framework, about_position, length):
     string_rep = string_rep.replace("0", str(n))
     return framework.cycles(string_rep)
 
+signed_inversion = inversion # old name
 
 def transposition(framework, sec_1, sec_2, inv_1=False, inv_2=False, revrev=False):
     """
