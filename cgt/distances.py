@@ -191,7 +191,6 @@ def prob_to_reach_in_steps_func(framework, model, sigma):
     irreps = framework.irreps()
     irreps_of_zs = _irreps_of_zs(framework, model)
     irreps_of_z = _irreps_of_z(framework, model)
-    irreps_of_s = _irreps_of_s(framework, model)
     if "eig_lists" in model.data_bundle:
         eig_lists = model.data_bundle["eig_lists"]
     else:
