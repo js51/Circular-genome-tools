@@ -62,9 +62,9 @@ class Model:
             # Transpositions
             elif model_name is MODEL.all_transpositions:
                 gens = rearrangements.all_transposition_instances(framework, canonical_reps_only = True)
-            elif model_name is MODEL.two_region_swaps:
+            elif model_name is MODEL.two_region_transpositions:
                 gens = rearrangements.all_transposition_instances(framework, scope_limit = 2, canonical_reps_only = True)
-            elif model_name is MODEL.two_region_swaps_without_inversions:
+            elif model_name is MODEL.two_region_transpositions_without_inversions:
                 gens = rearrangements.all_transposition_instances(framework, scope_limit = 2, with_inversion = False, canonical_reps_only = True)
             elif model_name is MODEL.two_region_revrevs:
                 gens = rearrangements.all_transposition_instances(framework, scope_limit = 2, only_revrevs = True, canonical_reps_only = True)
@@ -74,6 +74,8 @@ class Model:
                 gens = rearrangements.all_transposition_instances(framework, single_segment_limit = 1, with_inversion = False, canonical_reps_only = True)
             elif model_name is MODEL.three_region_transpositions:
                 gens = rearrangements.all_transposition_instances(framework, scope_limit = 3, canonical_reps_only = True)
+            elif model_name is MODEL.two_region_adjacent_transpositions:
+                gens = rearrangements.all_adjacent_transpositions_representatives(framework, num_regions=2)
             
             for generator in gens: 
                 model[generator] = relative_prob/len(gens)

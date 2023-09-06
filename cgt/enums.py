@@ -5,21 +5,21 @@ from enum import Enum, auto
 
 class MODEL(Enum):
     # Inversions
-    all_inversions		   = "all inversions"
+    all_inversions         = "all inversions"
     one_region_inversions  = "inversions of a single region"
     two_region_inversions  = "inversions of two adjacent regions"
-
     # Transpositions
     all_transpositions  = "all transpositions"
     ## "Swap" interpretation
-    two_region_swaps    = "Two region adjacent transpositions, with or without inversion"
-    two_region_swaps_without_inversions = "Two region adjacent transpositions, without inversion"
-    two_region_revrevs = "Take two ajacent regions and invert both of them"
-    # "Move" interpretation
+    two_region_transpositions    = "Two region adjacent transpositions, with or without inversion"
+    two_region_transpositions_without_inversions = "Two region adjacent transpositions, without inversion"
+    two_region_revrevs = "Take two adjacent regions and invert both of them"
+    ## "Move" interpretation
     one_region_moves  = "Move a single region, with or without inversion"
     one_region_moves_without_inversions  = "Move a single region, without inversion"
     # Other transpositions
-    three_region_transpositions = "transpositions involving a segment of three regionsm, with or without inversion"
+    three_region_transpositions = "transpositions involving a segment of three regions, with or without inversion"
+
 
     # Deprecated options
     two_region_adjacent_transpositions = "transpositions of two adjacent regions"
