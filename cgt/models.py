@@ -6,6 +6,7 @@ from .enums import *
 from . import rearrangements
 from scipy.sparse import dok_matrix as dok
 import numpy as np
+from warnings import warn
 
 
 class Model:
@@ -49,31 +50,33 @@ class Model:
             raise ValueError("supplied probabilities do not sum to 1")
         
         for model_name, relative_prob in named_model_dictionary.items():
-            if model_name is MODEL.one_region_inversions:
-                gens = rearrangements.all_inversions_representatives(framework, num_regions=1)
-                for generator in gens:
-                    model[generator] = relative_prob/len(gens)
 
-            if model_name is MODEL.two_region_inversions:
-                gens = rearrangements.all_inversions_representatives(framework, num_regions=2)
-                for generator in gens:
-                    model[generator] = relative_prob/len(gens)
-
+            # Inversions
             if model_name is MODEL.all_inversions:
                 gens = rearrangements.all_inversions_representatives(framework)
-                for generator in gens:
-                    model[generator] = relative_prob/len(gens)
+            elif model_name is MODEL.one_region_inversions:
+                gens = rearrangements.all_inversions_representatives(framework, num_regions=1)
+            elif model_name is MODEL.two_region_inversions:
+                gens = rearrangements.all_inversions_representatives(framework, num_regions=2)
 
-            if model_name is MODEL.two_region_adjacent_transpositions:
-                gens = rearrangements.all_adjacent_transpositions_representatives(framework, num_regions=2)
-                for generator in gens:
-                    model[generator] = relative_prob/len(gens)
-
-            if model_name is MODEL.all_transpositions:
-                gens = rearrangements.all_transposition_instances(framework)
-                gens = rearrangements.representatives(framework, gens)
-                for generator in gens:
-                    model[generator] = relative_prob/len(gens)
+            # Transpositions
+            elif model_name is MODEL.all_transpositions:
+                gens = rearrangements.all_transposition_instances(framework, canonical_reps_only = True)
+            elif model_name is MODEL.two_region_swaps:
+                gens = rearrangements.all_transposition_instances(framework, scope_limit = 2, canonical_reps_only = True)
+            elif model_name is MODEL.two_region_swaps_without_inversions:
+                gens = rearrangements.all_transposition_instances(framework, scope_limit = 2, with_inversion = False, canonical_reps_only = True)
+            elif model_name is MODEL.two_region_revrevs:
+                gens = rearrangements.all_transposition_instances(framework, scope_limit = 2, only_revrevs = True, canonical_reps_only = True)
+            elif model_name is MODEL.one_region_moves:
+                gens = rearrangements.all_transposition_instances(framework, single_segment_limit = 1, canonical_reps_only = True)
+            elif model_name is MODEL.one_region_moves_without_inversions:
+                gens = rearrangements.all_transposition_instances(framework, single_segment_limit = 1, with_inversion = False, canonical_reps_only = True)
+            elif model_name is MODEL.three_region_transpositions:
+                gens = rearrangements.all_transposition_instances(framework, scope_limit = 3, canonical_reps_only = True)
+            
+            for generator in gens: 
+                model[generator] = relative_prob/len(gens)
 
         model = cls(framework, model)
         model.names += list(named_model_dictionary.keys())

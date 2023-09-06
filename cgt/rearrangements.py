@@ -114,7 +114,8 @@ def transposition(framework, sec_1, sec_2, inv_1=False, inv_2=False, revrev=Fals
     return left_inversion * right_inversion * full_inversion
 
 
-def all_transposition_instances(framework):
+def all_transposition_instances(
+        framework, scope_limit = None, single_segment_limit = None, with_inversion = True, include_revrevs = False, only_revrevs=False, canonical_reps_only = False):
     """
     Return all instances that represent a transposition of the given length
 
@@ -129,19 +130,36 @@ def all_transposition_instances(framework):
     n = framework.n
     rearrangements = set()
 
-    for full_length in range(2,n): # Scope of the rearrangement
+    if scope_limit is None:
+        scope_limit = (n-1)
+
+    for full_length in range(2, scope_limit + 1): # Scope of the rearrangement
         for start in range(1, n+1): # Start of first segment
-            for l1 in range(1, full_length): # Length of first segment
+
+            if single_segment_limit is not None:
+                first_segment_lengths = list(range(1, single_segment_limit + 1)) + list(range(full_length - single_segment_limit, full_length))
+            else:
+                first_segment_lengths = range(1, full_length)
+
+            for l1 in first_segment_lengths: # Length of first segment
                 l2 = full_length - l1 # length of second segment
                 middle = (start + l1 - 1) % n + 1
                 end = (middle + l2 - 1) % n + 1
                 s, m, e = start, middle, end
-                possible_transpositions = {
-                    transposition(framework, (s, m), (m, e)),
-                    transposition(framework, (s, m), (m, e), inv_1=True),
-                    transposition(framework, (s, m), (m, e), inv_2=True)
-                }
+                possible_transpositions = { transposition(framework, (s, m), (m, e)) } if not only_revrevs else set()
+                if with_inversion and not only_revrevs:
+                    possible_transpositions |= {
+                        transposition(framework, (s, m), (m, e), inv_1=True),
+                        transposition(framework, (s, m), (m, e), inv_2=True)
+                    }
+                if include_revrevs or only_revrevs:
+                    possible_transpositions |= {
+                        transposition(framework, (s, m), (m, e), inv_1=True, inv_2=True, revrev=True)
+                    }
                 rearrangements = rearrangements.union(possible_transpositions)
+
+    if canonical_reps_only:
+        rearrangements = __representatives(framework, rearrangements, prioritise_string_length=True)
 
     return rearrangements
 
@@ -258,7 +276,7 @@ def segment_midpoint(n, start, end):
     """Return the midpoint of the segment from start to end"""
     return ((start + floor((segment_length(n,start, end) - 1) / 2) - 1) % n) + 1
 
-def __representatives(framework, set_of_permutations, classes=CLASSES.double_cosets):
+def __representatives(framework, set_of_permutations, classes=CLASSES.double_cosets, prioritise_string_length=False):
     if not framework.oriented:
         raise NotImplementedError(f"not yet implemented for {str(framework)}")
     Z = framework.symmetry_group()
@@ -276,15 +294,22 @@ def __representatives(framework, set_of_permutations, classes=CLASSES.double_cos
             perms.discard(element)
         cosets.append(coset)
     reps = set()
+
+    if prioritise_string_length:
+        sort_key = lambda x: (len(str(x).replace('-','')), str(x))
+
+    else:
+        sort_key = lambda x: (
+            sum(set(x.cycle_type()) - {1}),
+            list(x.cycle_type()).count(2),
+            str(x),
+        )
+
     for coset in cosets:
         reps.add(
             sorted(
                 list(coset),
-                key=lambda x: (
-                    sum(set(x.cycle_type())),
-                    list(x.cycle_type()).count(2),
-                    str(x),
-                ),
+                key=sort_key,
             )[0]
         )
     return reps
