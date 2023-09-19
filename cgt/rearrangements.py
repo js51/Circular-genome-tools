@@ -1,11 +1,10 @@
 """
-"""
 
+"""
 from copy import deepcopy
-from sage.all_cmdline import SymmetricGroup, floor, ceil
-import warnings
+from sage.all_cmdline import SymmetricGroup, floor
 from . import structures
-from .enums import *
+from .enums import CLASSES, SYMMETRY
 
 
 def inversion(framework, about_position, length):
@@ -97,17 +96,25 @@ def transposition(framework, sec_1, sec_2, inv_1=False, inv_2=False, revrev=Fals
     if sec_1[1] != sec_2[0]:
         raise ValueError("sections must be adjacent")
     full_inversion = (
-        signed_inversion(framework, segment_midpoint(n, sec_1[0], sec_2[1]), segment_length(n, sec_1[0], sec_2[1]))
+        signed_inversion(
+            framework,
+            segment_midpoint(n, sec_1[0], sec_2[1]),
+            segment_length(n, sec_1[0], sec_2[1]),
+        )
         if not revrev
         else framework.cycles("()")
     )
     left_inversion = (
-        signed_inversion(framework, segment_midpoint(n, *sec_1), segment_length(n, *sec_1))
+        signed_inversion(
+            framework, segment_midpoint(n, *sec_1), segment_length(n, *sec_1)
+        )
         if not inv_1
         else framework.cycles("()")
     )
     right_inversion = (
-        signed_inversion(framework, segment_midpoint(n, *sec_2), segment_length(n, *sec_2))
+        signed_inversion(
+            framework, segment_midpoint(n, *sec_2), segment_length(n, *sec_2)
+        )
         if not inv_2
         else framework.cycles("()")
     )
@@ -115,7 +122,14 @@ def transposition(framework, sec_1, sec_2, inv_1=False, inv_2=False, revrev=Fals
 
 
 def all_transposition_instances(
-        framework, scope_limit = None, single_segment_limit = None, with_inversion = True, include_revrevs = False, only_revrevs=False, canonical_reps_only = False):
+    framework,
+    scope_limit=None,
+    single_segment_limit=None,
+    with_inversion=True,
+    include_revrevs=False,
+    only_revrevs=False,
+    canonical_reps_only=False,
+):
     """
     Return all instances that represent a transposition of the given length
 
@@ -131,37 +145,53 @@ def all_transposition_instances(
     rearrangements = set()
 
     if scope_limit is None:
-        scope_limit = (n-1)
+        scope_limit = n - 1
 
-    for full_length in range(2, scope_limit + 1): # Scope of the rearrangement
-        for start in range(1, n+1): # Start of first segment
-
+    for full_length in range(2, scope_limit + 1):  # Scope of the rearrangement
+        for start in range(1, n + 1):  # Start of first segment
             if single_segment_limit is not None:
-                first_segment_lengths = list(range(1, single_segment_limit + 1)) + list(range(full_length - single_segment_limit, full_length))
+                first_segment_lengths = sum(
+                    list(range(1, single_segment_limit + 1)),
+                    list(range(full_length - single_segment_limit, full_length)),
+                )
             else:
                 first_segment_lengths = range(1, full_length)
 
-            for l1 in first_segment_lengths: # Length of first segment
-                l2 = full_length - l1 # length of second segment
+            for l1 in first_segment_lengths:  # Length of first segment
+                l2 = full_length - l1  # length of second segment
                 middle = (start + l1 - 1) % n + 1
                 end = (middle + l2 - 1) % n + 1
                 s, m, e = start, middle, end
-                possible_transpositions = { transposition(framework, (s, m), (m, e)) } if not only_revrevs else set()
+                possible_transpositions = (
+                    {transposition(framework, (s, m), (m, e))}
+                    if not only_revrevs
+                    else set()
+                )
                 if with_inversion and not only_revrevs:
                     possible_transpositions |= {
                         transposition(framework, (s, m), (m, e), inv_1=True),
-                        transposition(framework, (s, m), (m, e), inv_2=True)
+                        transposition(framework, (s, m), (m, e), inv_2=True),
                     }
                 if include_revrevs or only_revrevs:
                     possible_transpositions |= {
-                        transposition(framework, (s, m), (m, e), inv_1=True, inv_2=True, revrev=True)
+                        transposition(
+                            framework,
+                            (s, m),
+                            (m, e),
+                            inv_1=True,
+                            inv_2=True,
+                            revrev=True,
+                        )
                     }
                 rearrangements = rearrangements.union(possible_transpositions)
 
     if canonical_reps_only:
-        rearrangements = __representatives(framework, rearrangements, prioritise_string_length=True)
+        rearrangements = __representatives(
+            framework, rearrangements, prioritise_string_length=True
+        )
 
     return rearrangements
+
 
 def c_perm(n):
     """Return the permutation (1,...,n)(-n,...,1))"""
@@ -217,7 +247,7 @@ def __all_canonical_inversions(framework, num_regions=None):
             if framework.symmetry is not SYMMETRY.linear:
                 perms.union({G(f"(1,{n})")})
         return perms
-    elif num_regions == None:  # Return all inversions up to length floor(n/2)
+    elif num_regions is None:  # Return all inversions up to length floor(n/2)
         up_to_length = floor(framework.n / 2)
         if framework.oriented:
             perms = set()
@@ -268,15 +298,23 @@ def single_coset(framework, perm):
     Z = framework.symmetry_group()
     return {perm * d for d in Z}
 
+
 def segment_length(n, start, end):
     """Return the length of the segment from start to end"""
     return (end - start - 1) % n + 1
 
+
 def segment_midpoint(n, start, end):
     """Return the midpoint of the segment from start to end"""
-    return ((start + floor((segment_length(n,start, end) - 1) / 2) - 1) % n) + 1
+    return ((start + floor((segment_length(n, start, end) - 1) / 2) - 1) % n) + 1
 
-def __representatives(framework, set_of_permutations, classes=CLASSES.double_cosets, prioritise_string_length=False):
+
+def __representatives(
+    framework,
+    set_of_permutations,
+    classes=CLASSES.double_cosets,
+    prioritise_string_length=False,
+):
     if not framework.oriented:
         raise NotImplementedError(f"not yet implemented for {str(framework)}")
     Z = framework.symmetry_group()
@@ -296,7 +334,7 @@ def __representatives(framework, set_of_permutations, classes=CLASSES.double_cos
     reps = set()
 
     if prioritise_string_length:
-        sort_key = lambda x: (len(str(x).replace('-','')), str(x))
+        sort_key = lambda x: (len(str(x).replace("-", "")), str(x))
 
     else:
         sort_key = lambda x: (
@@ -313,6 +351,7 @@ def __representatives(framework, set_of_permutations, classes=CLASSES.double_cos
             )[0]
         )
     return reps
+
 
 representatives = __representatives
 
@@ -339,7 +378,7 @@ def all_adjacent_transpositions_representatives(framework, num_regions=None):
     if num_regions == 2:
         return __two_region_adjacent_transposition_reps(framework)
     else:
-        raise NotImplementedError(f"model not yet implemented")
+        raise NotImplementedError("model not yet implemented")
 
 
 def permutation_with_cuts(framework, cuts, perm=None, start=None):

@@ -15,6 +15,7 @@ from scipy.sparse import dok_matrix as dok
 from random import choice
 from .hyperoctahedral import HyperoctahedralGroupRepresentations
 
+
 class PositionParadigmFramework:
     """Everything you need for working with genomes under the position paradigm"""
 
