@@ -18,7 +18,7 @@ import networkx as nx
 from sage.all import ComplexDoubleField, UniversalCyclotomicField, matrix, Matrix, real, exp, round, CC, log
 from scipy.optimize import minimize_scalar
 
-def mles(framework, model, genome_instances=None, verbose=False):
+def mles(framework, model, genome_instances=None, verbose=False, show_work=False):
     """
     Returns a dictionary of maximum likelihood estimates for each genome instance under the given model and framework.
 
@@ -36,10 +36,10 @@ def mles(framework, model, genome_instances=None, verbose=False):
         genome_instances = [framework.canonical_instance(g) for g in framework.genomes()]
     for instance in genome_instances:
         if verbose: print(f"Computing MLE for {instance}")
-        mles[instance] = mle(framework, model, instance)
+        mles[instance] = mle(framework, model, instance, show_work=show_work)
     return mles
 
-def mle(framework, model, genome_instance):
+def mle(framework, model, genome_instance, show_work=False):
     """
     Returns the maximum likelihood estimate for a given genome instance under the given model and framework.
 
@@ -51,7 +51,12 @@ def mle(framework, model, genome_instance):
     Returns:
         float: the maximum likelihood estimate
     """
-    return maximise(framework, likelihood_function(framework, model, genome_instance))
+    L = likelihood_function(framework, model, genome_instance)
+    max_t = maximise(framework, L)
+    if show_work:
+        return max_t, L
+    else:
+        return max_t
 
 def maximise(framework, L, max_time=100):
     """
@@ -386,7 +391,7 @@ def genomes_for_dist_matrix(framework, genomes):
                 need_distances[(i, j)] = canonical_i.inverse() * canonical_j
     return need_distances
 
-def distance_matrix(framework, model, genomes, distance, replace_nan_with=np.nan, verbose=False):
+def distance_matrix(framework, model, genomes, distance, replace_nan_with=np.nan, verbose=False, show_work=False):
     """
     Compute a distance matrix for a given set of genomes and distance measure.
 
@@ -409,7 +414,10 @@ def distance_matrix(framework, model, genomes, distance, replace_nan_with=np.nan
     elif distance == DISTANCE.min_weighted:
         distances = min_distance(framework, model, genome_reps=need_distances, weighted=True)
     elif distance == DISTANCE.MLE:
-        distances = mles(framework, model, genome_instances=need_distances, verbose=verbose)
+        distances = mles(framework, model, genome_instances=need_distances, verbose=verbose, show_work=show_work)
+        if show_work:
+            likelihood_funcs = { k : v[1] for k,v in distances.items() }
+            distances = { k : v[0] for k,v in distances.items() }
 
     # Construct the distance matrix
     D = np.zeros((len(genomes), len(genomes)))
@@ -419,4 +427,7 @@ def distance_matrix(framework, model, genomes, distance, replace_nan_with=np.nan
     if replace_nan_with != np.nan:
         D[np.isnan(D)] = replace_nan_with
 
-    return D
+    if distance == DISTANCE.MLE and show_work:
+        return D, likelihood_funcs
+    else:
+        return D

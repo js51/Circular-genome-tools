@@ -59,7 +59,7 @@ class hyperoctahedral_group:
             default_element_type (str, optional): The type of element to use when generating random elements. Defaults to "signed_permutation".
         """
         self._n = n
-        self._singned_perms = structures.HyperoctahedralGroup(self._n)
+        self._signed_perms = structures.HyperoctahedralGroup(self._n)
         self._sage_signed_perms = SignedPermutations(self._n)
         self._Sn = SymmetricGroup(self._n)
         self._C2 = SymmetricGroup(2)
@@ -236,6 +236,11 @@ class hyperoctahedral_group:
                 transversal.append(elt)
         return transversal
     
+    def Phi(self, elt):
+        return self._sage_signed_perms(
+            [(-1 if elt[0][k] == self._C2((1,2)) else 1) * elt[1](k+1) for k in range(0, self._n)]
+        )
+
     def Phi_inv(self, elt):
         c = tuple(self._C2(() if elt(k) > 0 else (1, 2)) for k in range(1, self._n + 1))
         s = self._Sn(Permutation([abs(elt(k)) for k in range(1, self._n + 1)]))
