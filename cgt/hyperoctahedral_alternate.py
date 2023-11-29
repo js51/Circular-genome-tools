@@ -16,7 +16,7 @@ from sage.all_cmdline import (
 )
 
 
-def HyperoctahedralGroupRepresentations(n):
+def HyperoctahedralGroupRepresentationsAlt(n):
     """
     This function returns the irreducible representations of the hyperoctahedral group of order 2^n * n!, indexed by pairs of partitions of l and m, where l + m = n.
 
@@ -27,18 +27,18 @@ def HyperoctahedralGroupRepresentations(n):
         dict: A dictionary of the irreducible representations of the hyperoctahedral group of order 2^n * n!
     """
     irreps = {}
-    Hn = hyperoctahedral_group(n)
+    Hn = hyperoctahedral_group_alt(n)
     for little_subgroup_pair in Hn.little_subgroup_pairs():
         for partition_left in Partitions(little_subgroup_pair[0]):
             for partition_right in Partitions(little_subgroup_pair[1]):
                 partition_pair = (partition_left, partition_right)
                 irrep = Hn.irrep(partition_pair)
                 def wrapped_irrep(elt, _irrep=irrep):
-                    return _irrep(Hn.Phi(elt))
+                    return _irrep(Hn.Phi_inv(elt))
                 irreps[partition_pair] = wrapped_irrep
     return irreps
 
-class hyperoctahedral_group:
+class hyperoctahedral_group_alt:
     """
     This class represents the hyperoctahedral group of order 2^n * n!. It stores the group as a number of different isomorphic structures, as well as a number of other things that are helpful to keep track of in the context of genome rearrangements. It implements functions to compute the irreducible representations of the hyperoctahedral group.
     """
@@ -64,7 +64,17 @@ class hyperoctahedral_group:
         self._Sn = SymmetricGroup(self._n)
         self._C2 = SymmetricGroup(2)
         self._C2n = cartesian_product(tuple(SymmetricGroup(2) for _ in range(self._n)))
-        self._semidirect_product = self.semidirect_product_with_hyperoctahedral_twist(self._Sn, self._C2n)
+        self._semidirect_product = self.semidirect_product_with_hyperoctahedral_twist(self._C2n, self._Sn)
+        self._C2n_in_Hn = self._signed_perms.subgroup([
+            self._signed_perms((k,-k)) for k in range(1,self._n+1)
+        ])
+        self._Sn_in_Hn = self._signed_perms.subgroup([
+            self._signed_perms( 
+                str(tuple(i for i in range(1,self._n+1))) + 
+                str(tuple(-i for i in range(1,self._n+1)))
+            ),
+            self._signed_perms( '(1,2)(-1,-2)')
+        ])
 
     def hyperoctahedral_twist(self, s, c):
         """
@@ -131,11 +141,11 @@ class hyperoctahedral_group:
 
         def rep(g):
             try:
-                _ = len(g[0])  # works if it is a "tuple"
-            except:  # g[0] is not a "tuple" of permutations
-                g = (self.element_in_little_subgroup(g[0], l, m), g[1])
-            prod = rep_left(g[0][0]).tensor_product(rep_right(g[0][1]))
-            character = (x[i](ci) for i, ci in enumerate(g[1]))
+                _ = len(g[1])  # works if it is a "tuple"
+            except:  # g[1] is not a "tuple" of permutations
+                g = (g[0], self.element_in_little_subgroup(g[1], l, m))
+            prod = rep_left(g[1][0]).tensor_product(rep_right(g[1][1]))
+            character = (x[i](ci) for i, ci in enumerate(g[0]))
             coeff = 1
             for char in character:
                 coeff *= char
@@ -157,7 +167,7 @@ class hyperoctahedral_group:
         l, m = sum([0] + list(partition_pair[0])), sum([0] + list(partition_pair[1]))
         subgroup = self.little_subgroup(l, m)
         C2n_wr_SlxSm = self.semidirect_product_with_hyperoctahedral_twist(
-            subgroup, self._C2n
+            self._C2n, subgroup
         )
         tv = self.right_transversal(self._semidirect_product, C2n_wr_SlxSm)
 
@@ -196,7 +206,7 @@ class hyperoctahedral_group:
                 right *= Sm(string)
         return SlxSm((left, right))
 
-    def semidirect_product_with_hyperoctahedral_twist(self, G, N):
+    def semidirect_product_with_hyperoctahedral_twist(self, H, G):
         """
         Compute a semi-direct product of H and G with the hyperoctahedral twist (G acts on H^n by permuting factors). The group returned is a group of pairs (c, s) where c is an element of H^n and s is an element of G. The group operation is given by (c1, s1) * (c2, s2) = (c1 * s1(c2), s1 * s2).
 
@@ -208,18 +218,18 @@ class hyperoctahedral_group:
             group: The wreath product of H and G with the hyperoctahedral twist.
         """
         semidirect_product = GroupSemidirectProduct(
-            G, N, act_to_right=True, twist=lambda s, c: self.hyperoctahedral_twist(s, c)
+            G, H, act_to_right=True, twist=lambda s, c: self.hyperoctahedral_twist(s, c)
         )
 
         def random_element():
-            Sn, C = semidirect_product.cartesian_factors()
-            return semidirect_product((Sn.random_element(), C.random_element()))
+            C, Sn = semidirect_product.cartesian_factors()
+            return semidirect_product((C.random_element(), Sn.random_element()))
 
         def order():
-            return G.order() * N.order()
+            return H.order() * G.order()
 
         def elements():
-            return [semidirect_product((s, c)) for c in N for s in G]
+            return [semidirect_product((c, s)) for c in H for s in G]
 
         semidirect_product.random_element = random_element
         semidirect_product.action = self.hyperoctahedral_twist
@@ -235,13 +245,19 @@ class hyperoctahedral_group:
             if all(t * elt.inverse() not in subgroup for t in transversal):
                 transversal.append(elt)
         return transversal
-
+    
     def Phi(self, elt):
+        return self._sage_signed_perms(
+            [(-1 if elt[0][elt[1](k+1) - 1] == self._C2((1,2)) else 1) * elt[1](k+1) for k in range(0, self._n)]
+        )
+
+    def Phi_inv(self, elt):
         c = tuple(
             self._C2(
-                () if elt(k) > 0 else 
+                () if elt.inverse()(k) > 0 else
                 (1, 2)
-            ) for k in range(1, self._n + 1))
+            ) for k in range(1, self._n + 1)
+        )
         s = self._Sn(Permutation([abs(elt(k)) for k in range(1, self._n + 1)]))
         return self._semidirect_product((s, c))
 # %%
