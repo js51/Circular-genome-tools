@@ -251,7 +251,7 @@ class PositionParadigmFramework:
         return genomes
 
     def genome_canonical_instances(self):
-        """Return a dictionary of genomes with their canonical instances"""
+        """Return a set of all canonical genome instances"""
         return {self.one_row(elt) for elt in self.genome_group() if elt(1) == 1}
 
     def standard_reflection(self):

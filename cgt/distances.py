@@ -239,8 +239,9 @@ def discrete_MFPT(framework, model, genome_reps=None, verbose=False):
                 a_values.append(a_k)
                 prod *= (1 - a_values[k-1])
                 summands.append(k * a_k * prod)
-                if abs(a_values[k] - a_values[k-1]) < 10**(-16) and abs(a_values[k] - a_star) < 10**(-16):
-                    if verbose: print(f'Terms {a_values[k]} and {a_values[k-1]} are close enough to {a_star}')
+                if (abs(a_values[k] - a_values[k-1]) < 10**(-3)) and (abs(a_values[k] - a_star) < 10**(-3)):
+                    if verbose: 
+                        print(f'Terms {a_values[k]} and {a_values[k-1]} are close enough to {a_star}')
                     break
                 k += 1
             c = k
