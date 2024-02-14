@@ -15,7 +15,7 @@ Individual likelihood functions for the time elapsed between the identity and a 
 from cgt.enums import ALGEBRA, DISTANCE
 import numpy as np
 import networkx as nx
-from sage.all import ComplexDoubleField, UniversalCyclotomicField, matrix, Matrix, real, exp, round, CC, log
+from sage.all import ComplexDoubleField, QQ , UniversalCyclotomicField, matrix, Matrix, real, exp, round, CC, log
 from scipy.optimize import minimize_scalar
 
 def mles(framework, model, genome_instances=None, verbose=False, show_work=False):
@@ -110,12 +110,10 @@ def _irreps_of_zs(framework, model, force_recompute=False):
     if key in model.data_bundle and not force_recompute:
         irreps_of_zs =  model.data_bundle[key]
     else:
-        CDF, UCF = ComplexDoubleField(), UniversalCyclotomicField()
         z = framework.symmetry_element()
         s = model.s_element(in_algebra=ALGEBRA.genome)
         irreps_of_z, irreps_of_s = framework.irreps(z), framework.irreps(s)
-        irreps_of_zs = (matrix(UCF, irrep_z*irrep_s) for irrep_z, irrep_s in zip(irreps_of_z, irreps_of_s))
-        irreps_of_zs = [Matrix(CDF, irrep_zs) for irrep_zs in irreps_of_zs]
+        irreps_of_zs = [matrix(QQ, irrep_z*irrep_s) for irrep_z, irrep_s in zip(irreps_of_z, irreps_of_s)]
         for irrep in irreps_of_zs:
             irrep.set_immutable()
         model.data_bundle[key] = irreps_of_zs
@@ -288,9 +286,15 @@ def _partial_traces_for_genome(framework, instance, irreps, irreps_of_zs, projec
         } for r in range(len(irreps_of_zs))
     }
     for r, irrep in enumerate(irreps): # Iterate over irreducible representations
-        sigd = irreps_of_z[r] * irrep(instance.inverse())
+        if not np.any(irreps_of_z[r]): # matrix of zeros
+            sigd = irreps_of_z[r]
+        else:
+            sigd = irreps_of_z[r] * irrep(instance.inverse())
         for e, eigenvalue in enumerate(eig_lists[r]):
-            traces[r][eigenvalue] = real((sigd*projections[r][e]).trace())
+            if not np.any(irreps_of_z[r]): # matrix of zeros
+                traces[r][eigenvalue] = 0
+            else:
+                traces[r][eigenvalue] = real((sigd*projections[r][e]).trace())
     return traces
 
 def likelihood_function(framework, model, genome):

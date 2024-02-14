@@ -4,7 +4,7 @@ convert group elements and genomes between different forms, and instances can be
 that they can acces information without it needing to be recreated.
 """
 
-from sage.all_cmdline import QQ, FormalSum, SymmetricGroup, SymmetricGroupRepresentations, gap, UniversalCyclotomicField, Permutations, matrix, QQbar
+from sage.all_cmdline import QQ, FormalSum, SymmetricGroup, SymmetricGroupRepresentations, gap, Permutations, matrix, QQbar
 from sage.combinat.colored_permutations import SignedPermutations
 from .enums import *
 import numpy as np
@@ -435,3 +435,5 @@ class PositionParadigmFramework:
                 genome_string = '(' + self.draw_instance(self.cycles(canonical_instance), shortened=True) + ')'
             new_sum.append((coeff, genome_string))
         return FormalSum(new_sum, parent=QQ)
+
+genome_framework = PositionParadigmFramework

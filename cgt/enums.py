@@ -68,7 +68,7 @@ class IRREP_TYPE(Enum):
     seminormal     = auto()
 
 class DISTANCE(Enum):
-    min = minimum = auto()
+    min = minimum = minimum_distance = auto()
     min_weighted = minimum_weighted = auto()
     MFPT = mean_first_passage_time = auto()
     MLE = maximum_likelihood_distance = maximum_likelihood_estimate = auto()

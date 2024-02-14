@@ -42,15 +42,6 @@ class hyperoctahedral_group:
     """
     This class represents the hyperoctahedral group of order 2^n * n!. It stores the group as a number of different isomorphic structures, as well as a number of other things that are helpful to keep track of in the context of genome rearrangements. It implements functions to compute the irreducible representations of the hyperoctahedral group.
     """
-    _n = None
-    _sage_signed_perms = None
-    _signed_perms = None
-    _subgroup_of_s2n = None
-    _semidirect_product = None
-    _Sn = None
-    _C2 = None
-    _C2n = None
-    _twist = None
 
     def __init__(self, n, default_element_type="signed_permutation"):
         """
@@ -63,6 +54,15 @@ class hyperoctahedral_group:
         self._sage_signed_perms = SignedPermutations(self._n)
         self._Sn = SymmetricGroup(self._n)
         self._C2 = SymmetricGroup(2)
+        self._N = self._signed_perms.subgroup([
+            self._signed_perms((i,-i)) 
+            for i in range(1, self._n+1)
+        ])
+        self._Sn_in_Hn = self._signed_perms.subgroup([
+            self._signed_perms(f'({",".join(str(x) for x in range(1,n+1))})({",".join(str(-x) for x in range(1,n+1))})'),
+            self._signed_perms(f'(1,2)(-1,-2)')
+        ])
+        self._Sn_wr_N = GroupSemidirectProduct(self._Sn_in_Hn, self._N)
         self._C2n = cartesian_product(tuple(SymmetricGroup(2) for _ in range(self._n)))
         self._semidirect_product = self.semidirect_product_with_hyperoctahedral_twist(self._Sn, self._C2n)
 
@@ -80,8 +80,8 @@ class hyperoctahedral_group:
         try:
             _ = len(s)  # works if it is a "tuple"
         except:
-            pass
-        else:
+            pass # We have the usual hyperoctahedral group
+        else: # We have a wreath product of a little subgroup (as a direct product)
             s = self._Sn(s[0]) * self._Sn(s[1])
         return self._C2n((c[s(k) - 1] for k in range(1, self._n + 1)))
 
@@ -159,7 +159,7 @@ class hyperoctahedral_group:
         C2n_wr_SlxSm = self.semidirect_product_with_hyperoctahedral_twist(
             subgroup, self._C2n
         )
-        tv = self.right_transversal(self._semidirect_product, C2n_wr_SlxSm)
+        tv = self.right_transversal_of_little_subgroup(l)
 
         def _irrep(g):
             id_rep = rep(C2n_wr_SlxSm.one())
@@ -235,6 +235,18 @@ class hyperoctahedral_group:
             if all(t * elt.inverse() not in subgroup for t in transversal):
                 transversal.append(elt)
         return transversal
+    
+    def right_transversal_of_little_subgroup(self, k):
+        from itertools import combinations
+        n = self._n
+        H = self
+        combs = list(combinations(tuple((i for i in range(1, n+1))), k))
+        t_new = []
+        for comb in combs:
+            sets = ( (i for i in range(1,k+1)), (i for i in range(k+1, n+1)) )
+            elt = Permutation([next(sets[0]) if i in comb else next(sets[1]) for i in range(1, n+1)])
+            t_new.append(H._semidirect_product((H._Sn(elt.cycle_string()), (() for _ in range(n)))).inverse())
+        return t_new
 
     def Phi(self, elt):
         c = tuple(
