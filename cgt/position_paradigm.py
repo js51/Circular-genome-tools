@@ -253,6 +253,14 @@ class PositionParadigmFramework:
     def genome_canonical_instances(self):
         """Return a set of all canonical genome instances"""
         return {self.one_row(elt) for elt in self.genome_group() if elt(1) == 1}
+    
+    def genome_canonical_instances_generator(self):
+        m = self.n - 1
+        smaller_framework = PositionParadigmFramework(m, oriented=self.oriented, symmetry=self.symmetry)
+        for instance in smaller_framework.genome_group():
+            as_list = list(smaller_framework.one_row(instance))
+            new_list = [1] + [ x-1 if x < 0 else x+1 for x in as_list ]
+            yield self.one_row(self.cycles(new_list))
 
     def standard_reflection(self):
         """Return a permutation which reflects a genome instance about the center region (n odd), or the center two regions (n even)."""
