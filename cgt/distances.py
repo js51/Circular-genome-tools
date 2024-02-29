@@ -112,7 +112,7 @@ def _irreps_of_zs(framework, model, force_recompute=False):
     else:
         z = framework.symmetry_element()
         s = model.s_element(in_algebra=ALGEBRA.genome)
-        irreps_of_z, irreps_of_s = framework.irreps(z), framework.irreps(s)
+        irreps_of_z, irreps_of_s = _irreps_of_z(framework, model), framework.irreps(s)
         irreps_of_zs = [matrix(QQ, irrep_z*irrep_s) for irrep_z, irrep_s in zip(irreps_of_z, irreps_of_s)]
         for irrep in irreps_of_zs:
             irrep.set_immutable()
@@ -278,8 +278,8 @@ def _eigenvectors(mat, tol=10**(-8)):
 
 def _partial_traces_for_genome(framework, instance, irreps, irreps_of_zs, projections, eig_lists, irreps_of_z=None):
     """Return dictionary of partial traces, indexed first by irrep index and then by eigenvalaue"""
-    if irreps_of_z is None:
-        irreps_of_z = [irrep(framework.symmetry_element()) for irrep in irreps]
+    if irreps_of_z is None: # It almost never is. Can't used the cached version below because it's stored in the model (which we don't have)
+        irreps_of_z = framework.irreps(framework.symmetry_element())
     traces = {
         r: {
             eigenvalue: {} for eigenvalue in eig_lists[r]
