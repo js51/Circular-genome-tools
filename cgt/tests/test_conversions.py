@@ -3,7 +3,7 @@ import pytest
 
 @pytest.fixture
 def example_framework():
-    yield example()
+    yield example(5)
 
 def test_one_row_and_cycles_random(example_framework):
     fw, model = example_framework
