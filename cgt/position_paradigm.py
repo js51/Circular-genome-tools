@@ -119,7 +119,7 @@ class PositionParadigmFramework:
             [1, 2, -3]
         """
         try:
-            instance = self.cycles(deepcopy(instance))
+            instance = self.cycles(deepcopy(self.one_row(instance)))
         except:
             # Probably accidentally given a genome instead of an instance
             instance = self.instances(instance)[0]
