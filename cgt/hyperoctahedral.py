@@ -193,7 +193,7 @@ class hyperoctahedral_group:
                     if self._elt_in_subgroup(element[0], l):
                         Y[row][col] = np.array(rep(element), dtype=object)
                     else:  # A matrix of zeros
-                        Y[row][col] = np.zeros(rep_dimension)
+                        Y[row][col] = matrix(*rep_dimension).numpy(dtype=object)
 
             return matrix(np.block(Y))
 
@@ -279,7 +279,7 @@ class hyperoctahedral_group:
         return t_new
 
     def Phi(self, elt):
-        c = tuple(self._C2(() if elt(k) > 0 else (1, 2)) for k in range(1, self._n + 1))
+        c = tuple(self._C2(() if elt.inverse()(k) > 0 else (1, 2)) for k in range(1, self._n + 1))
         s = self._Sn(Permutation([abs(elt(k)) for k in range(1, self._n + 1)]))
         return self._semidirect_product((s, c))
 
