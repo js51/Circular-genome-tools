@@ -16,3 +16,4 @@ from .examples import *
 from .enums import *
 from .position_paradigm import PositionParadigmFramework, genome_framework
 from .models import Model
+from . import distances
