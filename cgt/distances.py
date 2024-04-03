@@ -114,8 +114,6 @@ def _irreps_of_zs(framework, model, force_recompute=False):
         s = model.s_element(in_algebra=ALGEBRA.genome)
         irreps_of_z, irreps_of_s = _irreps_of_z(framework, model), framework.irreps(s)
         irreps_of_zs = [matrix(QQ, irrep_z*irrep_s) for irrep_z, irrep_s in zip(irreps_of_z, irreps_of_s)]
-        for irrep in irreps_of_zs:
-            irrep.set_immutable()
         model.data_bundle[key] = irreps_of_zs
     return irreps_of_zs
 
@@ -135,54 +133,38 @@ def _irreps_of_z(framework, model, force_recompute=False):
     if key in model.data_bundle and not force_recompute:
         irreps_of_z =  model.data_bundle[key]
     else:
-        CDF, UCF = ComplexDoubleField(), UniversalCyclotomicField()
+        #CDF, UCF = ComplexDoubleField(), UniversalCyclotomicField()
         z = framework.symmetry_element()
         irreps_of_z = framework.irreps(z)
-        irreps_of_z = (matrix(UCF, irrep_z) for irrep_z in irreps_of_z)
-        irreps_of_z = [Matrix(CDF, irrep_z) for irrep_z in irreps_of_z]
-        for irrep in irreps_of_z:
-            irrep.set_immutable()
+        #irreps_of_z = (matrix(UCF, irrep_z) for irrep_z in irreps_of_z)
+        #irreps_of_z = [Matrix(CDF, irrep_z) for irrep_z in irreps_of_z]
         model.data_bundle[key] = irreps_of_z
     return irreps_of_z
 
-def _irreps_of_s(framework, model, force_recompute=False):
-    """
-    Return a set of matrices---images of s (the model element) under each irrep
-    
-    Args:
-        framework (PositionParadigmFramework): the framework
-        model (Model): the model
-        force_recompute (bool): whether to force recomputation and invalidate cache (default: False)
-
-    Returns:
-        list: a list of irredicuble representations of the group applied to s
-    """
-    key = "irreps_of_s"
-    if key in model.data_bundle and not force_recompute:
-        irreps_of_s =  model.data_bundle[key]
-    else:
-        CDF, UCF = ComplexDoubleField(), UniversalCyclotomicField()
-        s = model.s_element()
-        irreps_of_s = framework.irreps(s)
-        irreps_of_s = (matrix(UCF, irrep_s) for irrep_s in irreps_of_s)
-        irreps_of_s = [Matrix(CDF, irrep_s) for irrep_s in irreps_of_s]
-        for irrep in irreps_of_s:
-            irrep.set_immutable()
-        model.data_bundle[key] = irreps_of_s
-    return irreps_of_s
-
-def _eigenvalues(mat, round_to=7, make_real=True, inc_repeated=False, use_numpy=True, bin_eigs=False, tol=10**(-8)):
+def _eigenvalues(mat, round_to=7, make_real=True, inc_repeated=False):
     """Return all the eigenvalues for a given matrix mat"""
     col = list if inc_repeated else set
-    if use_numpy:
-        new_mat = np.array(matrix(CC, mat))
-        all_eigs = np.linalg.eigvals(new_mat)
-    else:
-        all_eigs = (eig for eig in mat.eigenvalues())
-    if bin_eigs:
-        return _bin(sorted(all_eigs), return_bin_size=False, tol=tol)
-    else:
-        return sorted(col(round(real(eig) if make_real else eig, round_to) for eig in all_eigs))
+    all_eigs = np.linalg.eigvals(mat)
+    return sorted(col(round(real(eig) if make_real else eig, round_to) for eig in all_eigs))
+
+def _eigenvectors_sage(mat):
+    eigs = mat.eigenvectors_right()
+    eigenvalues = [e[0] for e in eigs]
+    eigenvectors = [matrix(QQbar, e[1]).gram_schmidt(orthonormal=True) for e in eigs]
+    return {eigval : [matrix(QQbar, e) for e in list(eigenvectors[i][0])] for i, eigval in enumerate(eigenvalues)}
+
+def _eigenvectors(mat, round_to=7, make_real=True):
+    eigenvalues, eigenvectors = np.linalg.eig(mat)
+    eigenvectors, _ = np.linalg.qr(eigenvectors)
+    eigenvectors = list(eigenvectors.T)
+    eigen_dict = {}
+    for index, eig in enumerate(eigenvalues):
+        eigenvalue = round(real(eig) if make_real else eig, round_to)
+        try:
+            eigen_dict[eigenvalue].append(np.array([eigenvectors[index]]).T)
+        except KeyError:
+            eigen_dict[eigenvalue] = [np.array([eigenvectors[index]]).T]
+    return eigen_dict
     
 def probability_to_reach_in_steps(framework, model, sigma, k):
     alpha = prob_to_reach_in_steps_func(framework, model, sigma)
@@ -249,23 +231,9 @@ def discrete_MFPT(framework, model, genome_reps=None, verbose=False):
             dists[instance] = sum(summands) + remaining_sum
     return dists
 
-def _bin(eigenvalues, tol=10**(-8), return_bin_size=False):
-    binned_eigenvals = []
-    num_eigs = len(eigenvalues) # ??
-    e = 0
-    eigs = [real(eig) for eig in eigenvalues]
-    while e < num_eigs:
-        bin=[eigs[e]] # this is the eigenvalue
-        while len(bin) < num_eigs-e and abs(eigs[e]-eigs[e+len(bin)]) < tol:
-            bin.append(eigs[e+len(bin)])
-        average = real(sum(bin))/len(bin)
-        binned_eigenvals.append((average, len(bin)) if return_bin_size else average)
-        e=e+len(bin)
-    return binned_eigenvals
-
-def _eigenvectors(mat, tol=10**(-8)):
+def _eigenvectors_old(mat, tol=10**(-8)):
     eigen_tuples = sorted(mat.eigenvectors_right())
-    binned_eigenvals = _bin([et[0] for et in eigen_tuples], tol=tol, return_bin_size=True)
+    binned_eigenvals = None #_bin([et[0] for et in eigen_tuples], tol=tol, return_bin_size=True)
     # Orthogonalise the eigenvectors                      
     q=0
     eigenvectors = []
@@ -278,6 +246,7 @@ def _eigenvectors(mat, tol=10**(-8)):
 
 def _partial_traces_for_genome(framework, instance, irreps, irreps_of_zs, projections, eig_lists, irreps_of_z=None):
     """Return dictionary of partial traces, indexed first by irrep index and then by eigenvalaue"""
+    instance_inverse = instance.inverse()
     if irreps_of_z is None: # It almost never is. Can't used the cached version below because it's stored in the model (which we don't have)
         irreps_of_z = framework.irreps(framework.symmetry_element())
     traces = {
@@ -286,35 +255,75 @@ def _partial_traces_for_genome(framework, instance, irreps, irreps_of_zs, projec
         } for r in range(len(irreps_of_zs))
     }
     for r, irrep in enumerate(irreps): # Iterate over irreducible representations
-        if not np.any(irreps_of_z[r]): # matrix of zeros
+        zero_irrep = not np.any(irreps_of_z[r].numpy())
+        if zero_irrep: # matrix of zeros
             sigd = irreps_of_z[r]
         else:
-            sigd = irreps_of_z[r] * irrep(instance.inverse())
+            sigd = irreps_of_z[r] * irrep(instance_inverse)
         for e, eigenvalue in enumerate(eig_lists[r]):
-            if not np.any(irreps_of_z[r]): # matrix of zeros
+            if zero_irrep: # matrix of zeros
                 traces[r][eigenvalue] = 0
             else:
                 traces[r][eigenvalue] = real((sigd*projections[r][e]).trace())
     return traces
 
-def likelihood_function(framework, model, genome):
+def _partial_traces_for_genome_using_eigenvectors(framework, instance, irreps, irreps_of_zs, irreps_of_z):
+    """Return dictionary of partial traces, indexed first by irrep index and then by eigenvalaue"""
+    instance_inverse = instance.inverse()
+    traces = {
+        r : None for r in range(len(irreps_of_zs))
+    }
+    for r, irrep in enumerate(irreps): # Iterate over irreducible representations
+        zero_irrep = not np.any(irreps_of_z[r].numpy())
+        if zero_irrep: # matrix of zeros
+            sigd = irreps_of_z[r]
+        else:
+            sigd = irreps_of_z[r] * irrep(instance_inverse)
+        irrep_zs_np = irreps_of_zs[r].numpy(dtype=np.cdouble)
+        eigenvalues, eigenvectors = np.linalg.eig(irrep_zs_np)
+        eigenvalues = [round(x.real,7) for x in eigenvalues]
+        P = eigenvectors
+        P_inv = np.linalg.pinv(P)
+        ireep_of_g_inverse_z_np = sigd.numpy()
+        traces[r] = {eig : 0 for eig in eigenvalues}
+        for v, vector in enumerate(eigenvectors.T):
+            e_v = [0 for _ in range(len(eigenvalues))]
+            e_v[v] = 1
+            e_v = np.array([e_v])
+            left_mat = (e_v @ P_inv)
+            trace = (left_mat @ ireep_of_g_inverse_z_np @ np.array([vector], dtype=np.cdouble).T)[0,0]
+            traces[r][eigenvalues[v]] += trace
+    return traces
+
+def _eig_lists(model, irreps_of_zs):
+    if "eig_lists" in model.data_bundle:
+        eig_lists = model.data_bundle["eig_lists"]
+    else:
+        eig_lists = [_eigenvalues(irrep_zs) for irrep_zs in irreps_of_zs]
+        model.data_bundle["eig_lists"] = eig_lists
+    return eig_lists
+
+def _projections(model, irreps_of_zs, eig_lists):
+    if "projections" in model.data_bundle:
+        projections = model.data_bundle["projections"]
+    else:
+        projections = [_projection_operators(*vals) for vals in zip(irreps_of_zs, eig_lists)]
+        model.data_bundle["projections"] = projections
+    return projections
+
+def likelihood_function(framework, model, genome, use_eigenvectors=False):
     """Return the likelihood function for a given genome"""
     instance = framework.cycles(genome)
     G, Z = framework.genome_group(), framework.symmetry_group()
     irreps = framework.irreps()
     irreps_of_zs = _irreps_of_zs(framework, model)
     irreps_of_z = _irreps_of_z(framework, model)
-    if "eig_lists" in model.data_bundle:
-        eig_lists = model.data_bundle["eig_lists"]
+    eig_lists = _eig_lists(model, irreps_of_zs)
+    if not use_eigenvectors:
+        projections = _projections(model, irreps_of_zs, eig_lists)
+        traces = _partial_traces_for_genome(framework, instance, irreps, irreps_of_zs, projections, eig_lists, irreps_of_z)
     else:
-        eig_lists = [_eigenvalues(irrep_zs) for irrep_zs in irreps_of_zs]
-        model.data_bundle["eig_lists"] = eig_lists
-    if "projections" in model.data_bundle:
-        projections = model.data_bundle["projections"]
-    else:
-        projections = [_projection_operators(*vals) for vals in zip(irreps_of_zs, eig_lists)]
-        model.data_bundle["projections"] = projections
-    traces = _partial_traces_for_genome(framework, instance, irreps, irreps_of_zs, projections, eig_lists, irreps_of_z)
+        traces = _partial_traces_for_genome_using_eigenvectors(framework, instance, irreps, irreps_of_zs, irreps_of_z)
     dims = [irrep_of_zs.nrows() for irrep_of_zs in irreps_of_zs]
     def likelihood(t):
         ans = 0

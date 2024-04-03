@@ -4,6 +4,7 @@ This file contains the class for the hyperoctahedral group.
 
 # %%
 from cgt import structures
+import sage
 import numpy as np
 from sage.all_cmdline import (
     SymmetricGroup,
@@ -193,7 +194,7 @@ class hyperoctahedral_group:
                     if self._elt_in_subgroup(element[0], l):
                         Y[row][col] = np.array(rep(element), dtype=object)
                     else:  # A matrix of zeros
-                        Y[row][col] = matrix(*rep_dimension).numpy(dtype=object)
+                        Y[row][col] = np.zeros(rep_dimension, dtype=sage.rings.rational.Rational)
 
             return matrix(np.block(Y))
 
