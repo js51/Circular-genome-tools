@@ -141,6 +141,10 @@ class PositionParadigmFramework:
             return choice(list(genome))[0]
         else:
             return self.genome_group().random_element()
+        
+    def identity_instance(self):
+        """Return the identity permutation."""
+        return self.genome_group().one()
 
     def random_genome(self, format=FORMAT.formal_sum):
         """Return a random genome"""

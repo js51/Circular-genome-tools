@@ -189,8 +189,9 @@ class hyperoctahedral_group:
         def _irrep(g):
             Y = [[None for _ in range(len(tv))] for _ in range(len(tv))]
             for row in range(len(tv)):
+                element_part = g * tv[row].inverse()
                 for col in range(len(tv)):
-                    element = tv[col] * g * tv[row].inverse()
+                    element = tv[col] * element_part
                     if self._elt_in_subgroup(element[0], l):
                         Y[row][col] = np.array(rep(element), dtype=object)
                     else:  # A matrix of zeros

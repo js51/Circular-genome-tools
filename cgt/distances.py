@@ -273,15 +273,18 @@ def _partial_traces_for_genome_using_eigenvectors(framework, instance, irreps, i
     traces = {
         r : None for r in range(len(irreps_of_zs))
     }
+    eig_lists = []
     for r, irrep in enumerate(irreps): # Iterate over irreducible representations
         zero_irrep = not np.any(irreps_of_z[r].numpy())
         if zero_irrep: # matrix of zeros
             sigd = irreps_of_z[r]
         else:
             sigd = irreps_of_z[r] * irrep(instance_inverse)
-        irrep_zs_np = irreps_of_zs[r].numpy(dtype=np.cdouble)
+        irrep_zs_np = irreps_of_zs[r].numpy()
         eigenvalues, eigenvectors = np.linalg.eig(irrep_zs_np)
-        eigenvalues = [round(x.real,7) for x in eigenvalues]
+        eigenvectors = np.around(eigenvectors, 10)
+        eigenvalues = [round(x, 7) for x in eigenvalues]
+        eig_lists.append(set(eigenvalues))
         P = eigenvectors
         P_inv = np.linalg.pinv(P)
         ireep_of_g_inverse_z_np = sigd.numpy()
@@ -293,7 +296,7 @@ def _partial_traces_for_genome_using_eigenvectors(framework, instance, irreps, i
             left_mat = (e_v @ P_inv)
             trace = (left_mat @ ireep_of_g_inverse_z_np @ np.array([vector], dtype=np.cdouble).T)[0,0]
             traces[r][eigenvalues[v]] += trace
-    return traces
+    return eig_lists, traces
 
 def _eig_lists(model, irreps_of_zs):
     if "eig_lists" in model.data_bundle:
@@ -318,12 +321,12 @@ def likelihood_function(framework, model, genome, use_eigenvectors=False):
     irreps = framework.irreps()
     irreps_of_zs = _irreps_of_zs(framework, model)
     irreps_of_z = _irreps_of_z(framework, model)
-    eig_lists = _eig_lists(model, irreps_of_zs)
     if not use_eigenvectors:
+        eig_lists = _eig_lists(model, irreps_of_zs)
         projections = _projections(model, irreps_of_zs, eig_lists)
         traces = _partial_traces_for_genome(framework, instance, irreps, irreps_of_zs, projections, eig_lists, irreps_of_z)
     else:
-        traces = _partial_traces_for_genome_using_eigenvectors(framework, instance, irreps, irreps_of_zs, irreps_of_z)
+        eig_lists, traces = _partial_traces_for_genome_using_eigenvectors(framework, instance, irreps, irreps_of_zs, irreps_of_z)
     dims = [irrep_of_zs.nrows() for irrep_of_zs in irreps_of_zs]
     def likelihood(t):
         ans = 0
