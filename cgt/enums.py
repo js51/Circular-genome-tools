@@ -19,8 +19,6 @@ class MODEL(Enum):
     one_region_moves_without_inversions  = "Move a single region, without inversion"
     # Other transpositions
     three_region_transpositions = "transpositions involving a segment of three regions, with or without inversion"
-
-
     # Deprecated options
     two_region_adjacent_transpositions = "transpositions of two adjacent regions"
 
@@ -73,3 +71,12 @@ class DISTANCE(Enum):
     MFPT = mean_first_passage_time = auto()
     MLE = maximum_likelihood_distance = maximum_likelihood_estimate = auto()
     discrete_MFPT = DMFPT = discrete_mean_first_passage_time = auto()
+
+class DATA(Enum):
+    eig_data = 'eigen_data'
+    eigval_lists = 'eigenvalue_lists'
+    eigval_sets = 'eigenvalue_sets'
+    eigvec_lists = 'eigenvector_lists'
+    eigvec_mat_inv = "eigenvector_matrix_inverses"
+    projections = "projections"
+    eigval_sets_old = 'eig_lists'
