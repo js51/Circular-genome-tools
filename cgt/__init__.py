@@ -14,6 +14,7 @@ except ValueError:
     gap._Expect__command = gap._Expect__command.replace(gap._Expect__command[s:e], f'-b -o {gigs}G')
 from .examples import *
 from .enums import *
+from .constants import *
 from .position_paradigm import PositionParadigmFramework, genome_framework
 from .models import Model
 from . import distances
