@@ -10,3 +10,4 @@ class Genome:
             self.canonical_instance = framework.canonical_instance(framework(genome))
         except:
             raise TypeError("Unable to create genome object with given data")
+    

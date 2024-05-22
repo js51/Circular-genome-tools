@@ -5,7 +5,7 @@ import pytest
 
 def test_likelihood_function():
     for n in (3,4,5,6):
-        framework = position_paradigm.genome_framework(n)
+        framework = position_paradigm.GenomeFramework(n)
         converge_point = framework.symmetry_group().order()/framework.genome_group().order()
         model = Model.named_model_with_relative_probs(framework, {
             MODEL.all_inversions: 1

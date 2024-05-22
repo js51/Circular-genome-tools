@@ -15,6 +15,7 @@ except ValueError:
 from .examples import *
 from .enums import *
 from .constants import *
-from .position_paradigm import PositionParadigmFramework, genome_framework
+from .position_paradigm import GenomeFramework, PositionParadigmFramework, Framework
 from .models import Model
 from . import distances
+from . import plotting

@@ -80,3 +80,5 @@ class DATA(Enum):
     eigvec_mat_inv = "eigenvector_matrix_inverses"
     projections = "projections"
     eigval_sets_old = 'eig_lists'
+    irreps_z = 'irreps_of_z'
+    irreps_zs = 'irreps_of_zs'

@@ -3,7 +3,7 @@ from .. import hyperoctahedral
 
 def test_hyperoctahedral_group_irreps():
     for n in (2,3,4,5):
-        framework = position_paradigm.genome_framework(n)
+        framework = position_paradigm.GenomeFramework(n)
         for irrep in framework.irreps():
             r1 = framework.random_instance()
             r2 = framework.random_instance()
@@ -11,8 +11,8 @@ def test_hyperoctahedral_group_irreps():
 
 def test_hyperoctahedral_group_map():
     for n in (3, 4, 5, 10, 20, 30):
-        framework = position_paradigm.genome_framework(n)
-        H = hyperoctahedral.hyperoctahedral_group(n)
+        framework = position_paradigm.GenomeFramework(n)
+        H = hyperoctahedral.HyperoctahedralGroup(n)
         for _ in range(10):
             r1 = framework.random_instance()
             r2 = framework.random_instance()

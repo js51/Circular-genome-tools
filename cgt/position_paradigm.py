@@ -127,10 +127,10 @@ class PositionParadigmFramework:
         if self.symmetry in {SYMMETRY.circular, SYMMETRY.linear}:
             f = self.one_row(self.standard_reflection())
             if list(instance)[0] < 0:
-                instance = instance*f
+                instance = instance * f
             if self.symmetry is SYMMETRY.circular:
                 r = self.one_row(self.standard_rotation())
-                instance = instance*(r**((self.n-list(instance)[0]+1)%self.n))
+                instance = instance * (r ** ((self.n - list(instance)[0] + 1) % self.n))
             return instance
         else:
             raise NotImplementedError("No canonical form exists in the current framework")
@@ -264,7 +264,7 @@ class PositionParadigmFramework:
         for instance in smaller_framework.genome_group():
             as_list = list(smaller_framework.one_row(instance))
             new_list = [1] + [ x-1 if x < 0 else x+1 for x in as_list ]
-            yield self.one_row(self.cycles(new_list))
+            yield self.one_row(new_list)
 
     def standard_reflection(self):
         """Return a permutation which reflects a genome instance about the center region (n odd), or the center two regions (n even)."""
@@ -324,12 +324,6 @@ class PositionParadigmFramework:
             sigma.append(matrix[image,c]*(image+1))
         return self.cycles(sigma)
 
-    def matrix(self, element):
-        """Return the defining representation matrix. Note that matrix(x)matrix(y) = matrix(yx)"""
-        with warnings.catch_warnings(): # Sage uses deprecated objects in to_matrix for coloured permutations. We would like to not be reminded of this.
-            warnings.simplefilter("ignore", category=PendingDeprecationWarning)
-            return np.array(self.one_row(self.cycles(element)).to_matrix())
-
     def reg_rep_of_zs(self, model, to_adjacency_matrix=False, sparse=True):
         # TODO: #14 re-write to directly use model element from the genome algebra
         if self is not model.framework:
@@ -341,8 +335,6 @@ class PositionParadigmFramework:
         genomes = self.genomes()
         genome_list = list(genomes.values())
         reps = list(genomes.keys()) # Thousands of these
-        # Don't need the below line any more
-        #model_classes = list({frozenset({ d.inverse() * a * d for d in Z }) for a in model.generating_dictionary.keys()})
         model_generators_cycles = list(model.generating_dictionary.keys()) #[sorted(list(model_class))[0] for model_class in model_classes]
         model_generators = [
             self.one_row(elt) for elt in model_generators_cycles
@@ -361,6 +353,78 @@ class PositionParadigmFramework:
                     matrix[g, genome_lookup[self.canonical_instance(permutation * rearrangement)]] += coeff
         print('...done!')
         return matrix if sparse else matrix.toarray()
+    
+    def fast_canonical_instance_generator(self):
+        signed_perms = SignedPermutations(self.n)
+
+        def one_row(elt):
+            elt_dict = elt.dict()
+            return signed_perms([elt_dict[i] for i in range(1, self.n + 1)])
+
+        f = one_row(self.standard_reflection())
+        r = one_row(self.standard_rotation())
+
+        def canonical_instance(instance):
+            if instance(1) < 0:
+                instance = instance*f
+            instance = instance*(r**((self.n-instance(1)+1)%self.n))
+            return instance
+
+        m = self.n
+        group = self.genome_group()
+        spm = tuple(range(2, m + 1)) + tuple(range(-m, -1))
+        s_pmn = SymmetricGroup(spm)
+        h_gens = [
+            s_pmn([(2, 3), (-2, -3)]),
+            s_pmn(tuple(range(2, m + 1)) + tuple(range(-2, -(m + 1), -1))),
+        ]
+        subgroup = group.subgroup(h_gens)
+        for elt in subgroup:
+            yield one_row(elt)
+
+    def fast_reg_rep_of_zs(self, model):
+        """
+        
+        """
+        signed_perms = SignedPermutations(self.n)
+
+        def one_row(elt):
+            elt_dict = elt.dict()
+            return signed_perms([elt_dict[i] for i in range(1, self.n + 1)])
+
+        f = one_row(self.standard_reflection())
+        r = one_row(self.standard_rotation())
+
+        def canonical_instance(instance):
+            if instance(1) < 0:
+                instance = instance*f
+            instance = instance*(r**((self.n-instance(1)+1)%self.n))
+            return instance
+
+        m = self.n
+        group = self.genome_group()
+        spm = tuple(range(2, m + 1)) + tuple(range(-m, -1))
+        s_pmn = SymmetricGroup(spm)
+        h_gens = [
+            s_pmn([(2, 3), (-2, -3)]),
+            s_pmn(tuple(range(2, m + 1)) + tuple(range(-2, -(m + 1), -1))),
+        ]
+        subgroup = group.subgroup(h_gens)
+        instance_lookup_or = { one_row(elt) : index for index, elt in enumerate(subgroup)}
+        num_genomes = len(instance_lookup_or.keys())
+        matrix = dok((num_genomes, num_genomes), dtype=np.float32)
+        elements_dalpha = { one_row(d) * one_row(alpha) : prob for d in self.symmetry_group() for alpha, prob in model.generating_dictionary.items() }
+        tasks = len(instance_lookup_or) * len(elements_dalpha)
+        done = 0
+        increment = len(elements_dalpha)
+        for instance, index in instance_lookup_or.items():
+            print(f"{round(100 * done / tasks, 1)}% Complete", end="\r")
+            for da, prob in elements_dalpha.items():
+                matrix[index, instance_lookup_or[canonical_instance(instance * da)]] += prob
+            done += increment
+        print("100.0% Complete!")
+        return  1/(2*self.n) * matrix, instance_lookup_or
+
 
     def irreps(self, element=None):
         """
@@ -448,4 +512,6 @@ class PositionParadigmFramework:
             new_sum.append((coeff, genome_string))
         return FormalSum(new_sum, parent=QQ)
 
-genome_framework = PositionParadigmFramework
+# Convenient names
+GenomeFramework = PositionParadigmFramework
+Framework = PositionParadigmFramework
