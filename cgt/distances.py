@@ -16,9 +16,10 @@ from cgt.enums import ALGEBRA, DISTANCE, DATA
 from cgt.constants import VALUES_OF_N_WITH_SAVED_IRREPS_OF_Z
 import numpy as np
 import networkx as nx
-from sage.all import QQ, matrix, real, exp, round
+from sage.all import matrix, real, exp, round
 from scipy.optimize import minimize_scalar
 from cgt import pickle_manager
+from warnings import warn
 
 
 def mles(framework, model, genome_instances=None, verbose=False, show_work=False):
@@ -46,6 +47,15 @@ def mles(framework, model, genome_instances=None, verbose=False, show_work=False
     return mles
 
 
+def distance(framework, model, genome_instance, distance_measure):
+    distance_func = get_distance_function(distance_measure)
+    return distance_func(framework, model, [genome_instance])
+
+
+def distance_between(framework, model, genome_instance_1, genome_instance_2, distance_measure):
+    return distance(framework, model, genome_instance_1.inverse() * genome_instance_2, distance_measure)
+
+
 def mle(framework, model, genome_instance, show_work=False):
     """
     Returns the maximum likelihood estimate for a given genome instance under the given model and framework.
@@ -66,7 +76,7 @@ def mle(framework, model, genome_instance, show_work=False):
         return max_t
 
 
-def maximise(framework, L, max_time=200):
+def maximise(framework, L, max_time=None):
     """
     Return the time that maximises likelihood function L, using additional information from the framework
 
@@ -78,11 +88,14 @@ def maximise(framework, L, max_time=200):
     Returns:
         float: the time that maximises the likelihood function
     """
+    if max_time is None: 
+        max_time = framework.n * 25
     limit = 1 / framework.num_genomes()
     t_max = minimize_scalar(
         lambda t: -1 * L(t), method="bounded", bounds=(0, max_time)
     )["x"]
-    mle = t_max if L(t_max) > limit else np.nan
+    mle = t_max if L(t_max) > limit * (1 + (1/3)*0.01) else np.nan
+
     return mle
 
 
@@ -120,16 +133,16 @@ def _irreps_of_zs(framework, model, force_recompute=False):
     Returns:
         list: a list of irredicuble representations of the group applied to zs
     """
-    key = "irreps_of_zs"
+    key = DATA.irreps_zs
     if key in model.data_bundle and not force_recompute:
         irreps_of_zs = model.data_bundle[key]
     else:
         z = framework.symmetry_element()
         s = model.s_element(in_algebra=ALGEBRA.genome)
-        irreps_of_z, irreps_of_s = _irreps_of_z(framework, model), framework.irreps(s)
+        irreps_of_z = _irreps_of_z(framework, model)
+        irreps_of_s = framework.irreps(s)
         irreps_of_zs = [
-            matrix(QQ, irrep_z * irrep_s)
-            for irrep_z, irrep_s in zip(irreps_of_z, irreps_of_s)
+            irrep_z * irrep_s for irrep_z, irrep_s in zip(irreps_of_z, irreps_of_s)
         ]
         model.data_bundle[key] = irreps_of_zs
     return irreps_of_zs
@@ -147,16 +160,21 @@ def _irreps_of_z(framework, model=None, force_recompute=False):
     Returns:
         list: a list of irredicuble representations of the group applied to z
     """
-    key = "irreps_of_z"
+    key = DATA.irreps_z
     if model is not None and key in model.data_bundle and not force_recompute:
-        irreps_of_z = model.data_bundle[key]
-    elif framework.n in VALUES_OF_N_WITH_SAVED_IRREPS_OF_Z and not force_recompute:
-        irreps_of_z = pickle_manager.retrieve_irrep_of_z(n=framework.n)
-    else:
-        z = framework.symmetry_element()
-        irreps_of_z = framework.irreps(z)
-        if model is not None:
-            model.data_bundle[key] = irreps_of_z
+        return model.data_bundle[key]
+    if framework.n in VALUES_OF_N_WITH_SAVED_IRREPS_OF_Z and not force_recompute:
+        try:
+            irreps_of_z = pickle_manager.retrieve_irrep_of_z(n=framework.n)
+            if model is not None: 
+                model.data_bundle[key] = irreps_of_z
+            return irreps_of_z
+        except:
+            pass
+    z = framework.symmetry_element()
+    irreps_of_z = framework.irreps(z)
+    if model is not None: 
+        model.data_bundle[key] = irreps_of_z
     return irreps_of_z
 
 
@@ -202,12 +220,16 @@ def _eigen_data(framework, model, irreps_of_zs, round_vecs_to=10, round_vals_to=
         eigenvalues, eigenvectors = np.linalg.eig(irrep_zs_np)
         # Rounding
         eigenvectors = np.around(eigenvectors, round_vecs_to)  # a matrix
+        #print(f"Condition number is: {np.linalg.cond(eigenvectors)}")
         eigenvalues = [round(val, round_vals_to) for val in eigenvalues]
         # Store data
         eigen_data[DATA.eigval_lists].append(eigenvalues)
         eigen_data[DATA.eigval_sets].append(set(eigenvalues))
         eigen_data[DATA.eigvec_lists].append(eigenvectors.T.tolist())
-        eigen_data[DATA.eigvec_mat_inv].append(np.linalg.pinv(eigenvectors))
+        inverse_of_eigenvector_mat = np.linalg.pinv(eigenvectors)
+        #print(f"Elements of inverted eigenvector matrix range from ({np.amin(inverse_of_eigenvector_mat)} to {np.amax(inverse_of_eigenvector_mat)})")
+        eigen_data[DATA.eigvec_mat_inv].append(inverse_of_eigenvector_mat)
+
 
     # Store the data in the model
     model.data_bundle[DATA.eig_data] = eigen_data
@@ -219,7 +241,7 @@ def probability_to_reach_in_steps(framework, model, sigma, k):
     return alpha(k)
 
 
-def prob_to_reach_in_steps_func(framework, model, sigma):
+def prob_to_reach_in_steps_func(framework, model, sigma, use_eigenvectors=True):
     G, Z = framework.genome_group(), framework.symmetry_group()
     instance = framework.cycles(sigma)
     irreps = framework.irreps()
@@ -230,19 +252,24 @@ def prob_to_reach_in_steps_func(framework, model, sigma):
     else:
         eig_lists = [_eigenvalues(irrep_zs) for irrep_zs in irreps_of_zs]
         model.data_bundle[DATA.eigval_sets_old] = eig_lists
-    if DATA.projections in model.data_bundle:
-        projections = model.data_bundle[DATA.projections]
+    if not use_eigenvectors:
+        if DATA.projections in model.data_bundle:
+            projections = model.data_bundle[DATA.projections]
+        else:
+            projections = [
+                _projection_operators(*vals) for vals in zip(irreps_of_zs, eig_lists)
+            ]
+            model.data_bundle[DATA.projections] = projections
+        traces = _partial_traces_for_genome(
+            framework, model, instance, irreps, irreps_of_zs, projections, eig_lists, irreps_of_z
+        )
     else:
-        projections = [
-            _projection_operators(*vals) for vals in zip(irreps_of_zs, eig_lists)
-        ]
-        model.data_bundle[DATA.projections] = projections
-    traces = _partial_traces_for_genome(
-        framework, instance, irreps, irreps_of_zs, projections, eig_lists, irreps_of_z
-    )
+        eig_lists, traces = _partial_traces_for_genome_using_eigenvectors(
+            framework, model, instance, irreps, irreps_of_zs, irreps_of_z
+        )
     dims = [irrep_of_zs.nrows() for irrep_of_zs in irreps_of_zs]
 
-    def prob_in_steps(k, _traces=traces, _dims=dims, _eig_lists=eig_lists):
+    def prob_in_steps(k):
         alpha = 0
         for ptrace, dim, eig_list in zip(traces.values(), dims, eig_lists):
             term = 0
@@ -339,12 +366,11 @@ def _partial_traces_for_genome_using_eigenvectors(
     traces = {r: None for r, _ in enumerate(irreps_of_zs)}
     eigen_data = _eigen_data(framework, model, irreps_of_zs)
     for r, irrep in enumerate(irreps):  # Iterate over irreducible representations
-        zero_irrep = (irreps_of_z[r] == matrix(*irreps_of_z[r].dimensions()))
-        if zero_irrep:  # matrix of zeros
+        if not irreps_of_z[r]:  # matrix of zeros
             sigd = irreps_of_z[r]
         else:
             sigd = irreps_of_z[r] * irrep(instance_inverse)
-        ireep_of_g_inverse_z_np = sigd.numpy()
+        irrep_of_g_inverse_z_np = sigd.numpy()
         eigenvectors = eigen_data[DATA.eigvec_lists][r]
         eigenvalue_list = eigen_data[DATA.eigval_lists][r]
         P_inv = eigen_data[DATA.eigvec_mat_inv][r]
@@ -353,9 +379,17 @@ def _partial_traces_for_genome_using_eigenvectors(
             e_v = [0 for _ in eigenvalue_list]
             e_v[v] = 1
             e_v = np.array([e_v])
-            left_mat = e_v @ P_inv
-            trace = (left_mat @ ireep_of_g_inverse_z_np @ np.array([vector]).T)[0, 0]
+            left_mat = e_v @ P_inv # np.linalg.lstsq(np.array(eigenvectors), e_v.T, rcond=1e-07)[0].T
+            trace = (left_mat @ irrep_of_g_inverse_z_np @ np.array([vector]).T)[0, 0]
             traces[r][eigenvalue_list[v]] += trace
+        full_trace = sigd.trace()
+        sum_of_partial_traces = sum(traces[r].values())
+        if not sum_of_partial_traces - full_trace < 1e-04:
+            print(f"Sum of partial traces ({round(sum_of_partial_traces, 5)}) is very different from the full trace ({round(full_trace, 5)}) for irrep {r}.")
+            difference = full_trace - sum_of_partial_traces
+            # Spread difference proportionally over the traces
+            for eig in traces[r]:
+                traces[r][eig] += difference * (traces[r][eig] / sum_of_partial_traces)
     return eigen_data[DATA.eigval_sets], traces
 
 
@@ -379,7 +413,7 @@ def _projections(model, irreps_of_zs, eig_lists):
     return projections
 
 
-def likelihood_function(framework, model, genome, use_eigenvectors=False):
+def likelihood_function(framework, model, genome, use_eigenvectors=True):
     """Return the likelihood function for a given genome"""
     instance = framework.cycles(genome)
     G, Z = framework.genome_group(), framework.symmetry_group()
@@ -408,15 +442,15 @@ def likelihood_function(framework, model, genome, use_eigenvectors=False):
     def likelihood(t):
         ans = 0
         for r, dim in enumerate(dims):
-            ans += (
-                Z.order()
-                * (exp(-t) / G.order())
-                * dim
-                * sum(
-                    exp(eigenvalue * t) * traces[r][eigenvalue]
-                    for eigenvalue in eig_lists[r]
+                ans += (
+                    Z.order()
+                    * (exp(-t) / G.order())
+                    * dim
+                    * sum(
+                        exp(eigenvalue * t) * traces[r][eigenvalue]
+                        for eigenvalue in eig_lists[r]
+                    )
                 )
-            )
         return real(ans)
 
     return likelihood
@@ -453,21 +487,30 @@ def min_distance_using_irreps(framework, model, genome_reps=None):
     for rep in genome_reps:
         a = prob_to_reach_in_steps_func(framework, model, rep)
         for k in range(0, num_genomes):
-            if a(k) > 10 ** (-8):
+            if a(k) > 10 ** (-7):
                 dists[rep] = k
                 break
     return dists
 
+def first_nonzero_value(framework, function, limit=None):
+    if limit is None:
+        limit = framework.genome_group().order() / framework.symmetry_group().order()
+    first_k = limit
+    for k in range(0, limit):
+        if function(k) > 10 ** (-8):
+            first_k = k
+            break
+    return first_k
 
 def MFPT(framework, model, genome_reps=None, scale_by=1):
     """Return the mean time elapsed rearranging ref->genome where the target is an absorbing state"""
     genomes = framework.genomes()
     reps = list(genomes.keys())
     P = model.reg_rep_of_zs().toarray()
-    P_0 = P.copy()
+    P_0 = P.copy() 
     for i in range(len(P)):
         P_0[0, i] = 0
-    Z = np.linalg.inv(np.eye(len(P)) - P_0)
+    Z = np.linalg.pinv(np.eye(len(P)) - P_0)
 
     def MFTP_dists():
         return (Z @ P_0 @ Z)[:, 0]
@@ -480,7 +523,6 @@ def MFPT(framework, model, genome_reps=None, scale_by=1):
             for rep in genome_reps
         }
     return MFTP_distances
-
 
 def dict_to_distance_matrix(distances, framework, genomes=None):
     """If need to convert to pairwise distances, supply a list of genomes."""
@@ -515,14 +557,21 @@ def genomes_for_dist_matrix(framework, genomes):
     return need_distances
 
 
+def get_distance_function(distance_type):
+    match distance_type:
+        case DISTANCE.MFPT: return MFPT
+        case DISTANCE.discrete_MFPT: return discrete_MFPT
+        case DISTANCE.min: return min_distance_using_irreps
+        case DISTANCE.MLE: return mles
+        case DISTANCE.min_weighted: return min_distance
+
+
 def distance_matrix(
     framework,
     model,
     genomes,
     distance,
-    replace_nan_with=np.nan,
-    verbose=False,
-    show_work=False,
+    replace_nan_with=np.nan
 ):
     """
     Compute a distance matrix for a given set of genomes and distance measure.
@@ -536,30 +585,12 @@ def distance_matrix(
     need_distances = genomes_for_dist_matrix(framework, genomes)
     pairs, need_distances = map(list, zip(*need_distances.items()))
 
+    # Parameters
+    params = { "framework" : framework, "model" : model, "genome_reps" : need_distances }
+
     # Compute the distances:
-    if distance == DISTANCE.MFPT:
-        distances = MFPT(framework, model, genome_reps=need_distances)
-    elif distance == DISTANCE.discrete_MFPT:
-        distances = discrete_MFPT(framework, model, genome_reps=need_distances)
-    elif distance == DISTANCE.min:
-        distances = min_distance_using_irreps(
-            framework, model, genome_reps=need_distances
-        )
-    elif distance == DISTANCE.min_weighted:
-        distances = min_distance(
-            framework, model, genome_reps=need_distances, weighted=True
-        )
-    elif distance == DISTANCE.MLE:
-        distances = mles(
-            framework,
-            model,
-            genome_instances=need_distances,
-            verbose=verbose,
-            show_work=show_work,
-        )
-        if show_work:
-            likelihood_funcs = {k: v[1] for k, v in distances.items()}
-            distances = {k: v[0] for k, v in distances.items()}
+    distance_func = get_distance_function(distance)
+    distances = distance_func(**params)
 
     # Construct the distance matrix
     D = np.zeros((len(genomes), len(genomes)))
@@ -569,7 +600,4 @@ def distance_matrix(
     if replace_nan_with != np.nan:
         D[np.isnan(D)] = replace_nan_with
 
-    if distance == DISTANCE.MLE and show_work:
-        return D, likelihood_funcs
-    else:
-        return D
+    return D

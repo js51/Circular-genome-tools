@@ -30,7 +30,7 @@ def HyperoctahedralGroupRepresentations(n):
         dict: A dictionary of the irreducible representations of the hyperoctahedral group of order 2^n * n!
     """
     irreps = {}
-    Hn = hyperoctahedral_group(n)
+    Hn = HyperoctahedralGroup(n)
     for little_subgroup_pair in Hn.little_subgroup_pairs():
         for partition_left in Partitions(little_subgroup_pair[0]):
             for partition_right in Partitions(little_subgroup_pair[1]):
@@ -44,7 +44,7 @@ def HyperoctahedralGroupRepresentations(n):
     return irreps
 
 
-class hyperoctahedral_group:
+class HyperoctahedralGroup:
     """
     This class represents the hyperoctahedral group of order 2^n * n!. It stores the group as a number of different isomorphic structures, as well as a number of other things that are helpful to keep track of in the context of genome rearrangements. It implements functions to compute the irreducible representations of the hyperoctahedral group.
     """
