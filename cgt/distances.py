@@ -12,11 +12,12 @@ The distance measures implemented are:
 Individual likelihood functions for the time elapsed between the identity and a given genome can also be obtained
 """
 
-from cgt.enums import ALGEBRA, DISTANCE, DATA
+from cgt.enums import ALGEBRA, DISTANCE, DATA, SYMMETRY
 from cgt.constants import VALUES_OF_N_WITH_SAVED_IRREPS_OF_Z
 import numpy as np
 import networkx as nx
 from sage.all import matrix, real, exp, round
+import scipy
 from scipy.optimize import minimize_scalar
 from cgt import pickle_manager
 from warnings import warn
@@ -163,11 +164,12 @@ def _irreps_of_z(framework, model=None, force_recompute=False):
     key = DATA.irreps_z
     if model is not None and key in model.data_bundle and not force_recompute:
         return model.data_bundle[key]
-    if framework.n in VALUES_OF_N_WITH_SAVED_IRREPS_OF_Z and not force_recompute:
+    if framework.n in VALUES_OF_N_WITH_SAVED_IRREPS_OF_Z and framework.symmetry is SYMMETRY.circular and not force_recompute:
         try:
             irreps_of_z = pickle_manager.retrieve_irrep_of_z(n=framework.n)
             if model is not None: 
                 model.data_bundle[key] = irreps_of_z
+                model.data_bundle[DATA.irreps_z_np] = [irrep.numpy() for irrep in irreps_of_z] # TODO: This is a hack
             return irreps_of_z
         except:
             pass
@@ -175,6 +177,7 @@ def _irreps_of_z(framework, model=None, force_recompute=False):
     irreps_of_z = framework.irreps(z)
     if model is not None: 
         model.data_bundle[key] = irreps_of_z
+        model.data_bundle[DATA.irreps_z_np] = [irrep.numpy() for irrep in irreps_of_z] # TODO: This is a hack
     return irreps_of_z
 
 
@@ -208,6 +211,10 @@ def _eigen_data(framework, model, irreps_of_zs, round_vecs_to=10, round_vals_to=
         DATA.eigvec_mat_inv: [],
     }
 
+    # Fix for weird issue with SVD convergence (n=9)
+    if framework.n == 9 and round_vecs_to == 10:
+        round_vecs_to = 12
+
     # If the data is already stored in the model, return it
     if DATA.eig_data in model.data_bundle:
         return model.data_bundle[DATA.eig_data]
@@ -225,7 +232,7 @@ def _eigen_data(framework, model, irreps_of_zs, round_vecs_to=10, round_vals_to=
         # Store data
         eigen_data[DATA.eigval_lists].append(eigenvalues)
         eigen_data[DATA.eigval_sets].append(set(eigenvalues))
-        eigen_data[DATA.eigvec_lists].append(eigenvectors.T.tolist())
+        eigen_data[DATA.eigvec_lists].append(eigenvectors.T)
         inverse_of_eigenvector_mat = np.linalg.pinv(eigenvectors)
         #print(f"Elements of inverted eigenvector matrix range from ({np.amin(inverse_of_eigenvector_mat)} to {np.amax(inverse_of_eigenvector_mat)})")
         eigen_data[DATA.eigvec_mat_inv].append(inverse_of_eigenvector_mat)
@@ -345,7 +352,7 @@ def _partial_traces_for_genome(
         for r in range(len(irreps_of_zs))
     }
     for r, irrep in enumerate(irreps):  # Iterate over irreducible representations
-        zero_irrep = not np.any(irreps_of_z[r].numpy())
+        zero_irrep = not irreps_of_z[r] 
         if zero_irrep:  # matrix of zeros
             sigd = irreps_of_z[r]
         else:
@@ -354,7 +361,7 @@ def _partial_traces_for_genome(
             if zero_irrep:  # matrix of zeros
                 traces[r][eigenvalue] = 0
             else:
-                traces[r][eigenvalue] = real((sigd * projections[r][e]).trace())
+                traces[r][eigenvalue] = real((sigd.numpy() @ projections[r][e]).trace())
     return traces
 
 
@@ -363,33 +370,41 @@ def _partial_traces_for_genome_using_eigenvectors(
 ):
     """Return dictionary of partial traces, indexed first by irrep index and then by eigenvalaue"""
     instance_inverse = instance.inverse()
-    traces = {r: None for r, _ in enumerate(irreps_of_zs)}
     eigen_data = _eigen_data(framework, model, irreps_of_zs)
+    if DATA.partial_traces in model.data_bundle and instance_inverse in model.data_bundle[DATA.partial_traces]:
+        return eigen_data[DATA.eigval_sets], model.data_bundle[DATA.partial_traces][instance_inverse]
+    traces = {}
+    irreps_of_z_np = model.data_bundle[DATA.irreps_z_np]
     for r, irrep in enumerate(irreps):  # Iterate over irreducible representations
-        if not irreps_of_z[r]:  # matrix of zeros
-            sigd = irreps_of_z[r]
-        else:
-            sigd = irreps_of_z[r] * irrep(instance_inverse)
-        irrep_of_g_inverse_z_np = sigd.numpy()
-        eigenvectors = eigen_data[DATA.eigvec_lists][r]
+        # Faster convert to numpy
+        traces[r] = {}
+        irrep_instance = irrep(instance_inverse)
+        irrep_instance_np = np.zeros(irrep_instance.dimensions())
+        for (i, j), val in irrep_instance.items():
+            irrep_instance_np[i,j] = val
         eigenvalue_list = eigen_data[DATA.eigval_lists][r]
-        P_inv = eigen_data[DATA.eigvec_mat_inv][r]
-        traces[r] = {eig: 0 for eig in eigenvalue_list}
-        for v, vector in enumerate(eigenvectors):
-            e_v = [0 for _ in eigenvalue_list]
-            e_v[v] = 1
-            e_v = np.array([e_v])
-            left_mat = e_v @ P_inv # np.linalg.lstsq(np.array(eigenvectors), e_v.T, rcond=1e-07)[0].T
-            trace = (left_mat @ irrep_of_g_inverse_z_np @ np.array([vector]).T)[0, 0]
-            traces[r][eigenvalue_list[v]] += trace
-        full_trace = sigd.trace()
+        if not irreps_of_z[r]:  # matrix of zeros
+            irrep_of_g_inverse_z_np = irreps_of_z[r]
+            traces[r] = {eigenvalue: 0 for eigenvalue in eigenvalue_list}
+        else:
+            irrep_of_g_inverse_z_np = irreps_of_z_np[r] @ irrep_instance_np
+            eigenvectors = eigen_data[DATA.eigvec_lists][r]
+            P_inv = eigen_data[DATA.eigvec_mat_inv][r]
+            mat = ((P_inv @ irrep_of_g_inverse_z_np) * eigenvectors).sum(-1)
+            for v, eig in enumerate(eigenvalue_list):
+                if eig in traces[r]:
+                    traces[r][eig] += mat[v]
+                else:
+                    traces[r][eig] = mat[v]
+        full_trace = irrep_of_g_inverse_z_np.trace()
         sum_of_partial_traces = sum(traces[r].values())
         if not sum_of_partial_traces - full_trace < 1e-04:
             print(f"Sum of partial traces ({round(sum_of_partial_traces, 5)}) is very different from the full trace ({round(full_trace, 5)}) for irrep {r}.")
-            difference = full_trace - sum_of_partial_traces
-            # Spread difference proportionally over the traces
-            for eig in traces[r]:
-                traces[r][eig] += difference * (traces[r][eig] / sum_of_partial_traces)
+    
+    if DATA.partial_traces not in model.data_bundle:
+        model.data_bundle[DATA.partial_traces] = {}
+    model.data_bundle[DATA.partial_traces][instance_inverse] = traces
+
     return eigen_data[DATA.eigval_sets], traces
 
 
@@ -496,7 +511,7 @@ def first_nonzero_value(framework, function, limit=None):
     if limit is None:
         limit = framework.genome_group().order() / framework.symmetry_group().order()
     first_k = limit
-    for k in range(0, limit):
+    for k in range(1, limit):
         if function(k) > 10 ** (-8):
             first_k = k
             break
@@ -523,6 +538,13 @@ def MFPT(framework, model, genome_reps=None, scale_by=1):
             for rep in genome_reps
         }
     return MFTP_distances
+
+def fast_MFPT(framework, model):
+    reg_rep, genomes = framework.fast_reg_rep_of_zs(model)
+    Q = reg_rep[1:,1:] # Remove the absorbing state
+    m = Q.shape[0] # n - 1
+    A = scipy.sparse.identity(m) - Q
+    scipy.sparse.linalg.cg(A, np.ones(m))
 
 def dict_to_distance_matrix(distances, framework, genomes=None):
     """If need to convert to pairwise distances, supply a list of genomes."""
