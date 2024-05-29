@@ -50,8 +50,13 @@
 <li class="toctree-l3"><a class="reference internal" href="#cgt.distances.MFPT"><code class="docutils literal notranslate"><span class="pre">MFPT()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cgt.distances.dict_to_distance_matrix"><code class="docutils literal notranslate"><span class="pre">dict_to_distance_matrix()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cgt.distances.discrete_MFPT"><code class="docutils literal notranslate"><span class="pre">discrete_MFPT()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cgt.distances.distance"><code class="docutils literal notranslate"><span class="pre">distance()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cgt.distances.distance_between"><code class="docutils literal notranslate"><span class="pre">distance_between()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cgt.distances.distance_matrix"><code class="docutils literal notranslate"><span class="pre">distance_matrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cgt.distances.fast_MFPT"><code class="docutils literal notranslate"><span class="pre">fast_MFPT()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cgt.distances.first_nonzero_value"><code class="docutils literal notranslate"><span class="pre">first_nonzero_value()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cgt.distances.genomes_for_dist_matrix"><code class="docutils literal notranslate"><span class="pre">genomes_for_dist_matrix()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cgt.distances.get_distance_function"><code class="docutils literal notranslate"><span class="pre">get_distance_function()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cgt.distances.likelihood_function"><code class="docutils literal notranslate"><span class="pre">likelihood_function()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cgt.distances.maximise"><code class="docutils literal notranslate"><span class="pre">maximise()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cgt.distances.min_distance"><code class="docutils literal notranslate"><span class="pre">min_distance()</span></code></a></li>
@@ -82,7 +87,12 @@
 <li class="toctree-l4"><a class="reference internal" href="#cgt.enums.DATA.eigval_sets_old"><code class="docutils literal notranslate"><span class="pre">DATA.eigval_sets_old</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#cgt.enums.DATA.eigvec_lists"><code class="docutils literal notranslate"><span class="pre">DATA.eigvec_lists</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#cgt.enums.DATA.eigvec_mat_inv"><code class="docutils literal notranslate"><span class="pre">DATA.eigvec_mat_inv</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cgt.enums.DATA.irreps_z"><code class="docutils literal notranslate"><span class="pre">DATA.irreps_z</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cgt.enums.DATA.irreps_z_np"><code class="docutils literal notranslate"><span class="pre">DATA.irreps_z_np</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cgt.enums.DATA.irreps_zs"><code class="docutils literal notranslate"><span class="pre">DATA.irreps_zs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cgt.enums.DATA.partial_traces"><code class="docutils literal notranslate"><span class="pre">DATA.partial_traces</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#cgt.enums.DATA.projections"><code class="docutils literal notranslate"><span class="pre">DATA.projections</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cgt.enums.DATA.reg_rep_of_zs"><code class="docutils literal notranslate"><span class="pre">DATA.reg_rep_of_zs</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#cgt.enums.DISPLAY"><code class="docutils literal notranslate"><span class="pre">DISPLAY</span></code></a><ul>
@@ -123,6 +133,7 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#cgt.enums.MODEL"><code class="docutils literal notranslate"><span class="pre">MODEL</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#cgt.enums.MODEL.all_inversions"><code class="docutils literal notranslate"><span class="pre">MODEL.all_inversions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cgt.enums.MODEL.all_inversions_larger_less_likely"><code class="docutils literal notranslate"><span class="pre">MODEL.all_inversions_larger_less_likely</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#cgt.enums.MODEL.all_transpositions"><code class="docutils literal notranslate"><span class="pre">MODEL.all_transpositions</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#cgt.enums.MODEL.one_region_inversions"><code class="docutils literal notranslate"><span class="pre">MODEL.one_region_inversions</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#cgt.enums.MODEL.one_region_moves"><code class="docutils literal notranslate"><span class="pre">MODEL.one_region_moves</span></code></a></li>
@@ -181,12 +192,17 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-cgt.position_paradigm">cgt.position_paradigm module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#cgt.position_paradigm.Framework"><code class="docutils literal notranslate"><span class="pre">Framework</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cgt.position_paradigm.GenomeFramework"><code class="docutils literal notranslate"><span class="pre">GenomeFramework</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cgt.position_paradigm.PositionParadigmFramework"><code class="docutils literal notranslate"><span class="pre">PositionParadigmFramework</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#cgt.position_paradigm.PositionParadigmFramework.canonical_double_cosets"><code class="docutils literal notranslate"><span class="pre">PositionParadigmFramework.canonical_double_cosets()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#cgt.position_paradigm.PositionParadigmFramework.canonical_instance"><code class="docutils literal notranslate"><span class="pre">PositionParadigmFramework.canonical_instance()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#cgt.position_paradigm.PositionParadigmFramework.coefficient_in"><code class="docutils literal notranslate"><span class="pre">PositionParadigmFramework.coefficient_in()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#cgt.position_paradigm.PositionParadigmFramework.collect_genome_terms"><code class="docutils literal notranslate"><span class="pre">PositionParadigmFramework.collect_genome_terms()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#cgt.position_paradigm.PositionParadigmFramework.cycles"><code class="docutils literal notranslate"><span class="pre">PositionParadigmFramework.cycles()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#cgt.position_paradigm.PositionParadigmFramework.draw_instance"><code class="docutils literal notranslate"><span class="pre">PositionParadigmFramework.draw_instance()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cgt.position_paradigm.PositionParadigmFramework.fast_canonical_instance_generator"><code class="docutils literal notranslate"><span class="pre">PositionParadigmFramework.fast_canonical_instance_generator()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cgt.position_paradigm.PositionParadigmFramework.fast_reg_rep_of_zs"><code class="docutils literal notranslate"><span class="pre">PositionParadigmFramework.fast_reg_rep_of_zs()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#cgt.position_paradigm.PositionParadigmFramework.genome"><code class="docutils literal notranslate"><span class="pre">PositionParadigmFramework.genome()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#cgt.position_paradigm.PositionParadigmFramework.genome_canonical_instances"><code class="docutils literal notranslate"><span class="pre">PositionParadigmFramework.genome_canonical_instances()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#cgt.position_paradigm.PositionParadigmFramework.genome_canonical_instances_generator"><code class="docutils literal notranslate"><span class="pre">PositionParadigmFramework.genome_canonical_instances_generator()</span></code></a></li>
@@ -198,7 +214,6 @@
 <li class="toctree-l4"><a class="reference internal" href="#cgt.position_paradigm.PositionParadigmFramework.identity_instance"><code class="docutils literal notranslate"><span class="pre">PositionParadigmFramework.identity_instance()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#cgt.position_paradigm.PositionParadigmFramework.instances"><code class="docutils literal notranslate"><span class="pre">PositionParadigmFramework.instances()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#cgt.position_paradigm.PositionParadigmFramework.irreps"><code class="docutils literal notranslate"><span class="pre">PositionParadigmFramework.irreps()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#cgt.position_paradigm.PositionParadigmFramework.matrix"><code class="docutils literal notranslate"><span class="pre">PositionParadigmFramework.matrix()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#cgt.position_paradigm.PositionParadigmFramework.num_genomes"><code class="docutils literal notranslate"><span class="pre">PositionParadigmFramework.num_genomes()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#cgt.position_paradigm.PositionParadigmFramework.one_row"><code class="docutils literal notranslate"><span class="pre">PositionParadigmFramework.one_row()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#cgt.position_paradigm.PositionParadigmFramework.random_genome"><code class="docutils literal notranslate"><span class="pre">PositionParadigmFramework.random_genome()</span></code></a></li>
@@ -211,7 +226,6 @@
 <li class="toctree-l4"><a class="reference internal" href="#cgt.position_paradigm.PositionParadigmFramework.symmetry_group"><code class="docutils literal notranslate"><span class="pre">PositionParadigmFramework.symmetry_group()</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l3"><a class="reference internal" href="#cgt.position_paradigm.genome_framework"><code class="docutils literal notranslate"><span class="pre">genome_framework</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-cgt.rearrangements">cgt.rearrangements module</a><ul>
@@ -223,6 +237,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#cgt.rearrangements.conjugacy_class"><code class="docutils literal notranslate"><span class="pre">conjugacy_class()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cgt.rearrangements.cut_positions"><code class="docutils literal notranslate"><span class="pre">cut_positions()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cgt.rearrangements.double_coset"><code class="docutils literal notranslate"><span class="pre">double_coset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cgt.rearrangements.fast_all_inversion_reps"><code class="docutils literal notranslate"><span class="pre">fast_all_inversion_reps()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cgt.rearrangements.inversion"><code class="docutils literal notranslate"><span class="pre">inversion()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cgt.rearrangements.permutation_with_cuts"><code class="docutils literal notranslate"><span class="pre">permutation_with_cuts()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cgt.rearrangements.representatives"><code class="docutils literal notranslate"><span class="pre">representatives()</span></code></a></li>
@@ -254,23 +269,23 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-cgt.hyperoctahedral">cgt.hyperoctahedral module</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#cgt.hyperoctahedral.HyperoctahedralGroupRepresentations"><code class="docutils literal notranslate"><span class="pre">HyperoctahedralGroupRepresentations()</span></code></a></li>
-<li class="toctree-l3"><a class="reference internal" href="#cgt.hyperoctahedral.hyperoctahedral_group"><code class="docutils literal notranslate"><span class="pre">hyperoctahedral_group</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#cgt.hyperoctahedral.hyperoctahedral_group.Phi"><code class="docutils literal notranslate"><span class="pre">hyperoctahedral_group.Phi()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#cgt.hyperoctahedral.hyperoctahedral_group.character_for_tuple"><code class="docutils literal notranslate"><span class="pre">hyperoctahedral_group.character_for_tuple()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#cgt.hyperoctahedral.hyperoctahedral_group.element_in_little_subgroup"><code class="docutils literal notranslate"><span class="pre">hyperoctahedral_group.element_in_little_subgroup()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#cgt.hyperoctahedral.hyperoctahedral_group.hyperoctahedral_twist"><code class="docutils literal notranslate"><span class="pre">hyperoctahedral_group.hyperoctahedral_twist()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#cgt.hyperoctahedral.hyperoctahedral_group.irrep"><code class="docutils literal notranslate"><span class="pre">hyperoctahedral_group.irrep()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#cgt.hyperoctahedral.hyperoctahedral_group.little_subgroup"><code class="docutils literal notranslate"><span class="pre">hyperoctahedral_group.little_subgroup()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#cgt.hyperoctahedral.hyperoctahedral_group.little_subgroup_pairs"><code class="docutils literal notranslate"><span class="pre">hyperoctahedral_group.little_subgroup_pairs()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#cgt.hyperoctahedral.hyperoctahedral_group.little_subgroups"><code class="docutils literal notranslate"><span class="pre">hyperoctahedral_group.little_subgroups()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#cgt.hyperoctahedral.hyperoctahedral_group.orbit_representative"><code class="docutils literal notranslate"><span class="pre">hyperoctahedral_group.orbit_representative()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#cgt.hyperoctahedral.hyperoctahedral_group.representation_little_subgroup"><code class="docutils literal notranslate"><span class="pre">hyperoctahedral_group.representation_little_subgroup()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#cgt.hyperoctahedral.hyperoctahedral_group.right_transversal"><code class="docutils literal notranslate"><span class="pre">hyperoctahedral_group.right_transversal()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#cgt.hyperoctahedral.hyperoctahedral_group.right_transversal_of_little_subgroup"><code class="docutils literal notranslate"><span class="pre">hyperoctahedral_group.right_transversal_of_little_subgroup()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#cgt.hyperoctahedral.hyperoctahedral_group.semidirect_product_with_hyperoctahedral_twist"><code class="docutils literal notranslate"><span class="pre">hyperoctahedral_group.semidirect_product_with_hyperoctahedral_twist()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cgt.hyperoctahedral.HyperoctahedralGroup"><code class="docutils literal notranslate"><span class="pre">HyperoctahedralGroup</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#cgt.hyperoctahedral.HyperoctahedralGroup.Phi"><code class="docutils literal notranslate"><span class="pre">HyperoctahedralGroup.Phi()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cgt.hyperoctahedral.HyperoctahedralGroup.character_for_tuple"><code class="docutils literal notranslate"><span class="pre">HyperoctahedralGroup.character_for_tuple()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cgt.hyperoctahedral.HyperoctahedralGroup.element_in_little_subgroup"><code class="docutils literal notranslate"><span class="pre">HyperoctahedralGroup.element_in_little_subgroup()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cgt.hyperoctahedral.HyperoctahedralGroup.hyperoctahedral_twist"><code class="docutils literal notranslate"><span class="pre">HyperoctahedralGroup.hyperoctahedral_twist()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cgt.hyperoctahedral.HyperoctahedralGroup.irrep"><code class="docutils literal notranslate"><span class="pre">HyperoctahedralGroup.irrep()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cgt.hyperoctahedral.HyperoctahedralGroup.little_subgroup"><code class="docutils literal notranslate"><span class="pre">HyperoctahedralGroup.little_subgroup()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cgt.hyperoctahedral.HyperoctahedralGroup.little_subgroup_pairs"><code class="docutils literal notranslate"><span class="pre">HyperoctahedralGroup.little_subgroup_pairs()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cgt.hyperoctahedral.HyperoctahedralGroup.little_subgroups"><code class="docutils literal notranslate"><span class="pre">HyperoctahedralGroup.little_subgroups()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cgt.hyperoctahedral.HyperoctahedralGroup.orbit_representative"><code class="docutils literal notranslate"><span class="pre">HyperoctahedralGroup.orbit_representative()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cgt.hyperoctahedral.HyperoctahedralGroup.representation_little_subgroup"><code class="docutils literal notranslate"><span class="pre">HyperoctahedralGroup.representation_little_subgroup()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cgt.hyperoctahedral.HyperoctahedralGroup.right_transversal"><code class="docutils literal notranslate"><span class="pre">HyperoctahedralGroup.right_transversal()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cgt.hyperoctahedral.HyperoctahedralGroup.right_transversal_of_little_subgroup"><code class="docutils literal notranslate"><span class="pre">HyperoctahedralGroup.right_transversal_of_little_subgroup()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#cgt.hyperoctahedral.HyperoctahedralGroup.semidirect_product_with_hyperoctahedral_twist"><code class="docutils literal notranslate"><span class="pre">HyperoctahedralGroup.semidirect_product_with_hyperoctahedral_twist()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="#cgt.hyperoctahedral.HyperoctahedralGroupRepresentations"><code class="docutils literal notranslate"><span class="pre">HyperoctahedralGroupRepresentations()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#module-cgt.sorting">cgt.sorting module</a></li>
@@ -341,8 +356,18 @@
 <dd></dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="cgt.distances.distance">
+<span class="sig-prename descclassname"><span class="pre">cgt.distances.</span></span><span class="sig-name descname"><span class="pre">distance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">framework</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">genome_instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_measure</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.distance" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cgt.distances.distance_between">
+<span class="sig-prename descclassname"><span class="pre">cgt.distances.</span></span><span class="sig-name descname"><span class="pre">distance_between</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">framework</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">genome_instance_1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">genome_instance_2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance_measure</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.distance_between" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="cgt.distances.distance_matrix">
-<span class="sig-prename descclassname"><span class="pre">cgt.distances.</span></span><span class="sig-name descname"><span class="pre">distance_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">framework</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">genomes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace_nan_with</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">nan</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">verbose</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_work</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.distance_matrix" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">cgt.distances.</span></span><span class="sig-name descname"><span class="pre">distance_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">framework</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">genomes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">replace_nan_with</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">nan</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.distance_matrix" title="Link to this definition"></a></dt>
 <dd><p>Compute a distance matrix for a given set of genomes and distance measure.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -357,19 +382,34 @@
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="cgt.distances.fast_MFPT">
+<span class="sig-prename descclassname"><span class="pre">cgt.distances.</span></span><span class="sig-name descname"><span class="pre">fast_MFPT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">framework</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.fast_MFPT" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cgt.distances.first_nonzero_value">
+<span class="sig-prename descclassname"><span class="pre">cgt.distances.</span></span><span class="sig-name descname"><span class="pre">first_nonzero_value</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">framework</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">function</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">limit</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.first_nonzero_value" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="cgt.distances.genomes_for_dist_matrix">
 <span class="sig-prename descclassname"><span class="pre">cgt.distances.</span></span><span class="sig-name descname"><span class="pre">genomes_for_dist_matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">framework</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">genomes</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.genomes_for_dist_matrix" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="cgt.distances.get_distance_function">
+<span class="sig-prename descclassname"><span class="pre">cgt.distances.</span></span><span class="sig-name descname"><span class="pre">get_distance_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">distance_type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.get_distance_function" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="cgt.distances.likelihood_function">
-<span class="sig-prename descclassname"><span class="pre">cgt.distances.</span></span><span class="sig-name descname"><span class="pre">likelihood_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">framework</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">genome</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_eigenvectors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.likelihood_function" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">cgt.distances.</span></span><span class="sig-name descname"><span class="pre">likelihood_function</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">framework</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">genome</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_eigenvectors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.likelihood_function" title="Link to this definition"></a></dt>
 <dd><p>Return the likelihood function for a given genome</p>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cgt.distances.maximise">
-<span class="sig-prename descclassname"><span class="pre">cgt.distances.</span></span><span class="sig-name descname"><span class="pre">maximise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">framework</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">200</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.maximise" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">cgt.distances.</span></span><span class="sig-name descname"><span class="pre">maximise</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">framework</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">L</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_time</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.maximise" title="Link to this definition"></a></dt>
 <dd><p>Return the time that maximises likelihood function L, using additional information from the framework</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -444,7 +484,7 @@
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cgt.distances.prob_to_reach_in_steps_func">
-<span class="sig-prename descclassname"><span class="pre">cgt.distances.</span></span><span class="sig-name descname"><span class="pre">prob_to_reach_in_steps_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">framework</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.prob_to_reach_in_steps_func" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">cgt.distances.</span></span><span class="sig-name descname"><span class="pre">prob_to_reach_in_steps_func</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">framework</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_eigenvectors</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.distances.prob_to_reach_in_steps_func" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py function">
@@ -532,8 +572,33 @@
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="cgt.enums.DATA.irreps_z">
+<span class="sig-name descname"><span class="pre">irreps_z</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'irreps_of_z'</span></em><a class="headerlink" href="#cgt.enums.DATA.irreps_z" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cgt.enums.DATA.irreps_z_np">
+<span class="sig-name descname"><span class="pre">irreps_z_np</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'irreps_of_z_np'</span></em><a class="headerlink" href="#cgt.enums.DATA.irreps_z_np" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cgt.enums.DATA.irreps_zs">
+<span class="sig-name descname"><span class="pre">irreps_zs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'irreps_of_zs'</span></em><a class="headerlink" href="#cgt.enums.DATA.irreps_zs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cgt.enums.DATA.partial_traces">
+<span class="sig-name descname"><span class="pre">partial_traces</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'partial_traces'</span></em><a class="headerlink" href="#cgt.enums.DATA.partial_traces" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="cgt.enums.DATA.projections">
 <span class="sig-name descname"><span class="pre">projections</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'projections'</span></em><a class="headerlink" href="#cgt.enums.DATA.projections" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cgt.enums.DATA.reg_rep_of_zs">
+<span class="sig-name descname"><span class="pre">reg_rep_of_zs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'reg_rep_of_zs'</span></em><a class="headerlink" href="#cgt.enums.DATA.reg_rep_of_zs" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -689,6 +754,11 @@
 <dl class="py attribute">
 <dt class="sig sig-object py" id="cgt.enums.MODEL.all_inversions">
 <span class="sig-name descname"><span class="pre">all_inversions</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'all</span> <span class="pre">inversions'</span></em><a class="headerlink" href="#cgt.enums.MODEL.all_inversions" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cgt.enums.MODEL.all_inversions_larger_less_likely">
+<span class="sig-name descname"><span class="pre">all_inversions_larger_less_likely</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'all</span> <span class="pre">inversions,</span> <span class="pre">with</span> <span class="pre">larger</span> <span class="pre">inversions</span> <span class="pre">less</span> <span class="pre">likely'</span></em><a class="headerlink" href="#cgt.enums.MODEL.all_inversions_larger_less_likely" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -911,11 +981,28 @@
 <p>position_paradigm is the most important module in cgt. PositionParadigmFramework keeps track of important objects, can
 convert group elements and genomes between different forms, and instances can be passed to functions from other modules so
 that they can acces information without it needing to be recreated.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cgt.position_paradigm.Framework">
+<span class="sig-prename descclassname"><span class="pre">cgt.position_paradigm.</span></span><span class="sig-name descname"><span class="pre">Framework</span></span><a class="headerlink" href="#cgt.position_paradigm.Framework" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#cgt.position_paradigm.PositionParadigmFramework" title="cgt.position_paradigm.PositionParadigmFramework"><code class="xref py py-class docutils literal notranslate"><span class="pre">PositionParadigmFramework</span></code></a></p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="cgt.position_paradigm.GenomeFramework">
+<span class="sig-prename descclassname"><span class="pre">cgt.position_paradigm.</span></span><span class="sig-name descname"><span class="pre">GenomeFramework</span></span><a class="headerlink" href="#cgt.position_paradigm.GenomeFramework" title="Link to this definition"></a></dt>
+<dd><p>alias of <a class="reference internal" href="#cgt.position_paradigm.PositionParadigmFramework" title="cgt.position_paradigm.PositionParadigmFramework"><code class="xref py py-class docutils literal notranslate"><span class="pre">PositionParadigmFramework</span></code></a></p>
+</dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="cgt.position_paradigm.PositionParadigmFramework">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cgt.position_paradigm.</span></span><span class="sig-name descname"><span class="pre">PositionParadigmFramework</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_regions</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">oriented</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">symmetry</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">SYMMETRY.circular</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">genome_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">TYPE.reg_to_signed_pos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">precompute_irreps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>Everything you need for working with genomes under the position paradigm</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="cgt.position_paradigm.PositionParadigmFramework.canonical_double_cosets">
+<span class="sig-name descname"><span class="pre">canonical_double_cosets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">join_inverse_classes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.canonical_double_cosets" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="cgt.position_paradigm.PositionParadigmFramework.canonical_instance">
 <span class="sig-name descname"><span class="pre">canonical_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.canonical_instance" title="Link to this definition"></a></dt>
@@ -948,6 +1035,16 @@ sage: ppf.canonical_instance(‘(1,-2)(-1,2)’)
 <span class="sig-name descname"><span class="pre">draw_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">shortened</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.draw_instance" title="Link to this definition"></a></dt>
 <dd><p>Return a one-line drawing of a genome using arrows indicating orientation and elipsis indicating rotational symmetry</p>
 </dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cgt.position_paradigm.PositionParadigmFramework.fast_canonical_instance_generator">
+<span class="sig-name descname"><span class="pre">fast_canonical_instance_generator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cycles</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.fast_canonical_instance_generator" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="cgt.position_paradigm.PositionParadigmFramework.fast_reg_rep_of_zs">
+<span class="sig-name descname"><span class="pre">fast_reg_rep_of_zs</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.fast_reg_rep_of_zs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="cgt.position_paradigm.PositionParadigmFramework.genome">
@@ -1023,12 +1120,6 @@ Matrix entries sit inside the UniversalCyclotomicField and are exact expressions
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cgt.position_paradigm.PositionParadigmFramework.matrix">
-<span class="sig-name descname"><span class="pre">matrix</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">element</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.matrix" title="Link to this definition"></a></dt>
-<dd><p>Return the defining representation matrix. Note that matrix(x)matrix(y) = matrix(yx)</p>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="cgt.position_paradigm.PositionParadigmFramework.num_genomes">
 <span class="sig-name descname"><span class="pre">num_genomes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cgt.position_paradigm.PositionParadigmFramework.num_genomes" title="Link to this definition"></a></dt>
 <dd><p>Return the number of distinct genomes up to symmetries.</p>
@@ -1100,12 +1191,6 @@ True</p>
 <dd><p>Return the symmetry group of the genomes.</p>
 </dd></dl>
 
-</dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="cgt.position_paradigm.genome_framework">
-<span class="sig-prename descclassname"><span class="pre">cgt.position_paradigm.</span></span><span class="sig-name descname"><span class="pre">genome_framework</span></span><a class="headerlink" href="#cgt.position_paradigm.genome_framework" title="Link to this definition"></a></dt>
-<dd><p>alias of <a class="reference internal" href="#cgt.position_paradigm.PositionParadigmFramework" title="cgt.position_paradigm.PositionParadigmFramework"><code class="xref py py-class docutils literal notranslate"><span class="pre">PositionParadigmFramework</span></code></a></p>
 </dd></dl>
 
 </section>
@@ -1210,6 +1295,11 @@ True</p>
 <span class="sig-prename descclassname"><span class="pre">cgt.rearrangements.</span></span><span class="sig-name descname"><span class="pre">double_coset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">framework</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">perm</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.rearrangements.double_coset" title="Link to this definition"></a></dt>
 <dd><p>Return the double coset of perm in the symmetry group of framework</p>
 </dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cgt.rearrangements.fast_all_inversion_reps">
+<span class="sig-prename descclassname"><span class="pre">cgt.rearrangements.</span></span><span class="sig-name descname"><span class="pre">fast_all_inversion_reps</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">framework</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.rearrangements.fast_all_inversion_reps" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="cgt.rearrangements.inversion">
@@ -1388,47 +1478,30 @@ True</p>
 <section id="module-cgt.hyperoctahedral">
 <span id="cgt-hyperoctahedral-module"></span><h2>cgt.hyperoctahedral module<a class="headerlink" href="#module-cgt.hyperoctahedral" title="Link to this heading"></a></h2>
 <p>This file contains the class for the hyperoctahedral group.</p>
-<dl class="py function">
-<dt class="sig sig-object py" id="cgt.hyperoctahedral.HyperoctahedralGroupRepresentations">
-<span class="sig-prename descclassname"><span class="pre">cgt.hyperoctahedral.</span></span><span class="sig-name descname"><span class="pre">HyperoctahedralGroupRepresentations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.HyperoctahedralGroupRepresentations" title="Link to this definition"></a></dt>
-<dd><p>This function returns the irreducible representations of the hyperoctahedral group of order 2^n * n!, indexed by pairs of partitions of l and m, where l + m = n.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>n</strong> (<em>int</em>) – The order of the hyperoctahedral group.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A dictionary of the irreducible representations of the hyperoctahedral group of order 2^n * n!</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>dict</p>
-</dd>
-</dl>
-</dd></dl>
-
 <dl class="py class">
-<dt class="sig sig-object py" id="cgt.hyperoctahedral.hyperoctahedral_group">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cgt.hyperoctahedral.</span></span><span class="sig-name descname"><span class="pre">hyperoctahedral_group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_element_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'signed_permutation'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.hyperoctahedral_group" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="cgt.hyperoctahedral.HyperoctahedralGroup">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">cgt.hyperoctahedral.</span></span><span class="sig-name descname"><span class="pre">HyperoctahedralGroup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default_element_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'signed_permutation'</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.HyperoctahedralGroup" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>This class represents the hyperoctahedral group of order 2^n * n!. It stores the group as a number of different isomorphic structures, as well as a number of other things that are helpful to keep track of in the context of genome rearrangements. It implements functions to compute the irreducible representations of the hyperoctahedral group.</p>
 <dl class="py method">
-<dt class="sig sig-object py" id="cgt.hyperoctahedral.hyperoctahedral_group.Phi">
-<span class="sig-name descname"><span class="pre">Phi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elt</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.hyperoctahedral_group.Phi" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="cgt.hyperoctahedral.HyperoctahedralGroup.Phi">
+<span class="sig-name descname"><span class="pre">Phi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elt</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.HyperoctahedralGroup.Phi" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cgt.hyperoctahedral.hyperoctahedral_group.character_for_tuple">
-<span class="sig-name descname"><span class="pre">character_for_tuple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.hyperoctahedral_group.character_for_tuple" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="cgt.hyperoctahedral.HyperoctahedralGroup.character_for_tuple">
+<span class="sig-name descname"><span class="pre">character_for_tuple</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.HyperoctahedralGroup.character_for_tuple" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cgt.hyperoctahedral.hyperoctahedral_group.element_in_little_subgroup">
-<span class="sig-name descname"><span class="pre">element_in_little_subgroup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.hyperoctahedral_group.element_in_little_subgroup" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="cgt.hyperoctahedral.HyperoctahedralGroup.element_in_little_subgroup">
+<span class="sig-name descname"><span class="pre">element_in_little_subgroup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">elt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.HyperoctahedralGroup.element_in_little_subgroup" title="Link to this definition"></a></dt>
 <dd><p>Takes elt as an element of the little subgroup of Sn of order l!m! and returns an element of the direct product of S_l and S_m.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cgt.hyperoctahedral.hyperoctahedral_group.hyperoctahedral_twist">
-<span class="sig-name descname"><span class="pre">hyperoctahedral_twist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.hyperoctahedral_group.hyperoctahedral_twist" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="cgt.hyperoctahedral.HyperoctahedralGroup.hyperoctahedral_twist">
+<span class="sig-name descname"><span class="pre">hyperoctahedral_twist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">c</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.HyperoctahedralGroup.hyperoctahedral_twist" title="Link to this definition"></a></dt>
 <dd><p>This function implements the twist of the hyperoctahedral group, which is the action of S_n on (C_2)^n by permuting the factors.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1447,8 +1520,8 @@ True</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cgt.hyperoctahedral.hyperoctahedral_group.irrep">
-<span class="sig-name descname"><span class="pre">irrep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">partition_pair</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.hyperoctahedral_group.irrep" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="cgt.hyperoctahedral.HyperoctahedralGroup.irrep">
+<span class="sig-name descname"><span class="pre">irrep</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">partition_pair</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.HyperoctahedralGroup.irrep" title="Link to this definition"></a></dt>
 <dd><p>Returns the irreducible representation of the hyperoctahedral group of order 2^n * n! indexed by the pair of partitions of l and m where l + m = n. The representation is given as a function that takes an element of the hyperoctahedral group as input and returns the corresponding matrix.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1464,43 +1537,43 @@ True</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cgt.hyperoctahedral.hyperoctahedral_group.little_subgroup">
-<span class="sig-name descname"><span class="pre">little_subgroup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_direct_product</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.hyperoctahedral_group.little_subgroup" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="cgt.hyperoctahedral.HyperoctahedralGroup.little_subgroup">
+<span class="sig-name descname"><span class="pre">little_subgroup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">as_direct_product</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.HyperoctahedralGroup.little_subgroup" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cgt.hyperoctahedral.hyperoctahedral_group.little_subgroup_pairs">
-<span class="sig-name descname"><span class="pre">little_subgroup_pairs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.hyperoctahedral_group.little_subgroup_pairs" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="cgt.hyperoctahedral.HyperoctahedralGroup.little_subgroup_pairs">
+<span class="sig-name descname"><span class="pre">little_subgroup_pairs</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.HyperoctahedralGroup.little_subgroup_pairs" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cgt.hyperoctahedral.hyperoctahedral_group.little_subgroups">
-<span class="sig-name descname"><span class="pre">little_subgroups</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.hyperoctahedral_group.little_subgroups" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="cgt.hyperoctahedral.HyperoctahedralGroup.little_subgroups">
+<span class="sig-name descname"><span class="pre">little_subgroups</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.HyperoctahedralGroup.little_subgroups" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cgt.hyperoctahedral.hyperoctahedral_group.orbit_representative">
-<span class="sig-name descname"><span class="pre">orbit_representative</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.hyperoctahedral_group.orbit_representative" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="cgt.hyperoctahedral.HyperoctahedralGroup.orbit_representative">
+<span class="sig-name descname"><span class="pre">orbit_representative</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">l</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">m</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.HyperoctahedralGroup.orbit_representative" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cgt.hyperoctahedral.hyperoctahedral_group.representation_little_subgroup">
-<span class="sig-name descname"><span class="pre">representation_little_subgroup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">partition_pair</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.hyperoctahedral_group.representation_little_subgroup" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="cgt.hyperoctahedral.HyperoctahedralGroup.representation_little_subgroup">
+<span class="sig-name descname"><span class="pre">representation_little_subgroup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">partition_pair</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.HyperoctahedralGroup.representation_little_subgroup" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cgt.hyperoctahedral.hyperoctahedral_group.right_transversal">
-<span class="sig-name descname"><span class="pre">right_transversal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subgroup</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.hyperoctahedral_group.right_transversal" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="cgt.hyperoctahedral.HyperoctahedralGroup.right_transversal">
+<span class="sig-name descname"><span class="pre">right_transversal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">group</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subgroup</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.HyperoctahedralGroup.right_transversal" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cgt.hyperoctahedral.hyperoctahedral_group.right_transversal_of_little_subgroup">
-<span class="sig-name descname"><span class="pre">right_transversal_of_little_subgroup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.hyperoctahedral_group.right_transversal_of_little_subgroup" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="cgt.hyperoctahedral.HyperoctahedralGroup.right_transversal_of_little_subgroup">
+<span class="sig-name descname"><span class="pre">right_transversal_of_little_subgroup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">k</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.HyperoctahedralGroup.right_transversal_of_little_subgroup" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="cgt.hyperoctahedral.hyperoctahedral_group.semidirect_product_with_hyperoctahedral_twist">
-<span class="sig-name descname"><span class="pre">semidirect_product_with_hyperoctahedral_twist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.hyperoctahedral_group.semidirect_product_with_hyperoctahedral_twist" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="cgt.hyperoctahedral.HyperoctahedralGroup.semidirect_product_with_hyperoctahedral_twist">
+<span class="sig-name descname"><span class="pre">semidirect_product_with_hyperoctahedral_twist</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">G</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">N</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.HyperoctahedralGroup.semidirect_product_with_hyperoctahedral_twist" title="Link to this definition"></a></dt>
 <dd><p>Compute a semi-direct product of H and G with the hyperoctahedral twist (G acts on H^n by permuting factors). The group returned is a group of pairs (c, s) where c is an element of H^n and s is an element of G. The group operation is given by (c1, s1) * (c2, s2) = (c1 * s1(c2), s1 * s2).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -1518,6 +1591,23 @@ True</p>
 </dl>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="cgt.hyperoctahedral.HyperoctahedralGroupRepresentations">
+<span class="sig-prename descclassname"><span class="pre">cgt.hyperoctahedral.</span></span><span class="sig-name descname"><span class="pre">HyperoctahedralGroupRepresentations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">n</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#cgt.hyperoctahedral.HyperoctahedralGroupRepresentations" title="Link to this definition"></a></dt>
+<dd><p>This function returns the irreducible representations of the hyperoctahedral group of order 2^n * n!, indexed by pairs of partitions of l and m, where l + m = n.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>n</strong> (<em>int</em>) – The order of the hyperoctahedral group.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary of the irreducible representations of the hyperoctahedral group of order 2^n * n!</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
 </dd></dl>
 
 </section>
