@@ -89,3 +89,26 @@ cgt.hyperoctahedral module
    :undoc-members:
    :show-inheritance:
 
+cgt.sorting module
+--------------------------
+
+.. automodule:: cgt.sorting
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+cgt.pickle_manager module
+--------------------------
+
+.. automodule:: cgt.pickle_manager
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+cgt.constants module
+--------------------------
+
+.. automodule:: cgt.constants
+   :members:
+   :undoc-members:
+   :show-inheritance:

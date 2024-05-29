@@ -23,4 +23,6 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires='>=3',
+    package_data={'cgt': ['*.pickle']},
+    include_package_data=True,
 )

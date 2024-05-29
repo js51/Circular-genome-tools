@@ -6,7 +6,6 @@ from .enums import *
 from . import rearrangements
 from scipy.sparse import dok_matrix as dok
 import numpy as np
-from warnings import warn
 
 
 class Model:
@@ -18,7 +17,16 @@ class Model:
         self.names = []
         self._reg_rep_of_zs = None # For caching the regular representation of zs
         self.data_bundle = {} # Used to cache data for several functions
-        # TODO: Implement checks for certain model properties, for example time reversibility, symmetry and missing rearrangements
+        # Check for time-reversibility
+        #rearrangements = set(self.generating_dictionary.keys())
+        #for rearrangement in rearrangements:
+        #    if rearrangement.inverse() not in self.generating_dictionary:
+        #        print(f"Model does not contain the inverse of {rearrangement}. Adding it #with equal probability so that the model is time-reversible. This means #that the generating dictionary is no longer the same as the one provided to #the constructor.")
+        #        prob = self.generating_dictionary[rearrangement] / 2
+        #        self.generating_dictionary[rearrangement.inverse()] = prob
+        #        self.generating_dictionary[rearrangement] = prob
+
+        # TODO: Implement checks for certain model properties, for example symmetry and missing rearrangements
 
     def __repr__(self):
         return f"Model({str(self.framework)}, {str(self.generating_dictionary)})"
@@ -49,36 +57,47 @@ class Model:
         if abs(sum(named_model_dictionary.values()) - 1) > 0.00001: 
             raise ValueError("supplied probabilities do not sum to 1")
         
-        for model_name, relative_prob in named_model_dictionary.items():
+        special_model = False
+        # Check for special named models
+        if MODEL.all_inversions_larger_less_likely in named_model_dictionary:
+            special_model = True
+            if len(named_model_dictionary) > 1:
+                raise ValueError(f"Cannot have {MODEL.all_inversions_larger_less_likely} with other models")
+            elements = rearrangements.fast_all_inversion_reps(framework)
+            elements = sorted(list(elements), key = lambda x: len(x.cycles()))
+            denom = 2**len(elements) - 1
+            for e, element in enumerate(elements):
+                model[element] = (2**(len(elements) - e - 1))/denom
 
-            # Inversions
-            if model_name is MODEL.all_inversions:
-                gens = rearrangements.all_inversions_representatives(framework)
-            elif model_name is MODEL.one_region_inversions:
-                gens = rearrangements.all_inversions_representatives(framework, num_regions=1)
-            elif model_name is MODEL.two_region_inversions:
-                gens = rearrangements.all_inversions_representatives(framework, num_regions=2)
-
-            # Transpositions
-            elif model_name is MODEL.all_transpositions:
-                gens = rearrangements.all_transposition_instances(framework, canonical_reps_only = True)
-            elif model_name is MODEL.two_region_transpositions:
-                gens = rearrangements.all_transposition_instances(framework, scope_limit = 2, canonical_reps_only = True)
-            elif model_name is MODEL.two_region_transpositions_without_inversions:
-                gens = rearrangements.all_transposition_instances(framework, scope_limit = 2, with_inversion = False, canonical_reps_only = True)
-            elif model_name is MODEL.two_region_revrevs:
-                gens = rearrangements.all_transposition_instances(framework, scope_limit = 2, only_revrevs = True, canonical_reps_only = True)
-            elif model_name is MODEL.one_region_moves:
-                gens = rearrangements.all_transposition_instances(framework, single_segment_limit = 1, canonical_reps_only = True)
-            elif model_name is MODEL.one_region_moves_without_inversions:
-                gens = rearrangements.all_transposition_instances(framework, single_segment_limit = 1, with_inversion = False, canonical_reps_only = True)
-            elif model_name is MODEL.three_region_transpositions:
-                gens = rearrangements.all_transposition_instances(framework, scope_limit = 3, canonical_reps_only = True)
-            elif model_name is MODEL.two_region_adjacent_transpositions:
-                gens = rearrangements.all_adjacent_transpositions_representatives(framework, num_regions=2)
-            
-            for generator in gens: 
-                model[generator] = relative_prob/len(gens)
+        if not special_model:
+            for model_name, relative_prob in named_model_dictionary.items():
+                match model_name:
+                    # Inversions
+                    case MODEL.all_inversions:
+                        gens = rearrangements.all_inversions_representatives(framework)
+                    case MODEL.one_region_inversions:
+                        gens = rearrangements.all_inversions_representatives(framework, num_regions=1)
+                    case MODEL.two_region_inversions:
+                        gens = rearrangements.all_inversions_representatives(framework, num_regions=2)
+                    # Transpositions
+                    case MODEL.all_transpositions:
+                        gens = rearrangements.all_transposition_instances(framework, canonical_reps_only = True)
+                    case MODEL.two_region_transpositions:
+                        gens = rearrangements.all_transposition_instances(framework, scope_limit = 2, canonical_reps_only = True)
+                    case MODEL.two_region_transpositions_without_inversions:
+                        gens = rearrangements.all_transposition_instances(framework, scope_limit = 2, with_inversion = False, canonical_reps_only = True)
+                    case MODEL.two_region_revrevs:
+                        gens = rearrangements.all_transposition_instances(framework, scope_limit = 2, only_revrevs = True, canonical_reps_only = True)
+                    case MODEL.one_region_moves:
+                        gens = rearrangements.all_transposition_instances(framework, single_segment_limit = 1, canonical_reps_only = True)
+                    case MODEL.one_region_moves_without_inversions:
+                        gens = rearrangements.all_transposition_instances(framework, single_segment_limit = 1, with_inversion = False, canonical_reps_only = True)
+                    case MODEL.three_region_transpositions:
+                        gens = rearrangements.all_transposition_instances(framework, scope_limit = 3, canonical_reps_only = True)
+                    case MODEL.two_region_adjacent_transpositions:
+                        gens = rearrangements.all_adjacent_transpositions_representatives(framework, num_regions=2)
+                for generator in gens: 
+                    model[generator] = relative_prob/len(gens)
 
         model = cls(framework, model)
         model.names += list(named_model_dictionary.keys())
