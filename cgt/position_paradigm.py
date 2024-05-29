@@ -189,6 +189,36 @@ class PositionParadigmFramework:
     def _double_coset(self, instance):
         coset = set(d2 * instance * d1 for d1 in self.symmetry_group() for d2 in self.symmetry_group())
         return sorted(coset, key=self._sort_key_cycles)
+    
+    def _double_coset_canonical(self, instance, D_n, D_n_dict, with_inverses=False):
+        coset = set()
+        for d2 in D_n:
+            gd2 = instance * d2
+            j = gd2.inverse()(1)
+            for d1 in D_n_dict[j]:
+                perm = d1 * gd2
+                coset.add(perm)
+        if with_inverses:
+            coset |= { elt.inverse() for elt in coset }
+        return coset
+
+    def canonical_double_cosets(self, join_inverse_classes=False):
+        D_n = {self.one_row(d) for d in self.symmetry_group()}
+        D_n_dict = { i : set() for i in range(-self.n, self.n + 1) }
+        for d in D_n:
+            D_n_dict[d(1)].add(d)
+        num_genomes = self.num_genomes()
+        found = set()
+        cosets = [ ]
+        for instance in self.fast_canonical_instance_generator(cycles = False):
+            if len(found) == num_genomes:
+                break
+            if instance in found:
+                continue
+            coset = self._double_coset_canonical(instance, D_n, D_n_dict, with_inverses=join_inverse_classes)
+            found |= coset
+            cosets.append(coset)
+        return cosets
 
     def _conjugacy_class(self, instance):
         conj_class = set(d.inverse() * instance * d for d in self.symmetry_group())
@@ -354,7 +384,7 @@ class PositionParadigmFramework:
         print('...done!')
         return matrix if sparse else matrix.toarray()
     
-    def fast_canonical_instance_generator(self):
+    def fast_canonical_instance_generator(self, cycles=False):
         signed_perms = SignedPermutations(self.n)
 
         def one_row(elt):
@@ -380,12 +410,15 @@ class PositionParadigmFramework:
         ]
         subgroup = group.subgroup(h_gens)
         for elt in subgroup:
-            yield one_row(elt)
+            yield one_row(elt) if not cycles else self.cycles(one_row(elt))
 
     def fast_reg_rep_of_zs(self, model):
         """
         
         """
+        if DATA.reg_rep_of_zs in model.data_bundle:
+            return model.data_bundle[DATA.reg_rep_of_zs]
+        
         signed_perms = SignedPermutations(self.n)
 
         def one_row(elt):
@@ -423,7 +456,11 @@ class PositionParadigmFramework:
                 matrix[index, instance_lookup_or[canonical_instance(instance * da)]] += prob
             done += increment
         print("100.0% Complete!")
-        return  1/(2*self.n) * matrix, instance_lookup_or
+
+        reg_rep_of_zs = 1/(2*self.n) * matrix, instance_lookup_or
+        model.data_bundle[DATA.reg_rep_of_zs] = reg_rep_of_zs
+
+        return reg_rep_of_zs
 
 
     def irreps(self, element=None):
@@ -458,7 +495,7 @@ class PositionParadigmFramework:
                     else: # sigma is a group element
                         result = _irrep(sigma)
                     mat = result
-                    return mat.transpose() if _signed else matrix(mat)
+                    return mat if _signed else matrix(mat)
             return representation
         if not self.oriented:
             irreps = SymmetricGroupRepresentations(self.n)

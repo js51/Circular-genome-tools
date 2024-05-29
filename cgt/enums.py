@@ -21,6 +21,8 @@ class MODEL(Enum):
     three_region_transpositions = "transpositions involving a segment of three regions, with or without inversion"
     # Deprecated options
     two_region_adjacent_transpositions = "transpositions of two adjacent regions"
+    # Special models
+    all_inversions_larger_less_likely = "all inversions, with larger inversions less likely"
 
 class TYPE(Enum):
     reg_to_signed_pos = auto()
@@ -82,3 +84,6 @@ class DATA(Enum):
     eigval_sets_old = 'eig_lists'
     irreps_z = 'irreps_of_z'
     irreps_zs = 'irreps_of_zs'
+    reg_rep_of_zs = 'reg_rep_of_zs'
+    partial_traces = 'partial_traces'
+    irreps_z_np = 'irreps_of_z_np'

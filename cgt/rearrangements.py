@@ -248,7 +248,7 @@ def __all_canonical_inversions(framework, num_regions=None):
                 perms.union({G(f"(1,{n})")})
         return perms
     elif num_regions is None:  # Return all inversions up to length floor(n/2)
-        up_to_length = floor(framework.n / 2)
+        up_to_length = floor(framework.n / 2) if framework.symmetry is SYMMETRY.circular else n
         if framework.oriented:
             perms = set()
             for permutation in G:
@@ -272,7 +272,20 @@ def __all_canonical_inversions(framework, num_regions=None):
         raise NotImplementedError(
             f"inversions of length {num_regions} not yet implemented"
         )
+    
+_all_canonical_inversions = __all_canonical_inversions
 
+def fast_all_inversion_reps(framework):
+    n = framework.n
+    G = framework.genome_group()
+    n = int(floor(n / 2))
+    elements = set()
+    for i in range(1, n + 1):
+        elt = ""
+        for j in range(1, i + 1):
+            elt += f"({j},-{i - j + 1})"
+        elements.add(G(elt))
+    return elements
 
 def __two_region_adjacent_transposition_reps(framework):
     if not framework.oriented or framework.symmetry != SYMMETRY.circular:
@@ -372,7 +385,6 @@ def all_inversions_representatives(framework, num_regions=None):
         __all_canonical_inversions(framework, num_regions=num_regions),
         classes=CLASSES.double_cosets,
     )
-
 
 def all_adjacent_transpositions_representatives(framework, num_regions=None):
     if num_regions == 2:

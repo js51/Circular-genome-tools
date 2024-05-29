@@ -35,19 +35,22 @@ def latex_figure_setup():
 
 def x_axis_limit_for_framework(framework):
     n = framework.n
-    from_testing = {1: 10, 2: 10, 3: 10, 4: 14, 5: 22, 6: 26, 7: 34, 8: 40, 9: 200}
+    from_testing = {1: 10, 2: 10, 3: 10, 4: 14, 5: 22, 6: 26, 7: 34, 8: 40, 9: 98}
     if n in from_testing:
         return from_testing[n]
     else:
         return from_testing[2 * max(from_testing.keys())]
 
 
-def plot_likelihood_and_probability(framework, model, instance, width=6, height=4, dpi=300, use_eigenvectors=True):
+def plot_likelihood_and_probability(framework, model, instance, width=6, height=4, tmax = None, dpi=300, use_eigenvectors=True):
     a = cgt.distances.prob_to_reach_in_steps_func(framework, model, instance, use_eigenvectors=use_eigenvectors)
     L = cgt.distances.likelihood_function(
         framework, model, instance, use_eigenvectors=use_eigenvectors
     )
-    max_x = x_axis_limit_for_framework(framework)
+    if tmax is None:
+        max_x = x_axis_limit_for_framework(framework)
+    else:
+        max_x = tmax
     tvec_L = list(np.arange(0, max_x + 1, 0.2))
     tvec = list(np.arange(0, max_x + 1, 1))
     latex_figure_setup()
@@ -69,7 +72,12 @@ def plot_likelihood_and_probability(framework, model, instance, width=6, height=
         label="Likelihood",
     )
     plt.title(f"Genome: z{str(framework.canonical_instance(instance))}")
-    plt.xticks(list(range(0, 9, 1)) + list(range(10, max_x + 1, 2)))
+    n = framework.n
+    if n < 9:
+        x_tick_list = list(range(0, 9, 1)) + list(range(10, max_x + 1, 2))
+    else: 
+        x_tick_list = list(range(0, max_x + 1, 5))
+    plt.xticks(x_tick_list)
     # Legend without border
     # bbox is (x, y, width, height)
     plt.legend(loc="best", frameon=False, bbox_to_anchor=(0.7, 0.0, 0.3, 1.0))
@@ -79,3 +87,4 @@ def plot_likelihood_and_probability(framework, model, instance, width=6, height=
         f"MLE: {round(mle, 1) if not np.isnan(mle) else 'N/A'}, Min dist: {cgt.distances.first_nonzero_value(framework, a)}"
     )
     plt.show()
+    return a, L
