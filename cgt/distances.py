@@ -13,7 +13,7 @@ Individual likelihood functions for the time elapsed between the identity and a 
 """
 
 from cgt.enums import ALGEBRA, DISTANCE, DATA, SYMMETRY
-from cgt.constants import VALUES_OF_N_WITH_SAVED_IRREPS_OF_Z
+from cgt.constants import VALUES_OF_N_WITH_SAVED_IRREPS_OF_Z, ERROR_CORRECTION_ENABLED
 import numpy as np
 import networkx as nx
 from sage.all import matrix, real, exp, round
@@ -57,7 +57,7 @@ def distance_between(framework, model, genome_instance_1, genome_instance_2, dis
     return distance(framework, model, genome_instance_1.inverse() * genome_instance_2, distance_measure)
 
 
-def mle(framework, model, genome_instance, show_work=False):
+def mle(framework, model, genome_instance, show_work=False, use_eigenvectors=True):
     """
     Returns the maximum likelihood estimate for a given genome instance under the given model and framework.
 
@@ -69,7 +69,7 @@ def mle(framework, model, genome_instance, show_work=False):
     Returns:
         float: the maximum likelihood estimate
     """
-    L = likelihood_function(framework, model, genome_instance)
+    L = likelihood_function(framework, model, genome_instance, use_eigenvectors=use_eigenvectors)
     max_t = maximise(framework, L)
     if show_work:
         return max_t, L
@@ -280,7 +280,7 @@ def prob_to_reach_in_steps_func(framework, model, sigma, use_eigenvectors=True):
         alpha = 0
         for ptrace, dim, eig_list in zip(traces.values(), dims, eig_lists):
             term = 0
-            for e, eig in enumerate(eig_list):
+            for e, eig in enumerate(ptrace.keys()):
                 term += (eig**k) * ptrace[eig]
             alpha += dim * term
         return (Z.order() / G.order()) * alpha
@@ -364,7 +364,6 @@ def _partial_traces_for_genome(
                 traces[r][eigenvalue] = real((sigd.numpy() @ projections[r][e]).trace())
     return traces
 
-
 def _partial_traces_for_genome_using_eigenvectors(
     framework, model, instance, irreps, irreps_of_zs, irreps_of_z
 ):
@@ -379,9 +378,12 @@ def _partial_traces_for_genome_using_eigenvectors(
         # Faster convert to numpy
         traces[r] = {}
         irrep_instance = irrep(instance_inverse)
-        irrep_instance_np = np.zeros(irrep_instance.dimensions())
-        for (i, j), val in irrep_instance.items():
-            irrep_instance_np[i,j] = val
+        try:
+            irrep_instance_np = np.zeros(irrep_instance.dimensions())
+            for (i, j), val in irrep_instance.items():
+                irrep_instance_np[i,j] = val
+        except AttributeError:
+            irrep_instance_np = irrep_instance.numpy()
         eigenvalue_list = eigen_data[DATA.eigval_lists][r]
         if not irreps_of_z[r]:  # matrix of zeros
             irrep_of_g_inverse_z_np = irreps_of_z[r]
@@ -400,7 +402,26 @@ def _partial_traces_for_genome_using_eigenvectors(
         sum_of_partial_traces = sum(traces[r].values())
         if not sum_of_partial_traces - full_trace < 1e-04:
             print(f"Sum of partial traces ({round(sum_of_partial_traces, 5)}) is very different from the full trace ({round(full_trace, 5)}) for irrep {r}.")
+            # Add missing partial trace that we think is missing due to error.
+            error = full_trace - sum_of_partial_traces
+            very_small_eigenvalue = 10**(-10)
+            traces[r][very_small_eigenvalue] = error
     
+    if ERROR_CORRECTION_ENABLED:
+        dims = [irrep_z.shape[0] for irrep_z in irreps_of_z_np]
+        L_0 = (1/framework.num_genomes()) * sum(
+            dim * sum(traces[r].values())
+            for r, dim in enumerate(dims)
+        )
+        print(L_0)
+        error = 0.0 - L_0
+        error_per_dim = (error / len(dims)) * (framework.
+        num_genomes())
+        print(f"Error of {error} found. Correcting by {error_per_dim} per dimension.")
+        for r, dim in enumerate(dims):
+            for eigenvalue in traces[r].keys():
+                traces[r][eigenvalue] += (error_per_dim / (dim * len(traces[r].keys())))
+
     if DATA.partial_traces not in model.data_bundle:
         model.data_bundle[DATA.partial_traces] = {}
     model.data_bundle[DATA.partial_traces][instance_inverse] = traces
@@ -452,20 +473,21 @@ def likelihood_function(framework, model, genome, use_eigenvectors=True):
         eig_lists, traces = _partial_traces_for_genome_using_eigenvectors(
             framework, model, instance, irreps, irreps_of_zs, irreps_of_z
         )
+        eig_lists = [list(traces[r].keys()) for r in range(len(traces))]
     dims = [irrep_of_zs.nrows() for irrep_of_zs in irreps_of_zs]
 
     def likelihood(t):
         ans = 0
         for r, dim in enumerate(dims):
-                ans += (
-                    Z.order()
-                    * (exp(-t) / G.order())
-                    * dim
-                    * sum(
-                        exp(eigenvalue * t) * traces[r][eigenvalue]
-                        for eigenvalue in eig_lists[r]
-                    )
+            ans += (
+                Z.order()
+                * (exp(-t) / G.order())
+                * dim
+                * sum(
+                    exp(eigenvalue * t) * traces[r][eigenvalue]
+                    for eigenvalue in eig_lists[r]
                 )
+            )
         return real(ans)
 
     return likelihood
@@ -544,7 +566,27 @@ def fast_MFPT(framework, model):
     Q = reg_rep[1:,1:] # Remove the absorbing state
     m = Q.shape[0] # n - 1
     A = scipy.sparse.identity(m) - Q
-    scipy.sparse.linalg.cg(A, np.ones(m))
+    result = [0] + scipy.sparse.linalg.cg(A, np.ones(m))[0].tolist()
+    output_dict = {}
+    for genome, index in genomes.items():
+        output_dict[genome] = result[index]
+    return output_dict
+
+def fast_step_probabilities(framework, model, limit=20):
+    reg_rep, genomes = framework.fast_reg_rep_of_zs(model)
+    vector = reg_rep[0,:]
+    probs = []
+    for _ in range(limit - 1):
+        probs.append(vector.todense())
+        vector = vector @ reg_rep
+    probabilities = np.array(probs).transpose()
+    output_dict = {}
+    for genome, index in genomes.items():
+        output_dict[genome] = [0] + probabilities[index].tolist()[0]
+    identity = framework.one_row(framework.identity_instance())
+    output_dict[identity][0] = 1
+    return output_dict
+    
 
 def dict_to_distance_matrix(distances, framework, genomes=None):
     """If need to convert to pairwise distances, supply a list of genomes."""

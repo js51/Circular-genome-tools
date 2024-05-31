@@ -7,6 +7,7 @@ import matplotlib as mpl
 import matplotlib.pyplot as plt
 from cycler import cycler
 import numpy as np
+from cgt.enums import DATA
 
 
 def latex_figure_setup():
@@ -35,7 +36,7 @@ def latex_figure_setup():
 
 def x_axis_limit_for_framework(framework):
     n = framework.n
-    from_testing = {1: 10, 2: 10, 3: 10, 4: 14, 5: 22, 6: 26, 7: 34, 8: 40, 9: 98}
+    from_testing = { 1: 10, 2: 10, 3: 10, 4: 14, 5: 22, 6: 26, 7: 34, 8: 40, 9: 98 }
     if n in from_testing:
         return from_testing[n]
     else:
@@ -43,7 +44,7 @@ def x_axis_limit_for_framework(framework):
 
 
 def plot_likelihood_and_probability(framework, model, instance, width=6, height=4, tmax = None, dpi=300, use_eigenvectors=True):
-    a = cgt.distances.prob_to_reach_in_steps_func(framework, model, instance, use_eigenvectors=use_eigenvectors)
+    canonical_instance = framework.canonical_instance(instance)
     L = cgt.distances.likelihood_function(
         framework, model, instance, use_eigenvectors=use_eigenvectors
     )
@@ -51,6 +52,12 @@ def plot_likelihood_and_probability(framework, model, instance, width=6, height=
         max_x = x_axis_limit_for_framework(framework)
     else:
         max_x = tmax
+    if DATA.reg_rep_of_zs in model.data_bundle:
+        stepwise_dists = cgt.distances.fast_step_probabilities(framework, model, limit = max_x + 1)[canonical_instance]
+        def a(k):
+            return stepwise_dists[k]
+    else:
+        a = cgt.distances.prob_to_reach_in_steps_func(framework, model, instance, use_eigenvectors=use_eigenvectors)
     tvec_L = list(np.arange(0, max_x + 1, 0.2))
     tvec = list(np.arange(0, max_x + 1, 1))
     latex_figure_setup()
@@ -71,7 +78,7 @@ def plot_likelihood_and_probability(framework, model, instance, width=6, height=
         linestyle="solid",
         label="Likelihood",
     )
-    plt.title(f"Genome: z{str(framework.canonical_instance(instance))}")
+    plt.title(f"Genome: z{str(canonical_instance)}")
     n = framework.n
     if n < 9:
         x_tick_list = list(range(0, 9, 1)) + list(range(10, max_x + 1, 2))

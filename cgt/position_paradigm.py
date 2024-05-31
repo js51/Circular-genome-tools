@@ -416,6 +416,9 @@ class PositionParadigmFramework:
         """
         
         """
+        if self.symmetry is not SYMMETRY.circular:
+            raise NotImplementedError("Only circular genomes are supported for now. Use another regular rep function.")
+
         if DATA.reg_rep_of_zs in model.data_bundle:
             return model.data_bundle[DATA.reg_rep_of_zs]
         
