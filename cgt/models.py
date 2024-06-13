@@ -74,6 +74,10 @@ class Model:
                 match model_name:
                     # Inversions
                     case MODEL.all_inversions:
+                        if framework.symmetry == SYMMETRY.circular:
+                            gens = rearrangements.fast_all_inversion_reps(framework)
+                        elif framework.symmetry == SYMMETRY.linear:
+                            gens = rearrangements.all_inversions_representatives(framework)
                         gens = rearrangements.all_inversions_representatives(framework)
                     case MODEL.one_region_inversions:
                         gens = rearrangements.all_inversions_representatives(framework, num_regions=1)

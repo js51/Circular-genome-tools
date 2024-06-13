@@ -277,6 +277,8 @@ def __all_canonical_inversions(framework, num_regions=None):
 _all_canonical_inversions = __all_canonical_inversions
 
 def fast_all_inversion_reps(framework):
+    if framework.symmetry != SYMMETRY.circular:
+        raise NotImplementedError(f"not yet implemented for {str(framework)}")
     n = framework.n
     G = framework.genome_group()
     n = int(floor(n / 2))
