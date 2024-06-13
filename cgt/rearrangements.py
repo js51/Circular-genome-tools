@@ -35,7 +35,8 @@ def inversion(framework, about_position, length):
         string_rep += f"({about_position},{-about_position})"
         for i in range(1, k + 1):
             string_rep += f"({(r-i) % n},-{(r+i) % n})(-{(r-i) % n},{(r+i) % n})"
-    string_rep = string_rep.replace("0", str(n))
+    print(string_rep)
+    string_rep = string_rep.replace(' ', '').replace(",0", ',' + str(n)).replace("-0", '-' + str(n)).replace("(0", '(' + str(n))
     return framework.cycles(string_rep)
 
 

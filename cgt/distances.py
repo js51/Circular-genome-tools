@@ -12,16 +12,14 @@ The distance measures implemented are:
 Individual likelihood functions for the time elapsed between the identity and a given genome can also be obtained
 """
 
-from cgt.enums import ALGEBRA, DISTANCE, DATA, SYMMETRY
-from cgt.constants import VALUES_OF_N_WITH_SAVED_IRREPS_OF_Z, ERROR_CORRECTION_ENABLED
 import numpy as np
 import networkx as nx
 from sage.all import matrix, real, exp, round
 import scipy
 from scipy.optimize import minimize_scalar
 from cgt import pickle_manager
-from warnings import warn
-
+from cgt.enums import ALGEBRA, DISTANCE, DATA, SYMMETRY
+from cgt.constants import VALUES_OF_N_WITH_SAVED_IRREPS_OF_Z, ERROR_CORRECTION_ENABLED
 
 def mles(framework, model, genome_instances=None, verbose=False, show_work=False):
     """
@@ -84,7 +82,7 @@ def maximise(framework, L, max_time=None):
     Args:
         framework (PositionParadigmFramework): the framework
         L (function): the likelihood function to maximise
-        max_time (float): the maximum time to consider (default: 100)
+        max_time (float): the maximum time to consider (default: n * 25)
 
     Returns:
         float: the time that maximises the likelihood function
@@ -95,7 +93,7 @@ def maximise(framework, L, max_time=None):
     t_max = minimize_scalar(
         lambda t: -1 * L(t), method="bounded", bounds=(0, max_time)
     )["x"]
-    mle = t_max if L(t_max) > limit * (1 + (1/3)*0.01) else np.nan
+    mle = t_max if L(t_max) > limit * (1 + 0.01) else np.nan
 
     return mle
 
@@ -175,7 +173,7 @@ def _irreps_of_z(framework, model=None, force_recompute=False):
             pass
     z = framework.symmetry_element()
     irreps_of_z = framework.irreps(z)
-    if model is not None: 
+    if model is not None:
         model.data_bundle[key] = irreps_of_z
         model.data_bundle[DATA.irreps_z_np] = [irrep.numpy() for irrep in irreps_of_z] # TODO: This is a hack
     return irreps_of_z
@@ -476,10 +474,11 @@ def likelihood_function(framework, model, genome, use_eigenvectors=True):
         eig_lists = [list(traces[r].keys()) for r in range(len(traces))]
     dims = [irrep_of_zs.nrows() for irrep_of_zs in irreps_of_zs]
 
-    def likelihood(t):
+    def likelihood(t, return_terms=False):
         ans = 0
+        ans_terms = []
         for r, dim in enumerate(dims):
-            ans += (
+            term = (
                 Z.order()
                 * (exp(-t) / G.order())
                 * dim
@@ -488,6 +487,10 @@ def likelihood_function(framework, model, genome, use_eigenvectors=True):
                     for eigenvalue in eig_lists[r]
                 )
             )
+            ans_terms.append(term)
+            ans += term
+        if return_terms:
+            return ans_terms
         return real(ans)
 
     return likelihood
@@ -495,10 +498,10 @@ def likelihood_function(framework, model, genome, use_eigenvectors=True):
 
 def min_distance(framework, model, genome_reps=None, weighted=False):
     """Return dictionary of minimum distances ref->genome, using inverse of model probabilities as weights (or not)"""
-    matrix = model.reg_rep_of_zs().toarray()
+    reg_rep = model.reg_rep_of_zs().toarray()
     if weighted:
-        matrix[matrix != 0] = 1 / matrix[matrix != 0]
-    graph = nx.Graph(matrix)
+        reg_rep[reg_rep != 0] = 1 / reg_rep[reg_rep != 0]
+    graph = nx.Graph(reg_rep)
     genomes = list(framework.genomes().keys())
     if genome_reps is None:
         genome_reps = genomes
@@ -572,6 +575,20 @@ def fast_MFPT(framework, model):
         output_dict[genome] = result[index]
     return output_dict
 
+def fast_FPT_Var(framework, model):
+    reg_rep, genomes = framework.fast_reg_rep_of_zs(model)
+    Q = reg_rep[1:,1:] # Remove the absorbing state
+    m = Q.shape[0] # n - 1
+    A = scipy.sparse.identity(m) - Q
+    t = scipy.sparse.linalg.cg(A, np.ones(m))[0]
+    t_sq = np.multiply(t, t)
+    t_var = 2 * scipy.sparse.linalg.cg(A, t)[0] - t - t_sq
+    result = [0] + t_var.tolist()
+    output_dict = {}
+    for genome, index in genomes.items():
+        output_dict[genome] = result[index]
+    return output_dict
+
 def fast_step_probabilities(framework, model, limit=20):
     reg_rep, genomes = framework.fast_reg_rep_of_zs(model)
     vector = reg_rep[0,:]
@@ -586,20 +603,20 @@ def fast_step_probabilities(framework, model, limit=20):
     identity = framework.one_row(framework.identity_instance())
     output_dict[identity][0] = 1
     return output_dict
-    
+   
 
 def dict_to_distance_matrix(distances, framework, genomes=None):
     """If need to convert to pairwise distances, supply a list of genomes."""
     if genomes is not None:
         D = np.zeros((len(genomes), len(genomes)))
-        for i in range(len(genomes)):
+        for i, genome_i in enumerate(genomes):
             canonical_i = framework.canonical_instance(
-                framework.random_instance(genomes[i])
+                framework.random_instance(genome_i)
             )
             distances_copy = {canonical_i * k: v for k, v in distances.items()}
-            for j in range(len(genomes)):
+            for j, genome_j in enumerate(genomes):
                 canonical_j = framework.canonical_instance(
-                    framework.random_instance(genomes[j])
+                    framework.random_instance(genome_j)
                 )
                 D[i, j] = distances_copy[canonical_j]
     else:
