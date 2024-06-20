@@ -1,0 +1,4 @@
+pickles/irreps_of_z_n6.pickle filter=lfs diff=lfs merge=lfs -text
+pickles/irreps_of_z_n7.pickle filter=lfs diff=lfs merge=lfs -text
+pickles/irreps_of_z_n8.pickle filter=lfs diff=lfs merge=lfs -text
+pickles/irreps_of_z_n9.pickle filter=lfs diff=lfs merge=lfs -text
