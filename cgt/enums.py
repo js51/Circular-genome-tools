@@ -22,7 +22,7 @@ class MODEL(Enum):
     # Deprecated options
     two_region_adjacent_transpositions = "transpositions of two adjacent regions"
     # Special models
-    all_inversions_larger_less_likely = "all inversions, with larger inversions less likely"
+    all_inversions_larger_less_likely = all_inversions_smaller_more_likely = "all inversions, with larger inversions less likely"
 
 class TYPE(Enum):
     reg_to_signed_pos = auto()

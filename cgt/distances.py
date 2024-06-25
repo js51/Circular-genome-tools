@@ -286,14 +286,14 @@ def prob_to_reach_in_steps_func(framework, model, sigma, use_eigenvectors=True):
     return prob_in_steps
 
 
-def discrete_MFPT(framework, model, genome_reps=None, verbose=False):
-    if genome_reps is None:
+def discrete_MFPT(framework, model, genome_instances=None, verbose=False):
+    if genome_instances is None:
         genomes = list(framework.genomes().keys())
-        genome_reps = genomes
+        genome_instances = genomes
     dists = {}
     a_star = framework.symmetry_group().order() / framework.genome_group().order()
     identity = framework.one_row(framework.genome_group().identity())
-    for instance in genome_reps:
+    for instance in genome_instances:
         if instance == identity:
             dists[instance] = 0
         else:
@@ -496,15 +496,15 @@ def likelihood_function(framework, model, genome, use_eigenvectors=True):
     return likelihood
 
 
-def min_distance(framework, model, genome_reps=None, weighted=False):
+def min_distance(framework, model, genome_instances=None, weighted=False):
     """Return dictionary of minimum distances ref->genome, using inverse of model probabilities as weights (or not)"""
     reg_rep = model.reg_rep_of_zs().toarray()
     if weighted:
         reg_rep[reg_rep != 0] = 1 / reg_rep[reg_rep != 0]
     graph = nx.Graph(reg_rep)
     genomes = list(framework.genomes().keys())
-    if genome_reps is None:
-        genome_reps = genomes
+    if genome_instances is None:
+        genome_instances = genomes
     return {
         rep: nx.shortest_path_length(
             graph,
@@ -512,19 +512,19 @@ def min_distance(framework, model, genome_reps=None, weighted=False):
             target=genomes.index(rep),
             weight="weight" if weighted else None,
         )
-        for r, rep in enumerate(genome_reps)
+        for r, rep in enumerate(genome_instances)
     }
 
 
-def min_distance_using_irreps(framework, model, genome_reps=None):
+def min_distance_using_irreps(framework, model, genome_instances=None):
     num_genomes = int(
         framework.genome_group().order() / framework.symmetry_group().order()
     )
-    if genome_reps is None:
+    if genome_instances is None:
         genomes = list(framework.genomes().keys())
-        genome_reps = genomes
+        genome_instances = genomes
     dists = {}
-    for rep in genome_reps:
+    for rep in genome_instances:
         a = prob_to_reach_in_steps_func(framework, model, rep)
         for k in range(0, num_genomes):
             if a(k) > 10 ** (-7):
@@ -542,7 +542,7 @@ def first_nonzero_value(framework, function, limit=None):
             break
     return first_k
 
-def MFPT(framework, model, genome_reps=None, scale_by=1):
+def MFPT(framework, model, genome_instances=None, scale_by=1):
     """Return the mean time elapsed rearranging ref->genome where the target is an absorbing state"""
     genomes = framework.genomes()
     reps = list(genomes.keys())
@@ -557,22 +557,25 @@ def MFPT(framework, model, genome_reps=None, scale_by=1):
 
     MFTP_distances = list(MFTP_dists())
     MFTP_distances = {rep: scale_by * MFTP_distances[r] for r, rep in enumerate(reps)}
-    if genome_reps is not None:
+    if genome_instances is not None:
         MFTP_distances = {
             rep: MFTP_distances[framework.canonical_instance(rep)]
-            for rep in genome_reps
+            for rep in genome_instances
         }
     return MFTP_distances
 
-def fast_MFPT(framework, model):
+def fast_MFPT(framework, model, genome_instances = None):
     reg_rep, genomes = framework.fast_reg_rep_of_zs(model)
     Q = reg_rep[1:,1:] # Remove the absorbing state
     m = Q.shape[0] # n - 1
     A = scipy.sparse.identity(m) - Q
     result = [0] + scipy.sparse.linalg.cg(A, np.ones(m))[0].tolist()
     output_dict = {}
+    if genome_instances is None:
+        genome_instances = genomes.keys()
     for genome, index in genomes.items():
-        output_dict[genome] = result[index]
+        if genome in genome_instances:
+            output_dict[genome] = result[index]
     return output_dict
 
 def fast_FPT_Var(framework, model):
@@ -640,7 +643,7 @@ def genomes_for_dist_matrix(framework, genomes):
 
 def get_distance_function(distance_type):
     match distance_type:
-        case DISTANCE.MFPT: return MFPT
+        case DISTANCE.MFPT: return fast_MFPT
         case DISTANCE.discrete_MFPT: return discrete_MFPT
         case DISTANCE.min: return min_distance_using_irreps
         case DISTANCE.MLE: return mles
@@ -667,7 +670,7 @@ def distance_matrix(
     pairs, need_distances = map(list, zip(*need_distances.items()))
 
     # Parameters
-    params = { "framework" : framework, "model" : model, "genome_reps" : need_distances }
+    params = { "framework" : framework, "model" : model, "genome_instances" : need_distances }
 
     # Compute the distances:
     distance_func = get_distance_function(distance)
