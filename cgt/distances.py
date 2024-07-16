@@ -516,6 +516,24 @@ def min_distance(framework, model, genome_instances=None, weighted=False):
     }
 
 
+def fast_min_distance(framework, model, genome_instances=None):
+    num_genomes = int(
+        framework.genome_group().order() / framework.symmetry_group().order()
+    )
+    if genome_instances is None:
+        genomes = list(framework.genomes().keys())
+        genome_instances = genomes
+    dists = {}
+    for rep in genome_instances:
+        stepwise_dists = fast_step_probabilities(framework, model)[rep]
+        def a(k):
+            return stepwise_dists[k]
+        for k in range(0, num_genomes):
+            if a(k) > 10 ** (-10):
+                dists[rep] = k
+                break
+    return dists
+
 def min_distance_using_irreps(framework, model, genome_instances=None):
     num_genomes = int(
         framework.genome_group().order() / framework.symmetry_group().order()
@@ -646,6 +664,7 @@ def get_distance_function(distance_type):
         case DISTANCE.MFPT: return fast_MFPT
         case DISTANCE.discrete_MFPT: return discrete_MFPT
         case DISTANCE.min: return min_distance_using_irreps
+        case DISTANCE.min_exact: return fast_min_distance
         case DISTANCE.MLE: return mles
         case DISTANCE.min_weighted: return min_distance
 
@@ -682,6 +701,8 @@ def distance_matrix(
         D[i, j] = distances[need_distances[p]]
 
     if replace_nan_with != np.nan:
+        if replace_nan_with == 'max':
+            replace_nan_with = D.max() + 0.1
         D[np.isnan(D)] = replace_nan_with
 
     return D

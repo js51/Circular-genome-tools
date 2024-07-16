@@ -19,7 +19,7 @@ def newick_to_tree(newick_string):
     return tree
 
 
-def evolve_on_tree(tree, framework, model, root="random", at_least_one_change=False, exactly_n_changes=None):
+def evolve_on_tree(tree, framework, model, root="random", at_least_one_change=False, exactly_n_changes=None, exactly_bl_changes=False):
     # The tree should be a networkx DiGraph
     # Choose a genome at the root of the tree
     if root == "random":
@@ -43,6 +43,8 @@ def evolve_on_tree(tree, framework, model, root="random", at_least_one_change=Fa
         # Decide how many rearrangements to apply
         if exactly_n_changes is not None:
             num_rearrangements = exactly_n_changes
+        elif exactly_bl_changes:
+            num_rearrangements = int(branch_length)
         else:
             num_rearrangements = np.random.poisson(branch_length)
         if at_least_one_change:

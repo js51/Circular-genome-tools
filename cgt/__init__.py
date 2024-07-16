@@ -19,3 +19,6 @@ from .position_paradigm import GenomeFramework, PositionParadigmFramework, Frame
 from .models import Model
 from . import distances
 from . import plotting
+import warnings
+# This is required because we have complex numbers arising from numerical error that we want to ignore
+warnings.filterwarnings("ignore", message="ComplexWarning")

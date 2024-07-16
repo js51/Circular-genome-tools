@@ -73,6 +73,7 @@ class DISTANCE(Enum):
     MFPT = mean_first_passage_time = auto()
     MLE = maximum_likelihood_distance = maximum_likelihood_estimate = auto()
     discrete_MFPT = DMFPT = discrete_mean_first_passage_time = auto()
+    min_exact = auto()
 
 class DATA(Enum):
     eig_data = 'eigen_data'
