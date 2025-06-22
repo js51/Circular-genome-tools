@@ -19,13 +19,13 @@ def newick_to_tree(newick_string):
     return tree
 
 
-def evolve_on_tree(tree, framework, model, root="random", at_least_one_change=False, exactly_n_changes=None, exactly_bl_changes=False):
+def  evolve_on_tree(tree, framework, model, root="random", at_least_one_change=False, exactly_n_changes=None, exactly_bl_changes=False):
     # The tree should be a networkx DiGraph
     # Choose a genome at the root of the tree
     if root == "random":
-        root = framework.random_genome()
+        root = framework.cycles(framework.random_instance())
     else:
-        root = framework.identity_genome()
+        root = framework.cycles(framework.identity_instance())
 
     # Get the root and set the genome at the root
     root_id = [n for n, d in tree.in_degree() if d == 0][0]
@@ -37,9 +37,10 @@ def evolve_on_tree(tree, framework, model, root="random", at_least_one_change=Fa
         # Get the genome at the parent node
         parent = tree.nodes[node]["genome"]
         # Get the branch length of the in-edge
-        branch_length = tree.nodes[successor]["weight"]
-        tree[node][successor]["weight"] = branch_length
-        tree[node][successor]["len"] = branch_length
+        if not exactly_n_changes:
+            branch_length = tree.nodes[successor]["weight"]
+            tree[node][successor]["weight"] = branch_length
+            tree[node][successor]["len"] = branch_length
         # Decide how many rearrangements to apply
         if exactly_n_changes is not None:
             num_rearrangements = exactly_n_changes
@@ -60,18 +61,11 @@ def evolve_on_tree(tree, framework, model, root="random", at_least_one_change=Fa
             # Draw a rearrangement
             rearrangement = draw_rearrangement(model)
             # Apply the rearrangement
-            formal_sum = tree.nodes[successor]["genome"] * rearrangement
-            selected_genome_instance = cgt.simulations.draw_genome(formal_sum)
+            selected_genome_instance = tree.nodes[successor]["genome"] * cgt.simulations.draw_genome(framework.symmetry_element()) * rearrangement
             canonical_instance = framework.canonical_instance(selected_genome_instance)
-            genome = framework.genome(
-                framework.cycles(
-                    framework.canonical_instance(selected_genome_instance)
-                ),
-                format=cgt.FORMAT.formal_sum,
-            )
             # Update the genome at the successor node
-            tree.nodes[successor]["genome"] = genome
-            tree.nodes[successor]["label"] = str(framework.collect_genome_terms(genome))
+            tree.nodes[successor]["genome"] = selected_genome_instance
+            tree.nodes[successor]["label"] = str(canonical_instance) + "z"
 
     return tree
 
@@ -148,3 +142,4 @@ def draw_genome(formal_sum):
 def set_node(node, framework, genome):
     node["genome"] = genome
     node["label"] = str(framework.canonical_instance(genome))
+
